@@ -8,18 +8,17 @@
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 :root{
-  --bg:#F7F5F0;--surface:#FFFFFF;--surface2:#F3F0EA;--border:#E3DDD5;--border2:#C9C2B6;
-  --ink:#1A1815;--ink2:#47443E;--ink3:#8C887F;
-  --aws:#F0561A;--aws-bg:#FFF0EB;--aws-border:#F7C4A6;
-  --blue:#1558C7;--blue-bg:#EBF1FF;--blue-border:#B8CDF5;
-  --green:#0D7A40;--green-bg:#E8F7EF;--green-border:#90D0AB;
-  --red:#C22B1E;--red-bg:#FEF0EE;--red-border:#F4ADA6;
-  --amber:#A85500;--amber-bg:#FFF8EB;--amber-border:#ECCE90;
-  --purple:#5B2FA6;--purple-bg:#F0ECFF;
-  --shadow-sm:0 1px 3px rgba(0,0,0,.05),0 2px 6px rgba(0,0,0,.04);
-  --shadow-card:0 1px 2px rgba(0,0,0,.04),0 3px 10px rgba(0,0,0,.05);
-  --r:10px;--r2:16px;
-  --font:'Outfit',system-ui,sans-serif;--font-serif:'DM Serif Display',Georgia,serif
+  --bg:#F5F3EE;--surface:#FFFFFF;--surface2:#F9F8F5;--border:#E2DED6;--border2:#CBC6BC;
+  --ink:#1C1A17;--ink2:#4A4740;--ink3:#8A8680;
+  --aws:#E8501A;--aws-bg:#FEF0EB;--aws-border:#F5C4B0;
+  --blue:#1D5FBF;--blue-bg:#EBF2FF;--blue-border:#BFCFE8;
+  --green:#1A7A4A;--green-bg:#EBF7F1;--green-border:#A8DABC;
+  --red:#C0392B;--red-bg:#FEF0EE;--red-border:#F5B8B2;
+  --amber:#B45309;--amber-bg:#FEF9EB;--amber-border:#E8D49A;
+  --purple:#5B3FA6;--purple-bg:#F2EEFF;
+  --r:10px;--r2:14px;
+  --font:'Outfit',system-ui,sans-serif;
+  --font-serif:'DM Serif Display',Georgia,serif
 }
 body{font-family:var(--font);background:var(--bg);color:var(--ink);min-height:100vh;font-size:16px;line-height:1.7}
 button,input{font-family:var(--font)}
@@ -27,67 +26,64 @@ button,input{font-family:var(--font)}
 
 /* ── LAYOUT ── */
 #app{display:flex;min-height:100vh}
-.sidebar{width:248px;flex-shrink:0;background:var(--surface);border-right:1.5px solid var(--border);display:flex;flex-direction:column;position:sticky;top:0;height:100vh;overflow-y:auto;scrollbar-width:thin;scrollbar-color:var(--border) transparent}
+.sidebar{width:240px;flex-shrink:0;background:var(--surface);border-right:1.5px solid var(--border);display:flex;flex-direction:column;position:sticky;top:0;height:100vh;overflow-y:auto}
 .main{flex:1;overflow-x:hidden;background:var(--bg)}
-.view{max-width:880px;padding:40px 48px 80px;animation:fadeUp .22s ease both}
-@keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.view{max-width:860px;padding:40px 44px 80px;animation:fadeUp .2s ease both}
+@keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
 
 /* ── SIDEBAR ── */
-.sb-top{padding:20px 16px 16px;border-bottom:1.5px solid var(--border)}
+.sb-top{padding:22px 20px 18px;border-bottom:1.5px solid var(--border)}
 .sb-logo{display:flex;align-items:center;gap:10px}
-.sb-badge{background:linear-gradient(135deg,#F0561A,#FF8A50);color:#fff;font-size:11px;font-weight:700;padding:5px 10px;border-radius:8px;letter-spacing:.5px;box-shadow:0 2px 8px rgba(240,86,26,.35)}
-.sb-title{font-size:14px;font-weight:700;color:var(--ink)}
-.sb-subtitle{font-size:11px;color:var(--ink3);margin-top:1px}
-.sb-section{padding:14px 10px 6px}
-.sb-label{font-size:10px;font-weight:700;color:var(--ink3);text-transform:uppercase;letter-spacing:1.2px;padding:0 8px 8px;display:flex;align-items:center;gap:6px}
-.sb-label::after{content:'';flex:1;height:1px;background:var(--border)}
-.sb-item{display:flex;align-items:center;gap:9px;width:100%;padding:8px 10px;border-radius:10px;border:none;background:none;color:var(--ink2);font-size:13.5px;font-weight:500;cursor:pointer;text-align:left;transition:all .15s;position:relative}
+.sb-badge{background:var(--aws);color:#fff;font-size:11px;font-weight:700;padding:4px 9px;border-radius:6px;letter-spacing:.4px}
+.sb-title{font-size:15px;font-weight:700;color:var(--ink)}
+.sb-subtitle{font-size:12px;color:var(--ink3);margin-top:2px}
+
+.sb-section{padding:16px 12px 8px}
+.sb-label{font-size:10px;font-weight:700;color:var(--ink3);text-transform:uppercase;letter-spacing:1px;padding:0 8px 6px}
+.sb-item{display:flex;align-items:center;gap:9px;width:100%;padding:8px 10px;border-radius:8px;border:none;background:none;color:var(--ink2);font-size:14px;font-weight:500;cursor:pointer;text-align:left;transition:all .13s}
 .sb-item:hover{background:var(--surface2);color:var(--ink)}
 .sb-item.active{background:var(--aws-bg);color:var(--aws);font-weight:600}
-.sb-item.active::before{content:'';position:absolute;left:0;top:22%;height:56%;width:3px;background:var(--aws);border-radius:0 3px 3px 0}
-.sb-item.active .si-dot{background:var(--aws);box-shadow:0 0 0 3px rgba(240,86,26,.15)}
-.si-dot{width:8px;height:8px;border-radius:50%;background:var(--border2);flex-shrink:0;transition:all .15s}
+.sb-item.active .si-dot{background:var(--aws)}
+.si-dot{width:7px;height:7px;border-radius:50%;background:var(--border2);flex-shrink:0;transition:background .13s}
 .sb-item:hover .si-dot{background:var(--ink3)}
-.sb-rate{font-size:10px;font-weight:700;margin-left:auto;padding:1px 6px;border-radius:5px}
-
-/* ── SIDEBAR PROGRESS ── */
-.sb-prog{height:3px;background:var(--border);border-radius:2px;margin-top:5px;overflow:hidden;margin-left:16px;width:calc(100% - 28px)}
-.sb-prog-fill{height:100%;border-radius:2px;transition:width .5s}
+.sb-rate{font-size:10px;font-weight:700;margin-left:auto;padding:1px 5px;border-radius:4px}
 
 /* ── PAGE HEADER ── */
-.pg-hdr{margin-bottom:36px;padding-bottom:28px;border-bottom:2px solid var(--border)}
-.pg-back{display:inline-flex;align-items:center;gap:5px;font-size:12.5px;color:var(--ink3);border:none;background:none;cursor:pointer;padding:0;margin-bottom:16px;transition:color .13s}
+.pg-hdr{margin-bottom:32px;padding-bottom:24px;border-bottom:1.5px solid var(--border)}
+.pg-back{display:inline-flex;align-items:center;gap:5px;font-size:13px;color:var(--ink3);border:none;background:none;cursor:pointer;padding:0;margin-bottom:12px;transition:color .13s}
 .pg-back:hover{color:var(--ink)}
-.pg-icon{font-size:32px;margin-bottom:10px;display:block}
-.pg-title{font-family:var(--font-serif);font-size:34px;font-weight:400;color:var(--ink);line-height:1.18;margin-bottom:8px}
-.pg-sub{font-size:15px;color:var(--ink3);font-weight:400;line-height:1.6}
-.pg-tags{display:flex;gap:6px;margin-top:14px;flex-wrap:wrap}
-.pg-tag{font-size:11px;font-weight:600;padding:4px 10px;border-radius:20px;letter-spacing:.3px}
+.pg-icon{font-size:28px;margin-bottom:8px}
+.pg-title{font-family:var(--font-serif);font-size:28px;font-weight:400;color:var(--ink);line-height:1.25;margin-bottom:6px}
+.pg-sub{font-size:15px;color:var(--ink3);font-weight:400}
+.pg-tags{display:flex;gap:6px;margin-top:12px;flex-wrap:wrap}
+.pg-tag{font-size:11px;font-weight:600;padding:3px 9px;border-radius:20px;letter-spacing:.3px}
 
 /* ── SECTION CARD ── */
-.s-card{background:var(--surface);border:1.5px solid var(--border);border-radius:var(--r2);padding:26px;margin-bottom:16px;box-shadow:var(--shadow-card)}
-.s-card h3{font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--ink3);margin-bottom:18px;display:flex;align-items:center;gap:8px}
-.s-card h3::after{content:'';flex:1;height:1px;background:var(--border)}
+.s-card{background:var(--surface);border:1.5px solid var(--border);border-radius:var(--r2);padding:24px;margin-bottom:16px}
+.s-card h3{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.9px;color:var(--ink3);margin-bottom:18px}
+.s-card + .s-card{margin-top:0}
 
 /* ── BULLET LIST ── */
 .bl{display:grid;gap:10px}
-.bl-item{display:flex;gap:12px;font-size:15px;color:var(--ink2);line-height:1.75;align-items:flex-start}
-.bl-dot{width:7px;height:7px;border-radius:50%;background:var(--aws);flex-shrink:0;margin-top:9px;box-shadow:0 0 0 3px var(--aws-bg)}
+.bl-item{display:flex;gap:12px;font-size:15px;color:var(--ink2);line-height:1.7;align-items:flex-start}
+.bl-dot{width:6px;height:6px;border-radius:50%;background:var(--aws);flex-shrink:0;margin-top:9px}
 .bl-item strong{color:var(--ink);font-weight:600}
-.bl-item em{color:var(--aws);font-style:normal;font-weight:600}
+.bl-item em{color:var(--aws);font-style:normal;font-weight:500}
 
 /* ── PROPERTY LIST ── */
 .pl{display:grid;gap:0}
-.pl-row{display:grid;grid-template-columns:148px 1fr;gap:16px;padding:11px 0;border-bottom:1px solid var(--border);font-size:15px;align-items:baseline}
+.pl-row{display:grid;grid-template-columns:140px 1fr;gap:16px;padding:10px 0;border-bottom:1px solid var(--border);font-size:15px;align-items:baseline}
 .pl-row:last-child{border-bottom:none}
 .pl-k{font-size:13px;font-weight:600;color:var(--ink3)}
 .pl-v{color:var(--ink2)}
 
 /* ── TABLE ── */
-.tbl-wrap{overflow-x:auto;border-radius:var(--r);border:1.5px solid var(--border);margin-bottom:4px}
+.tbl-wrap{overflow-x:auto;margin:0 -2px}
 .tbl{width:100%;border-collapse:collapse;font-size:14px}
-.tbl th{text-align:left;padding:11px 14px;background:var(--surface2);font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;color:var(--ink3);border-bottom:1.5px solid var(--border)}
-.tbl td{padding:12px 14px;border-bottom:1px solid var(--border);color:var(--ink2);vertical-align:top;line-height:1.6}
+.tbl th{text-align:left;padding:10px 14px;background:var(--surface2);font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;color:var(--ink3);border-bottom:1.5px solid var(--border)}
+.tbl th:first-child{border-radius:var(--r) 0 0 0}
+.tbl th:last-child{border-radius:0 var(--r) 0 0}
+.tbl td{padding:11px 14px;border-bottom:1px solid var(--border);color:var(--ink2);vertical-align:top;line-height:1.6}
 .tbl td:first-child{font-weight:600;color:var(--ink);font-size:13px}
 .tbl tr:last-child td{border-bottom:none}
 .tbl tr:hover td{background:var(--surface2)}
@@ -97,81 +93,79 @@ button,input{font-family:var(--font)}
 .na{color:var(--ink3);font-style:italic}
 
 /* ── FORMULA / CODE ── */
-.formula{background:#1A1815;color:#EAE6DC;border-radius:var(--r);padding:20px 22px;margin:4px 0;font-family:'SFMono-Regular',Consolas,monospace;font-size:13.5px;line-height:1.9;border:1px solid rgba(255,255,255,.05)}
+.formula{background:var(--ink);color:#E8E4DB;border-radius:var(--r);padding:18px 20px;margin:4px 0;font-family:'SFMono-Regular',Consolas,monospace;font-size:13.5px;line-height:1.85}
 .formula-lbl{font-size:10px;font-weight:700;color:var(--ink3);text-transform:uppercase;letter-spacing:.8px;margin-bottom:8px;font-family:var(--font)}
-.code-inline{font-family:'SFMono-Regular',Consolas,monospace;font-size:12.5px;background:var(--surface2);border:1px solid var(--border);padding:2px 7px;border-radius:5px;color:var(--blue)}
+.code-inline{font-family:'SFMono-Regular',Consolas,monospace;font-size:13px;background:var(--surface2);border:1px solid var(--border);padding:1px 6px;border-radius:4px;color:var(--blue)}
 
 /* ── TRAP ── */
-.trap{border-radius:var(--r);padding:14px 16px;margin-bottom:10px;font-size:14px;line-height:1.75;display:flex;gap:12px;align-items:flex-start;border:1.5px solid}
-.trap-icon{font-size:16px;flex-shrink:0;margin-top:2px}
-.trap.red{background:var(--red-bg);border-color:var(--red-border)}
-.trap.amber{background:var(--amber-bg);border-color:var(--amber-border)}
+.trap{border-radius:var(--r);padding:14px 16px;margin-bottom:10px;font-size:14px;line-height:1.75;border-left:3px solid;display:flex;gap:12px;align-items:flex-start}
+.trap-icon{font-size:15px;flex-shrink:0;margin-top:1px}
+.trap.red{background:var(--red-bg);border-color:var(--red)}
+.trap.amber{background:var(--amber-bg);border-color:var(--amber)}
 .trap strong{font-weight:700;color:var(--ink);display:block;margin-bottom:3px}
-.trap-freq{font-size:10px;font-weight:700;padding:2px 7px;border-radius:5px;margin-left:4px;vertical-align:middle;display:inline-block}
-.trap.red .trap-freq{background:var(--red);color:#fff}
-.trap.amber .trap-freq{background:var(--amber);color:#fff}
+.trap-freq{font-size:10px;font-weight:700;padding:2px 7px;border-radius:4px;margin-left:4px;vertical-align:middle;display:inline-block}
+.trap.red .trap-freq{background:var(--red-bg);color:var(--red)}
+.trap.amber .trap-freq{background:var(--amber-bg);color:var(--amber)}
 
 /* ── FLOW STEPS ── */
 .flow{display:flex;flex-direction:column}
 .flow-step{display:flex;gap:14px}
-.flow-n{width:30px;height:30px;border-radius:50%;background:var(--aws);color:#fff;font-size:13px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px;box-shadow:0 2px 8px rgba(240,86,26,.3)}
-.flow-body{padding-bottom:22px;padding-left:6px;border-left:2px solid var(--border);margin-left:14px;flex:1;font-size:15px;color:var(--ink2);line-height:1.75}
+.flow-n{width:28px;height:28px;border-radius:50%;background:var(--aws-bg);border:2px solid var(--aws-border);color:var(--aws);font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:3px}
+.flow-body{padding-bottom:22px;padding-left:4px;border-left:2px dashed var(--border);margin-left:14px;flex:1;font-size:15px;color:var(--ink2);line-height:1.7}
 .flow-step:last-child .flow-body{border-left-color:transparent;padding-bottom:0}
 .flow-body strong{color:var(--ink)}
 
 /* ── HOME ── */
 .home-section{margin-bottom:36px}
-.home-label{font-size:11px;font-weight:700;color:var(--ink3);text-transform:uppercase;letter-spacing:.9px;margin-bottom:16px;display:flex;align-items:center;gap:8px}
+.home-label{font-size:11px;font-weight:700;color:var(--ink3);text-transform:uppercase;letter-spacing:.9px;margin-bottom:14px;display:flex;align-items:center;gap:8px}
 .home-label::after{content:'';flex:1;height:1px;background:var(--border)}
-.svc-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(215px,1fr));gap:10px}
-.svc-card{background:var(--surface);border:1.5px solid var(--border);border-radius:var(--r2);padding:20px;cursor:pointer;transition:all .2s ease;box-shadow:var(--shadow-card)}
-.svc-card:hover{border-color:var(--aws-border);box-shadow:0 6px 24px rgba(240,86,26,.12);transform:translateY(-2px)}
-.svc-icon{font-size:24px;margin-bottom:12px}
+.svc-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:10px}
+.svc-card{background:var(--surface);border:1.5px solid var(--border);border-radius:var(--r2);padding:18px 20px;cursor:pointer;transition:all .15s}
+.svc-card:hover{border-color:var(--aws-border);box-shadow:0 2px 12px rgba(0,0,0,.06);transform:translateY(-1px)}
+.svc-icon{font-size:22px;margin-bottom:10px}
 .svc-name{font-size:15px;font-weight:700;margin-bottom:4px}
 .svc-desc{font-size:13px;color:var(--ink3);line-height:1.5}
 .svc-tags{display:flex;gap:5px;margin-top:12px;flex-wrap:wrap}
-.svc-tag{font-size:11px;font-weight:600;padding:2px 9px;border-radius:12px}
+.svc-tag{font-size:11px;font-weight:600;padding:2px 8px;border-radius:12px}
 
 /* ── TABS ── */
-.tabs{display:flex;gap:3px;margin-bottom:20px;background:var(--surface2);border:1.5px solid var(--border);border-radius:var(--r);padding:4px}
-.tab-btn{flex:1;padding:8px 12px;border-radius:7px;border:none;background:transparent;color:var(--ink3);font-size:13px;font-weight:500;cursor:pointer;transition:all .15s}
-.tab-btn.active{background:var(--surface);color:var(--ink);font-weight:600;box-shadow:var(--shadow-sm)}
+.tabs{display:flex;gap:4px;margin-bottom:20px;background:var(--surface2);border:1.5px solid var(--border);border-radius:var(--r);padding:4px}
+.tab-btn{flex:1;padding:8px 12px;border-radius:7px;border:none;background:transparent;color:var(--ink3);font-size:13px;font-weight:500;cursor:pointer;transition:all .13s}
+.tab-btn.active{background:var(--surface);color:var(--ink);font-weight:600;box-shadow:0 1px 4px rgba(0,0,0,.08)}
 .tab-panel{display:none}
 .tab-panel.active{display:block;animation:fadeUp .15s ease both}
 
 /* ── QUIZ ── */
 .qz-header{display:flex;align-items:center;gap:14px;margin-bottom:24px}
-.qz-prog-wrap{flex:1;height:6px;background:var(--border);border-radius:4px;overflow:hidden}
-.qz-prog-fill{height:100%;background:linear-gradient(90deg,var(--aws),#FF8A50);border-radius:4px;transition:width .4s ease}
+.qz-prog-wrap{flex:1;height:5px;background:var(--border);border-radius:3px;overflow:hidden}
+.qz-prog-fill{height:100%;background:var(--aws);border-radius:3px;transition:width .35s ease}
 .qz-label{font-size:13px;color:var(--ink3);white-space:nowrap}
-.qz-score{font-size:13px;font-weight:600;color:var(--ink);background:var(--surface2);border:1px solid var(--border);padding:4px 14px;border-radius:20px}
+.qz-score{font-size:13px;font-weight:600;color:var(--ink);background:var(--surface2);border:1px solid var(--border);padding:4px 12px;border-radius:20px}
 
-.q-card{background:var(--surface);border:1.5px solid var(--border);border-radius:var(--r2);padding:28px;margin-bottom:14px;box-shadow:var(--shadow-card)}
-.q-meta{display:flex;align-items:center;gap:8px;margin-bottom:16px}
-.q-topic{font-size:11px;font-weight:700;padding:4px 10px;border-radius:6px;background:var(--aws-bg);color:var(--aws);border:1px solid var(--aws-border)}
+.q-card{background:var(--surface);border:1.5px solid var(--border);border-radius:var(--r2);padding:24px;margin-bottom:14px}
+.q-meta{display:flex;align-items:center;gap:8px;margin-bottom:14px}
+.q-topic{font-size:11px;font-weight:700;padding:3px 9px;border-radius:5px;background:var(--aws-bg);color:var(--aws)}
 .q-diff{font-size:12px;color:var(--ink3)}
-.q-text{font-size:16px;line-height:1.85;color:var(--ink)}
-.q-text em{font-style:normal;color:var(--aws);font-weight:600;background:var(--aws-bg);padding:1px 5px;border-radius:4px}
+.q-text{font-size:16px;line-height:1.8;color:var(--ink)}
+.q-text em{font-style:normal;color:var(--aws);font-weight:600}
 .q-text .code-inline{font-size:13.5px}
 
-.choices{display:grid;gap:10px;margin-bottom:14px}
-.choice{display:flex;align-items:flex-start;gap:14px;padding:16px 18px;border:1.5px solid var(--border);border-radius:var(--r2);cursor:pointer;transition:all .2s cubic-bezier(.34,1.3,.64,1);font-size:15px;line-height:1.65;color:var(--ink2);background:var(--surface);box-shadow:var(--shadow-sm)}
-.choice:hover:not(.disabled){border-color:var(--blue-border);background:var(--blue-bg);color:var(--ink);transform:translateX(4px);box-shadow:0 4px 14px rgba(21,88,199,.1)}
-.choice.sel{border-color:var(--blue-border);background:var(--blue-bg);color:var(--ink);transform:translateX(4px)}
-.choice.correct{border-color:var(--green-border);background:var(--green-bg);animation:bounceChoice .3s ease}
+.choices{display:grid;gap:9px;margin-bottom:14px}
+.choice{display:flex;align-items:flex-start;gap:12px;padding:14px 16px;border:1.5px solid var(--border);border-radius:var(--r);cursor:pointer;transition:all .13s;font-size:15px;line-height:1.65;color:var(--ink2);background:var(--surface)}
+.choice:hover:not(.disabled){border-color:var(--blue-border);background:var(--blue-bg);color:var(--ink)}
+.choice.sel{border-color:var(--blue-border);background:var(--blue-bg);color:var(--ink)}
+.choice.correct{border-color:var(--green-border);background:var(--green-bg)}
 .choice.wrong{border-color:var(--red-border);background:var(--red-bg)}
 .choice.reveal{border-color:var(--green-border);background:var(--green-bg)}
 .choice.disabled{cursor:default}
-@keyframes bounceChoice{0%{transform:scale(.98)}50%{transform:scale(1.01)}100%{transform:scale(1)}}
-
-.ck{width:28px;height:28px;border-radius:8px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;background:var(--surface2);border:1.5px solid var(--border);color:var(--ink3);margin-top:1px;transition:all .15s}
+.ck{width:26px;height:26px;border-radius:6px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;background:var(--surface2);border:1px solid var(--border);color:var(--ink3);margin-top:1px;transition:all .13s}
 .choice:hover:not(.disabled) .ck{background:var(--blue-bg);border-color:var(--blue-border);color:var(--blue)}
-.choice.sel .ck{background:var(--blue);border-color:var(--blue);color:#fff}
-.choice.correct .ck{background:var(--green);border-color:var(--green);color:#fff}
-.choice.wrong .ck{background:var(--red);border-color:var(--red);color:#fff}
-.choice.reveal .ck{background:var(--green);border-color:var(--green);color:#fff}
+.choice.sel .ck{background:var(--blue-bg);border-color:var(--blue-border);color:var(--blue)}
+.choice.correct .ck{background:var(--green-bg);border-color:var(--green-border);color:var(--green)}
+.choice.wrong .ck{background:var(--red-bg);border-color:var(--red-border);color:var(--red)}
+.choice.reveal .ck{background:var(--green-bg);border-color:var(--green-border);color:var(--green)}
 
-.exp-box{border-radius:var(--r);padding:18px 20px;margin-bottom:14px;font-size:14px;line-height:1.85}
+.exp-box{border-radius:var(--r);padding:16px 18px;margin-bottom:14px;font-size:14px;line-height:1.8}
 .exp-box.c{background:var(--green-bg);border:1.5px solid var(--green-border)}
 .exp-box.w{background:var(--red-bg);border:1.5px solid var(--red-border)}
 .exp-title{font-size:15px;font-weight:700;margin-bottom:8px}
@@ -179,79 +173,76 @@ button,input{font-family:var(--font)}
 .exp-box.w .exp-title{color:var(--red)}
 .exp-body{color:var(--ink2)}
 .exp-body strong{color:var(--ink);font-weight:600}
-.exp-rule-box{background:linear-gradient(135deg,#FFF8EB,#FFF3DC);border:1.5px solid var(--amber-border);border-radius:8px;padding:12px 16px;margin-top:12px;font-size:13.5px;color:var(--ink2);font-weight:500}
+.exp-rule-box{background:var(--surface2);border:1px solid var(--border);border-radius:7px;padding:10px 14px;margin-top:10px;font-size:13px;color:var(--ink3)}
 .exp-rule-box::before{content:'📌  ';font-size:13px}
-.why-wrong-box{background:var(--amber-bg);border:1.5px solid var(--amber-border);border-radius:8px;padding:12px 16px;margin-top:10px;font-size:13px;color:var(--ink2);line-height:1.7}
-.why-wrong-box::before{content:'其他选项为何错：';display:block;font-size:10px;font-weight:700;color:var(--amber);text-transform:uppercase;letter-spacing:.7px;margin-bottom:5px}
+.why-wrong-box{background:var(--amber-bg);border:1px solid var(--amber-border);border-radius:7px;padding:10px 14px;margin-top:8px;font-size:13px;color:var(--ink2);line-height:1.7}
+.why-wrong-box::before{content:'其他选项为何错：';display:block;font-size:11px;font-weight:700;color:var(--amber);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px}
 
 /* ── BUTTONS ── */
-.btn{display:inline-flex;align-items:center;gap:7px;padding:11px 22px;border-radius:10px;font-size:14px;font-weight:600;cursor:pointer;border:none;transition:all .15s}
-.btn-primary{background:linear-gradient(135deg,var(--aws),#FF7A45);color:#fff;box-shadow:0 2px 10px rgba(240,86,26,.3)}
-.btn-primary:hover{filter:brightness(1.06);box-shadow:0 4px 16px rgba(240,86,26,.4);transform:translateY(-1px)}
-.btn-sec{background:var(--surface);color:var(--ink);border:1.5px solid var(--border);box-shadow:var(--shadow-sm)}.btn-sec:hover{border-color:var(--border2);background:var(--surface2)}
+.btn{display:inline-flex;align-items:center;gap:7px;padding:10px 20px;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;border:none;transition:all .13s}
+.btn-primary{background:var(--aws);color:#fff}.btn-primary:hover{filter:brightness(1.08)}
+.btn-sec{background:var(--surface);color:var(--ink);border:1.5px solid var(--border)}.btn-sec:hover{border-color:var(--border2);background:var(--surface2)}
 .btn-ghost{background:transparent;color:var(--ink3);padding:10px 14px}.btn-ghost:hover{color:var(--ink);background:var(--surface2)}
 .btn-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:4px}
 .btn:disabled{opacity:.4;cursor:default;pointer-events:none}
 
 /* ── RESULT ── */
-.res-card{background:var(--surface);border:1.5px solid var(--border);border-radius:var(--r2);padding:40px;text-align:center;margin-bottom:20px;box-shadow:var(--shadow-card)}
-.res-num{font-family:var(--font-serif);font-size:72px;line-height:1;margin-bottom:6px}
+.res-card{background:var(--surface);border:1.5px solid var(--border);border-radius:var(--r2);padding:36px;text-align:center;margin-bottom:20px}
+.res-num{font-family:var(--font-serif);font-size:64px;line-height:1;margin-bottom:6px}
 .res-num.p{color:var(--green)}.res-num.g{color:var(--blue)}.res-num.a{color:var(--amber)}.res-num.r{color:var(--red)}
 .res-pct{font-size:16px;color:var(--ink3);margin-bottom:10px}
-.res-msg{font-size:16px;color:var(--ink2)}
-.wi{background:var(--surface);border:1.5px solid var(--red-border);border-radius:10px;padding:14px 18px;font-size:14px;color:var(--ink2);margin-bottom:8px;line-height:1.6}
-.wi-t{display:inline-block;font-size:10px;font-weight:700;padding:2px 7px;border-radius:5px;background:var(--red);color:#fff;margin-right:6px;vertical-align:middle}
+.res-msg{font-size:15px;color:var(--ink2)}
+.wi{background:var(--surface);border:1.5px solid var(--red-border);border-radius:8px;padding:12px 16px;font-size:14px;color:var(--ink2);margin-bottom:8px;line-height:1.55}
+.wi-t{display:inline-block;font-size:10px;font-weight:700;padding:2px 7px;border-radius:4px;background:var(--red-bg);color:var(--red);margin-right:6px;vertical-align:middle}
 
 /* ── TOPIC PICKER ── */
-.topic-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(185px,1fr));gap:10px;margin-bottom:24px}
-.topic-btn{background:var(--surface);border:1.5px solid var(--border);border-radius:var(--r2);padding:18px;cursor:pointer;text-align:left;transition:all .2s ease;box-shadow:var(--shadow-sm)}
-.topic-btn:hover{border-color:var(--aws-border);background:var(--aws-bg);box-shadow:0 4px 16px rgba(240,86,26,.1);transform:translateY(-2px)}
+.topic-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:10px;margin-bottom:20px}
+.topic-btn{background:var(--surface);border:1.5px solid var(--border);border-radius:var(--r);padding:16px;cursor:pointer;text-align:left;transition:all .13s}
+.topic-btn:hover{border-color:var(--aws-border);background:var(--aws-bg)}
 .tb-name{font-size:15px;font-weight:700;margin-bottom:4px}
 .tb-count{font-size:12px;color:var(--ink3)}
-.tb-bar{height:4px;background:var(--border);border-radius:3px;margin-top:12px;overflow:hidden}
-.tb-fill{height:100%;border-radius:3px;background:linear-gradient(90deg,var(--aws),#FF8A50);transition:width .5s}
+.tb-bar{height:3px;background:var(--border);border-radius:2px;margin-top:10px;overflow:hidden}
+.tb-fill{height:100%;border-radius:2px;transition:width .5s}
 
 /* ── COMPARE ── */
-.compare-hero{background:linear-gradient(135deg,#1A1815 0%,#2C2720 60%,#3A2515 100%);color:#F5F0E8;border-radius:var(--r2);padding:32px;margin-bottom:20px;position:relative;overflow:hidden}
-.compare-hero::before{content:'';position:absolute;top:-60px;right:-60px;width:240px;height:240px;background:radial-gradient(circle,rgba(240,86,26,.18),transparent 70%);pointer-events:none}
-.compare-hero h2{font-family:var(--font-serif);font-size:26px;font-weight:400;margin-bottom:8px}
-.compare-hero p{font-size:14px;opacity:.65;line-height:1.7}
+.compare-hero{background:linear-gradient(135deg,#1C1A17 0%,#2D2A24 100%);color:#F5F3EE;border-radius:var(--r2);padding:28px;margin-bottom:20px}
+.compare-hero h2{font-family:var(--font-serif);font-size:22px;font-weight:400;margin-bottom:6px}
+.compare-hero p{font-size:14px;opacity:.7}
 
 /* ── KEYWORD BADGE ── */
-.kw-box{background:linear-gradient(135deg,#0F172A,#1B2840);border-radius:var(--r);padding:16px 18px;margin:12px 0;display:flex;flex-wrap:wrap;gap:7px;align-items:center;border:1px solid rgba(255,255,255,.05)}
-.kw-box::before{content:'🔑  考试关键词';font-size:10px;font-weight:700;color:#8A9BBF;text-transform:uppercase;letter-spacing:1.2px;display:block;width:100%;margin-bottom:8px}
-.kw{display:inline-flex;align-items:center;gap:5px;padding:5px 11px;border-radius:20px;font-size:12px;font-weight:600;background:#1E3A5F;color:#93C5FD;border:1px solid rgba(29,78,216,.2)}
-.kw.green{background:#14532D;color:#86EFAC;border-color:rgba(22,101,52,.2)}
-.kw.amber{background:#451A03;color:#FCD34D;border-color:rgba(120,53,15,.2)}
-.kw.red{background:#450A0A;color:#FCA5A5;border-color:rgba(127,29,29,.2)}
-.kw.purple{background:#2E1065;color:#C4B5FD;border-color:rgba(76,29,149,.2)}
+.kw-box{background:linear-gradient(135deg,#0F172A,#1E293B);border-radius:var(--r);padding:16px 18px;margin:12px 0;display:flex;flex-wrap:wrap;gap:7px;align-items:center}
+.kw-box::before{content:'🔑 考试关键词';font-size:10px;font-weight:700;color:#94A3B8;text-transform:uppercase;letter-spacing:1px;display:block;width:100%;margin-bottom:6px}
+.kw{display:inline-flex;align-items:center;gap:5px;padding:4px 10px;border-radius:20px;font-size:12px;font-weight:600;background:#1E3A5F;color:#93C5FD;border:1px solid #1D4ED840}
+.kw.green{background:#14532D;color:#86EFAC;border-color:#16653140}
+.kw.amber{background:#451A03;color:#FCD34D;border-color:#78350F40}
+.kw.red{background:#450A0A;color:#FCA5A5;border-color:#7F1D1D40}
+.kw.purple{background:#2E1065;color:#C4B5FD;border-color:#4C1D9540}
 
 /* ── DASHBOARD STATS ── */
 .stat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:28px}
-.stat-card{background:var(--surface);border:1.5px solid var(--border);border-radius:var(--r2);padding:20px 16px;position:relative;overflow:hidden;box-shadow:var(--shadow-card)}
-.stat-card::before{content:'';position:absolute;top:0;left:0;right:0;height:4px}
-.stat-card.blue::before{background:linear-gradient(90deg,var(--blue),#4A90E2)}
-.stat-card.green::before{background:linear-gradient(90deg,var(--green),#34C47C)}
-.stat-card.aws::before{background:linear-gradient(90deg,var(--aws),#FF8A50)}
-.stat-card.amber::before{background:linear-gradient(90deg,var(--amber),#E8A44A)}
-.stat-num{font-family:var(--font-serif);font-size:38px;font-weight:400;line-height:1;margin-bottom:5px}
+.stat-card{background:var(--surface);border:1.5px solid var(--border);border-radius:var(--r2);padding:18px 16px;position:relative;overflow:hidden}
+.stat-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px}
+.stat-card.blue::before{background:var(--blue)}
+.stat-card.green::before{background:var(--green)}
+.stat-card.aws::before{background:var(--aws)}
+.stat-card.amber::before{background:var(--amber)}
+.stat-num{font-family:var(--font-serif);font-size:36px;font-weight:400;line-height:1;margin-bottom:4px}
 .stat-label{font-size:12px;color:var(--ink3);font-weight:500}
 .stat-sub{font-size:11px;color:var(--ink3);margin-top:3px}
 
 /* ── STUDY PATH ── */
-.path-item{display:flex;align-items:center;gap:12px;padding:12px 16px;border-radius:var(--r2);font-size:14px;cursor:pointer;transition:all .15s;border:1.5px solid var(--border);background:var(--surface);margin-bottom:8px;box-shadow:var(--shadow-sm)}
-.path-item:hover{border-color:var(--aws-border);background:var(--aws-bg);box-shadow:0 2px 12px rgba(240,86,26,.08)}
-.path-status{width:24px;height:24px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700}
-.path-status.done{background:var(--green);color:#fff}
-.path-status.next{background:var(--aws);color:#fff;animation:pulseGlow 2s infinite}
+.path-item{display:flex;align-items:center;gap:12px;padding:10px 14px;border-radius:var(--r);font-size:14px;cursor:pointer;transition:all .13s;border:1.5px solid var(--border);background:var(--surface);margin-bottom:6px}
+.path-item:hover{border-color:var(--aws-border);background:var(--aws-bg)}
+.path-status{width:22px;height:22px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700}
+.path-status.done{background:var(--green-bg);color:var(--green);border:2px solid var(--green-border)}
+.path-status.next{background:var(--aws-bg);color:var(--aws);border:2px solid var(--aws-border)}
 .path-status.todo{background:var(--surface2);color:var(--ink3);border:2px solid var(--border)}
-@keyframes pulseGlow{0%,100%{box-shadow:0 0 0 0 rgba(240,86,26,.4)}50%{box-shadow:0 0 0 6px rgba(240,86,26,0)}}
 .path-name{flex:1;font-weight:600;color:var(--ink)}
 .path-rate{font-size:12px;font-weight:700}
 
 /* ── EXAM TIP CARD ── */
 .tip-card{background:linear-gradient(135deg,var(--purple-bg),#EEF2FF);border:1.5px solid #C4B5FD;border-radius:var(--r2);padding:20px 22px;margin-bottom:20px}
-.tip-label{font-size:10px;font-weight:700;color:var(--purple);text-transform:uppercase;letter-spacing:1.2px;margin-bottom:8px}
+.tip-label{font-size:10px;font-weight:700;color:var(--purple);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px}
 .tip-text{font-size:15px;color:var(--ink2);line-height:1.8}
 
 /* ── PROGRESS RING ── */
@@ -259,29 +250,54 @@ button,input{font-family:var(--font)}
 .prog-ring-label{font-size:12px;color:var(--ink3);font-weight:500;text-align:center}
 
 /* ── KEYBOARD HINT ── */
-.kbd-hint{display:inline-flex;align-items:center;gap:4px;font-size:11px;color:var(--ink3);background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:2px 8px}
+.kbd-hint{display:inline-flex;align-items:center;gap:4px;font-size:11px;color:var(--ink3);background:var(--surface2);border:1px solid var(--border);border-radius:5px;padding:2px 7px}
 .kbd-hint kbd{font-family:var(--font);font-size:10px;font-weight:700;color:var(--ink2)}
+
+/* ── SIDEBAR PROGRESS ── */
+.sb-prog{height:3px;background:var(--border);border-radius:2px;margin-top:5px;overflow:hidden;margin-left:16px;width:calc(100% - 28px)}
+.sb-prog-fill{height:100%;border-radius:2px;transition:width .5s}
 
 /* ── CHEATSHEET ── */
 .cheat-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
-.cheat-item{background:var(--surface2);border-radius:10px;padding:12px 14px;font-size:13px;border:1px solid var(--border)}
-.cheat-q{color:var(--ink3);font-size:11px;margin-bottom:4px;text-transform:uppercase;letter-spacing:.5px;font-weight:600}
+.cheat-item{background:var(--surface2);border-radius:8px;padding:10px 12px;font-size:13px}
+.cheat-q{color:var(--ink3);font-size:12px;margin-bottom:3px}
 .cheat-a{color:var(--ink);font-weight:700}
 
-/* ── MOBILE NAV ── */
-.mobile-nav{display:none;position:fixed;bottom:0;left:0;right:0;background:var(--surface);border-top:1.5px solid var(--border);padding:8px 0 env(safe-area-inset-bottom,8px);z-index:100;box-shadow:0 -4px 20px rgba(0,0,0,.08)}
+/* ── MOBILE NAV (bottom bar) ── */
+.mobile-nav{display:none;position:fixed;bottom:0;left:0;right:0;background:var(--surface);border-top:1.5px solid var(--border);padding:8px 0 env(safe-area-inset-bottom,8px);z-index:100}
 .mobile-nav-inner{display:flex;justify-content:space-around}
-.mobile-nav-btn{display:flex;flex-direction:column;align-items:center;gap:2px;padding:4px 16px;border:none;background:none;color:var(--ink3);font-size:10px;font-weight:600;cursor:pointer;transition:all .13s}
+.mobile-nav-btn{display:flex;flex-direction:column;align-items:center;gap:2px;padding:4px 16px;border:none;background:none;color:var(--ink3);font-size:10px;font-weight:600;cursor:pointer}
 .mobile-nav-btn.active{color:var(--aws)}
 .mobile-nav-btn .mni{font-size:20px}
 
+/* Responsive grid utility classes */
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.g3{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.g2-sm{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.g3-sm{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;font-size:12px;text-align:center}
+
 @media(max-width:720px){
   .sidebar{display:none}
-  .view{padding:20px 18px 90px}
-  .pg-title{font-size:26px}
+  .view{padding:20px 16px 80px}
+  .pg-title{font-size:22px}
   .stat-grid{grid-template-columns:1fr 1fr}
   .mobile-nav{display:block}
   .cheat-grid{grid-template-columns:1fr}
+  /* Responsive grids → single column on mobile */
+  .g2,.g2-sm,.g3,.g3-sm{grid-template-columns:1fr}
+  /* Property list labels don't overflow */
+  .pl-row{grid-template-columns:1fr;gap:4px}
+  .pl-row .pl-key{font-weight:700;color:var(--ink)}
+  /* Tabs wrap on narrow screens */
+  .tabs{flex-wrap:wrap}
+  .tab-btn{flex:none;min-width:calc(50% - 4px);font-size:12px;padding:7px 8px}
+  /* Quiz choices full-width */
+  .choice{padding:11px 12px;font-size:14px}
+  /* Diagram/flow boxes */
+  .flow-step{gap:10px}
+  .kw-box{gap:5px}
+  /* Compare page table overflow */
+  .tbl-wrap{-webkit-overflow-scrolling:touch}
 }
 </style>
 </head>
@@ -325,7 +341,7 @@ button,input{font-family:var(--font)}
   </div>
   <div class="sb-section">
     <div class="sb-label">高可用架构</div>
-    <button class="sb-item" onclick="go('scalability',this)"><span class="si-dot" style="background:#059669"></span>扩展性 &amp; HA</button>
+    <button class="sb-item" onclick="go('scalability',this)"><span class="si-dot" style="background:#059669"></span>扩展性 &amp; HA<span id="sp-ha" class="sb-rate"></span></button>
     <button class="sb-item" onclick="go('elb',this)"><span class="si-dot" style="background:#7C3AED"></span>Load Balancer<span id="sp-lb" class="sb-rate"></span></button>
     <button class="sb-item" onclick="go('asg',this)"><span class="si-dot" style="background:#E8501A"></span>Auto Scaling Group<span id="sp-asg" class="sb-rate"></span></button>
   </div>
@@ -341,10 +357,15 @@ button,input{font-family:var(--font)}
     <div class="sb-label">EC2 镜像</div>
     <button class="sb-item" onclick="go('ami',this)"><span class="si-dot" style="background:#C0392B"></span>AMI</button>
   </div>
+  <div class="sb-section">
+    <div class="sb-label">数据库</div>
+    <button class="sb-item" onclick="go('rds',this)"><span class="si-dot" style="background:#C084FC"></span>RDS &amp; Aurora<span id="sp-rds" class="sb-rate"></span></button>
+    <button class="sb-item" onclick="go('elasticache',this)"><span class="si-dot" style="background:#F472B6"></span>ElastiCache<span id="sp-elasticache" class="sb-rate"></span></button>
+  </div>
   <div style="padding:12px 16px;margin-top:auto;border-top:1px solid var(--border)">
     <div style="font-size:11px;color:var(--ink3);line-height:1.7">
       <div style="font-weight:700;color:var(--ink2);margin-bottom:4px">📋 下一章预告</div>
-      <div>S3 · S3 存储类型 · 安全策略</div>
+      <div>Route 53 · Classic Architecture · S3</div>
     </div>
   </div>
 </nav>
@@ -903,7 +924,248 @@ text:'SNI（Server Name Indication）解决了什么问题？不支持 SNI 的 A
 en:'What problem does SNI solve? Which AWS service does NOT support SNI?',
 ch:['SNI 解决跨 AZ 证书共享；不支持 NLB','SNI 让一台 LB 可以同时持有多个 SSL 证书服务多个域名；<strong>CLB（v1）不支持</strong>，ALB/NLB/CloudFront 支持','SNI 是一种新的加密算法；所有 AWS LB 都支持','SNI 只用于 HTTP 路由；不支持 GWLB'],
 ench:['SNI solves cross-AZ cert sharing; NLB does not support it','SNI lets one LB hold multiple SSL certs for multiple domains; <strong>CLB (v1) does NOT support it</strong> — ALB/NLB/CloudFront do','SNI is a new encryption algorithm; all AWS LBs support it','SNI is only for HTTP routing; GWLB does not support it'],
-ans:1,exp:'<strong>SNI（Server Name Indication）</strong>：<br>解决问题：一台 LB 同时服务多个不同域名，每个域名需要不同 SSL 证书。SNI 让客户端在 SSL 握手时告知目标 Hostname，LB 返回对应证书。<br><br>支持：✅ ALB（v2）、✅ NLB（v2）、✅ CloudFront<br>不支持：❌ <strong>CLB（v1）</strong>——每个域名需要单独一个 CLB。',ww:'CLB 不支持 SNI，不是 NLB（A 错）。SNI 不是加密算法（C 错）。',rule:'一个 LB + 多个域名 + 多个 SSL → SNI → ALB 或 NLB。CLB 不支持 SNI。'}
+ans:1,exp:'<strong>SNI（Server Name Indication）</strong>：<br>解决问题：一台 LB 同时服务多个不同域名，每个域名需要不同 SSL 证书。SNI 让客户端在 SSL 握手时告知目标 Hostname，LB 返回对应证书。<br><br>支持：✅ ALB（v2）、✅ NLB（v2）、✅ CloudFront<br>不支持：❌ <strong>CLB（v1）</strong>——每个域名需要单独一个 CLB。',ww:'CLB 不支持 SNI，不是 NLB（A 错）。SNI 不是加密算法（C 错）。',rule:'一个 LB + 多个域名 + 多个 SSL → SNI → ALB 或 NLB。CLB 不支持 SNI。'},
+
+{id:'asg_07',topic:'Auto Scaling Group',diff:'high',
+text:'ASG 的 <em>Predictive Scaling</em> 与 Scheduled Scaling 的核心区别是什么？',
+en:'What is the key difference between ASG <em>Predictive Scaling</em> and Scheduled Scaling?',
+ch:['两者完全相同，都是基于时间规律扩缩','Predictive Scaling 由 AWS ML 自动分析历史负载并预测未来流量，自动调度扩缩；Scheduled Scaling 需要手动指定时间和容量','Predictive Scaling 只适用于 NLB，Scheduled 适用于 ALB','Predictive Scaling 无法与 ASG 一起使用'],
+ench:['They are identical — both scale based on time patterns','Predictive Scaling uses AWS ML to analyze historical load and forecast future traffic, auto-scheduling scaling; Scheduled requires manual time/capacity specification','Predictive Scaling only works with NLB; Scheduled works with ALB','Predictive Scaling cannot be used with ASG'],
+ans:1,exp:'<strong>Predictive Scaling</strong>：AWS ML 模型<strong>持续分析历史负载</strong> → 生成预测曲线 → 提前自动调度扩缩动作。不需要人工维护时间计划，适合有周期性规律但 pattern 复杂的场景。<br><br><strong>Scheduled Scaling</strong>：你手动指定"在什么时间把 Min 设为多少"。适合简单明确的时间规律（如每天9点、每周五），无需历史数据。<br><br>两者都是"提前"扩缩，区别在于是人工计划还是 ML 自动学习。',ww:'两者不同，Predictive 是 ML 驱动（A 错）。没有 NLB/ALB 限制（C 错）。',rule:'Predictive = AWS ML 自动预测 + 调度。Scheduled = 人工指定时间 + 容量。都是提前扩缩。'},
+
+{id:'asg_08',topic:'Auto Scaling Group',diff:'high',
+text:'你的 Web 应用使用 ALB + ASG，想通过扩缩保证<em>每台 EC2 实例处理的请求数保持稳定</em>（不被压垮）。应该用哪个 CloudWatch 指标做 Target Tracking？',
+en:'Your web app uses ALB + ASG. You want to ensure <em>each EC2 instance handles a stable number of requests</em>. Which CloudWatch metric should you use for Target Tracking?',
+ch:['CPUUtilization — 监控 CPU 使用率','RequestCountPerTarget — 确保每台实例的请求数稳定','Average Network In/Out — 监控网络流量','Any Custom Metric — 使用自定义业务指标'],
+ench:['CPUUtilization — monitor CPU usage','RequestCountPerTarget — keep request count per instance stable','Average Network In/Out — monitor network traffic','Any Custom Metric — use a custom business metric'],
+ans:1,exp:'<strong>RequestCountPerTarget</strong>：由 <strong>ALB</strong> 提供的指标，表示每台 EC2 实例平均接收到的请求数量。配合 Target Tracking，可以设定每台实例的目标请求数（如 1000 req/target），当请求增加超出目标，ASG 自动 Scale Out 加实例；请求减少时 Scale In。<br><br>适合场景：Web 应用需要保证每台实例不被过载，且搭配 ALB 使用。<br>注意：此指标需要 <strong>ALB</strong> 提供，NLB 没有此指标。',ww:'CPUUtilization 是 CPU 维度（A），不直接反映请求压力。网络流量（C）适合视频等网络密集型应用。自定义指标（D）需要额外开发推送。',rule:'ALB + ASG 场景，保证每实例请求数稳定 → Target Tracking + RequestCountPerTarget。'},
+
+{id:'asg_09',topic:'Auto Scaling Group',diff:'high',
+text:'ASG 刚刚完成了一次 Scale Out（新增了 2 台实例）。<em>30 秒后</em> CloudWatch Alarm 再次触发，要求再加实例。ASG 会怎么做？',
+en:'ASG just completed a Scale Out (added 2 instances). <em>30 seconds later</em>, CloudWatch Alarm triggers again requesting more instances. What will ASG do?',
+ch:['立即再次 Scale Out，加更多实例','忽略这次 Alarm——因为还在默认 300 秒冷却期（Cooldown Period）内','先终止刚加的实例，再重新扩缩','抛出错误，无法在 Scale Out 后立即再次扩缩'],
+ench:['Immediately scale out again and add more instances','Ignore this Alarm — still within the default 300-second Cooldown Period','Terminate the recently added instances and rescale','Throw an error — cannot scale immediately after a scale-out'],
+ans:1,exp:'<strong>Scaling Cooldown（扩缩冷却期）</strong>默认 <strong>300 秒</strong>。每次扩缩动作完成后进入冷却期，在冷却期内 ASG <strong>忽略所有新的扩缩触发</strong>（无论 CloudWatch Alarm 触发多少次）。<br><br>目的：让新实例启动完毕、指标趋于稳定，避免 ASG 反复快速扩缩（Scaling Thrashing）浪费资源。<br><br>30 秒 &lt; 300 秒冷却期 → 此次 Alarm 被忽略（Ignore Action）。',ww:'冷却期内不会立即再次扩缩（A 错）。冷却期不会终止已加实例（C 错）。',rule:'Cooldown 默认 300 秒。冷却期内 Alarm 触发 → 忽略。缩短冷却 → 使用 Ready-to-use AMI。'},
+
+{id:'asg_10',topic:'Auto Scaling Group',diff:'high',
+text:'你的应用 Scale Out 后，新实例需要很长时间初始化才能处理请求，导致 Cooldown 期间指标持续高企。最佳解决方案是什么？',
+en:'After Scale Out, new instances take a long time to initialize before serving requests, causing metrics to stay high during the Cooldown period. What is the best solution?',
+ch:['增加 Cooldown 时间到 600 秒，给实例更多初始化时间','使用预装好所有依赖和配置的 AMI（Ready-to-use AMI / Golden AMI），让实例更快启动和服务','减少 Min Capacity，让 ASG 不需要频繁扩缩','改用 Scheduled Scaling，避免动态扩缩'],
+ench:['Increase Cooldown to 600 seconds to give more initialization time','Use a pre-configured AMI (Ready-to-use AMI / Golden AMI) so instances start and serve faster','Reduce Min Capacity so ASG scales less frequently','Switch to Scheduled Scaling to avoid dynamic scaling'],
+ans:1,exp:'<strong>Ready-to-use AMI（Golden AMI）</strong>是最佳实践：将所有软件、配置、依赖提前打包进 AMI，新实例启动后无需再安装配置，可以<strong>立即处理请求</strong>。<br><br>好处链：实例启动更快 → 更快服务流量 → 指标（CPU/请求数）更快回落 → 可以使用更短的 Cooldown → ASG 响应更灵敏。<br><br>增加 Cooldown（A）反而让问题持续更久。减少 Min（C）解决不了初始化慢的问题。',ww:'增加 Cooldown 治标不治本（A 错）。减少 Min 不是解决方案（C 错）。',rule:'实例初始化慢 → 用 Golden AMI（Ready-to-use AMI）预装环境 → 加速启动 + 缩短 Cooldown 需求。'},
+
+/* ── HA & Scalability Quiz (Official Udemy) ── */
+{id:'ha_01',topic:'扩展性与高可用',diff:'mid',
+text:'将 EC2 实例从 <span class="code-inline">r4.large</span> 升级到 <span class="code-inline">r4.4xlarge</span>，这种操作叫做什么？',
+en:'Scaling an EC2 instance from <span class="code-inline">r4.large</span> to <span class="code-inline">r4.4xlarge</span> is called ............',
+ch:['Horizontal Scalability（水平扩展）','Vertical Scalability（垂直扩展）'],
+ench:['Horizontal Scalability','Vertical Scalability'],
+ans:1,exp:'<strong>Vertical Scalability（垂直扩展 / Scale Up）</strong> = 把同一台实例变得更大、更强。<br>r4.large → r4.4xlarge：同一个 r4 家族，只是换了更大的规格（实例数量不变，性能提升）。<br><br>对比：<br>• <strong>Vertical</strong>：1台实例，规格变大（Scale Up / Down）<br>• <strong>Horizontal</strong>：增加实例数量（Scale Out / In），需要 ASG',ww:'Horizontal Scalability 是增加实例数量（加更多台），不是升级单台规格（A 错）。',rule:'单台升规格 = Vertical（垂直）。加台数 = Horizontal（水平）。'},
+
+{id:'ha_02',topic:'扩展性与高可用',diff:'mid',
+text:'在 Auto Scaling Group 上运行应用程序，ASG 根据负载自动增减 EC2 实例数量，这叫做什么？',
+en:'Running an application on an Auto Scaling Group that scales the number of EC2 instances in and out is called ............',
+ch:['Horizontal Scalability（水平扩展）','Vertical Scalability（垂直扩展）'],
+ench:['Horizontal Scalability','Vertical Scalability'],
+ans:0,exp:'<strong>Horizontal Scalability（水平扩展 / Scale Out&In）</strong> = 增减实例数量。<br>ASG 自动 Scale Out（加实例）和 Scale In（减实例）就是水平扩展的典型实现。<br><br>水平扩展需要应用支持分布式架构，AWS 通过 <strong>Auto Scaling Group + Load Balancer</strong> 来实现。',ww:'Vertical 是换更大规格的单台实例（B 错）。',rule:'ASG 增减实例数量 = Horizontal Scalability。换更大实例规格 = Vertical Scalability。'},
+
+{id:'ha_03',topic:'Load Balancer',diff:'high',
+text:'Elastic Load Balancer 提供的是什么？',
+en:'Elastic Load Balancers provide a ................',
+ch:['可以在应用中直接使用的静态 IPv4 地址','可以在应用中使用的静态 DNS 名称（static DNS name）','可以在应用中直接使用的静态 IPv6 地址'],
+ench:['A static IPv4 address we can use in our application','A static DNS name we can use in our application','A static IPv6 address we can use in our application'],
+ans:1,exp:'<strong>Elastic Load Balancer 提供的是静态 DNS 名称</strong>，而不是静态 IP 地址。<br><br>关键区分：<br>• <strong>ALB</strong>：只有静态 DNS 名称，没有固定 IP<br>• <strong>NLB</strong>：既有静态 DNS 名称，<strong>也有每个 AZ 的静态 IP</strong>（还可以绑定 Elastic IP）<br>• <strong>CLB</strong>：只有静态 DNS 名称<br><br>AWS 设计 ELB 用 DNS 名称而非 IP，是因为底层基础设施会变化，DNS 能始终指向正确的 endpoint。',ww:'ELB 没有静态 IPv4（A 错）。IPv6 也不是 ELB 提供的主要入口（C 错）。',rule:'ELB 整体提供静态 DNS 名称。只有 NLB 额外提供静态 IP（每 AZ 一个）。'},
+
+{id:'ha_04',topic:'Load Balancer',diff:'high',
+text:'你用 ALB + 多台 EC2 搭建了网站。用户反映：在网站页面间跳转时，总是被要求<em>重新认证</em>。你在自己的机器和只有 1 台 EC2 的开发环境中测试，完全正常。这是什么原因？',
+en:'Your website is hosted on EC2 instances behind an ALB. Users complain they have to re-authenticate when moving between pages. It works fine on your machine and in Dev with 1 EC2 instance. What is the reason?',
+ch:['多台 EC2 实例运行时，网站代码存在问题','EC2 实例因为看不到客户端真实 IP（收到的是 ELB 的 IP），所以注销了用户','ELB 没有开启 Sticky Sessions（粘性会话）'],
+ench:['Your website must have an issue when hosted on multiple EC2 instances','The EC2 instances log out users because they receive ELB IP addresses instead of client IPs','The Elastic Load Balancer does not have Sticky Sessions enabled'],
+ans:2,exp:'<strong>根本原因：没有开启 Sticky Sessions（粘性会话）</strong><br><br>用户登录后，Session 数据保存在某台 EC2 上。下一次请求被 ALB 路由到另一台 EC2，那台 EC2 没有该用户的 Session，于是要求重新认证。<br><br>单机（1台 EC2）没问题，因为每次请求都到同一台实例。多台 EC2 时，没有 Sticky Sessions 就会出现这个问题。<br><br><strong>解决方案</strong>：<br>① 开启 Sticky Sessions（简单但可能造成负载不均衡）<br>② 更好的方案：用 ElastiCache 或 DynamoDB 集中存储 Session，所有 EC2 共享',ww:'代码没问题，本地和 Dev 都正常（A 错）。客户端 IP 问题不会导致注销（B 错，这是另一个知识点）。',rule:'多实例重新认证问题 → Sticky Sessions 未开启。根本解决方案 → 集中 Session 存储（ElastiCache）。'},
+
+{id:'ha_05',topic:'Load Balancer',diff:'high',
+text:'你发现 EC2 实例收到的请求都来自 ALB 的私有 IP。如何获取<em>连接到你网站的客户端真实 IP</em>？',
+en:'Your website only sees traffic from ALB\'s private IP addresses. What should you do to get the IP address of clients connected to your website?',
+ch:['修改前端，让用户每次请求都带上自己的 IP','修改后端，从 <strong>X-Forwarded-For</strong> 请求头中获取客户端 IP','修改后端，从 X-Forwarded-Port 请求头中获取客户端 IP','修改后端，从 X-Forwarded-Proto 请求头中获取客户端 IP'],
+ench:['Modify frontend so users send their IP in every request','Modify backend to get client IP from the <strong>X-Forwarded-For</strong> header','Modify backend to get client IP from the X-Forwarded-Port header','Modify backend to get client IP from the X-Forwarded-Proto header'],
+ans:1,exp:'使用 ALB 时，EC2 收到的请求来自 ALB 的私有 IP（因为 ALB 做了 SSL Termination 并重新发起连接）。<br><br>ALB 在转发请求时，会在 HTTP 请求头中额外添加：<br>• <strong>X-Forwarded-For</strong>：客户端真实 IP ← <strong>这个是答案</strong><br>• <strong>X-Forwarded-Port</strong>：客户端的端口号<br>• <strong>X-Forwarded-Proto</strong>：客户端使用的协议（HTTP 或 HTTPS）<br><br>后端只需读取 <code>X-Forwarded-For</code> 请求头即可获取真实客户端 IP。',ww:'X-Forwarded-Port 是端口（C 错）。X-Forwarded-Proto 是协议（D 错）。让用户自己传 IP 不现实也不安全（A 错）。',rule:'ALB 后面获取客户端真实 IP → 读 HTTP Header: X-Forwarded-For。'},
+
+{id:'ha_06',topic:'Load Balancer',diff:'high',
+text:'你的网站部署在 ELB 后的 EC2 实例上。发现有些 EC2 实例<em>会周期性崩溃</em>，导致用户有时无法正常使用。如何防止用户连接到已崩溃的实例？',
+en:'Some EC2 instances behind your ELB crash from time to time, causing users to sometimes experience issues. What should you do to protect users from connecting to crashing instances?',
+ch:['Enable ELB Health Checks（开启健康检查）','Enable ELB Stickiness（开启粘性会话）','Enable SSL Termination（开启 SSL 终止）','Enable Cross-Zone Load Balancing（开启跨区域负载均衡）'],
+ench:['Enable ELB Health Checks','Enable ELB Stickiness','Enable SSL Termination','Enable Cross-Zone Load Balancing'],
+ans:0,exp:'<strong>ELB Health Checks</strong> 是解决方案：<br><br>ELB 定期向每台实例发送 HTTP 请求（如 /health），如果实例不响应或返回非 200 状态码，ELB 将其标记为 Unhealthy，并<strong>停止向其发送新请求</strong>。<br><br>崩溃的实例无法响应 Health Check → 被标记为 Unhealthy → 流量自动切走 → 用户不再连接到该实例。<br><br>注意：ELB 只是停止发流量，不会关闭实例。需要结合 ASG + ELB Health Check 才能自动终止并替换故障实例。',ww:'Stickiness 是让同一用户总到同一台实例（B 错）。SSL Termination 是加密处理（C 错）。Cross-Zone 是跨 AZ 分流（D 错）。',rule:'防止用户连到崩溃实例 → Enable ELB Health Checks。彻底自愈 → ASG + ELB Health Check。'},
+
+{id:'ha_07',topic:'Load Balancer',diff:'high',
+text:'ALB 支持以下协议，<em>除了</em>哪个？（EXCEPT）',
+en:'Application Load Balancers support the following protocols, EXCEPT:',
+ch:['HTTP','HTTPS','TCP','WebSocket'],
+ench:['HTTP','HTTPS','TCP','WebSocket'],
+ans:2,exp:'<strong>ALB（Application Load Balancer）支持</strong>：HTTP、HTTPS、WebSocket<br><strong>ALB 不支持</strong>：<strong>TCP</strong>（原始 TCP 协议是 NLB 的专属）<br><br>层级记忆：<br>• ALB = <strong>Layer 7</strong>（应用层）→ 理解 HTTP/HTTPS/WebSocket 的内容<br>• NLB = <strong>Layer 4</strong>（传输层）→ 处理 TCP/TLS/UDP，不解析 HTTP 内容<br>• GWLB = <strong>Layer 3</strong>（网络层）→ IP 包级别<br><br>WebSocket 虽然基于 TCP，但它是应用层协议，ALB 原生支持。',ww:'HTTP（A）、HTTPS（B）、WebSocket（D）都是 ALB 支持的协议。TCP 是 NLB 的领域（C 是答案）。',rule:'ALB = HTTP + HTTPS + WebSocket。TCP/UDP → NLB。考试见 TCP → 答 NLB。'},
+
+{id:'ha_08',topic:'Load Balancer',diff:'high',
+text:'ALB 可以根据以下条件路由流量到不同 Target Group，<em>除了</em>哪个？（EXCEPT）',
+en:'Application Load Balancers can route traffic to different Target Groups based on the following, EXCEPT:',
+ch:['客户端的地理位置（Client\'s Location / Geography）','主机名（Hostname）','请求 URL 路径（Request URL Path）','来源 IP 地址（Source IP Address）'],
+ench:['Client\'s Location (Geography)','Hostname','Request URL Path','Source IP Address'],
+ans:0,exp:'<strong>ALB 支持的路由规则</strong>：<br>• ✅ <strong>URL Path</strong>（路径）：/users → 用户服务，/search → 搜索服务<br>• ✅ <strong>Hostname</strong>（域名）：one.example.com vs other.example.com<br>• ✅ <strong>HTTP Headers</strong>（请求头）<br>• ✅ <strong>Query String</strong>（查询参数）：?platform=mobile<br>• ✅ <strong>Source IP Address</strong>（来源 IP）<br><br>• ❌ <strong>Client\'s Location / Geography</strong>：ALB <strong>不支持</strong>基于地理位置路由！<br><br>地理位置路由需要用 <strong>Route 53</strong> 的 Geolocation Routing Policy，不是 ALB 的功能。',ww:'Hostname（B）、URL Path（C）、Source IP（D）都是 ALB 支持的路由条件。地理位置（A）是 Route 53 的功能，ALB 不支持。',rule:'ALB 路由：URL Path / Hostname / HTTP Headers / Query String / Source IP。❌ 地理位置 → Route 53。'},
+
+{id:'ha_09',topic:'Load Balancer',diff:'high',
+text:'ALB 的 Target Group 中，注册的目标类型可以是以下几种，<em>除了</em>哪个？（EXCEPT）',
+en:'Registered targets in a Target Group for an Application Load Balancer can be one of the following, EXCEPT:',
+ch:['EC2 Instances','Network Load Balancer（NLB）','Private IP Addresses（私有 IP 地址）','Lambda Functions'],
+ench:['EC2 Instances','Network Load Balancer (NLB)','Private IP Addresses','Lambda Functions'],
+ans:1,exp:'<strong>ALB Target Group 支持的目标类型</strong>：<br>• ✅ EC2 Instances<br>• ✅ IP Addresses（必须是私有 IP）<br>• ✅ Lambda Functions（HTTP 请求转为 JSON 事件）<br>• ✅ ECS Tasks（容器任务）<br><br>• ❌ <strong>Network Load Balancer（NLB）</strong>：ALB 不能以 NLB 作为目标<br><br>注意不要搞反！<strong>NLB 的 Target Group 可以包含 ALB</strong>（NLB→ALB 组合架构，先获得静态IP再做URL路由），但反过来 ALB 不能指向 NLB。',ww:'EC2（A）、Private IP（C）、Lambda（D）都是 ALB Target Group 支持的。NLB 可以指向 ALB，但 ALB 不能指向 NLB（B 是答案）。',rule:'ALB Target Group：EC2 / IP / Lambda / ECS。❌ 不能是 NLB。NLB Target Group 才可以是 ALB。'},
+
+{id:'ha_10',topic:'Load Balancer',diff:'high',
+text:'出于合规要求，你需要向终端用户暴露一个<em>固定的静态 IP 地址</em>，让他们可以编写稳定的防火墙规则。应选哪种 ELB？',
+en:'For compliance purposes, you need to expose a fixed static IP address to end-users so they can write stable firewall rules. Which Elastic Load Balancer should you choose?',
+ch:['Application Load Balancer（附加 Elastic IP）','Network Load Balancer'],
+ench:['Application Load Balancer with an Elastic IP attached to it','Network Load Balancer'],
+ans:1,exp:'<strong>Network Load Balancer（NLB）</strong> 是唯一能提供固定静态 IP 的 ELB：<br>• 每个 AZ 分配一个<strong>静态 IP 地址（Static IP per AZ）</strong><br>• 还可以绑定 <strong>Elastic IP</strong>（更灵活控制 IP 地址）<br><br>对比：<br>• <strong>ALB / CLB</strong>：只有静态 DNS 名称，<strong>没有固定 IP</strong>，不能绑定 Elastic IP<br><br>合规场景（防火墙规则、IP 白名单）→ 必须用 NLB，因为 ALB 的 IP 会随时变化。',ww:'ALB 没有固定 IP，无法绑定 Elastic IP（A 错）。NLB 才是正确答案。',rule:'需要固定静态 IP 给用户 → NLB（每AZ有静态IP，可绑Elastic IP）。ALB/CLB 只有 DNS 名称，没有固定 IP。'},
+
+{id:'ha_11',topic:'Load Balancer',diff:'high',
+text:'你想在 ALB 中创建一个<em>自定义的基于应用的 Cookie（Custom Application-based Cookie）</em>。以下哪个名称可以使用？',
+en:'You want to create a custom application-based cookie in your ALB. Which of the following can you use as a cookie name?',
+ch:['AWSALBAPP','APPUSERC','AWSALBTG','AWSALB'],
+ench:['AWSALBAPP','APPUSERC','AWSALBTG','AWSALB'],
+ans:1,exp:'<strong>自定义 Cookie 名称不能使用以下 AWS 保留名称</strong>：<br>• ❌ <strong>AWSALB</strong>（ALB Duration-based Cookie 的保留名）<br>• ❌ <strong>AWSALBAPP</strong>（ALB Application Cookie 的保留名）<br>• ❌ <strong>AWSALBTG</strong>（ALB Target Group Cookie 的保留名）<br>• ❌ <strong>AWSELB</strong>（CLB 的保留名）<br><br>• ✅ <strong>APPUSERC</strong>（不是保留名，可以自由使用）<br><br>记忆规律：以 AWS 开头的 ELB 相关 Cookie 名称都是保留的，自定义名称必须避开这些前缀。',ww:'AWSALBAPP/AWSALBTG/AWSALB 都是 AWS 保留名称，不能用于自定义 Cookie（A/C/D 错）。',rule:'ALB 自定义 Cookie：避开 AWSALB、AWSALBAPP、AWSALBTG 等保留名。用自定义名如 APPUSERC 即可。'},
+
+{id:'ha_12',topic:'Load Balancer',diff:'high',
+text:'你有一个 NLB，在 us-east-1 中分配流量。<span class="code-inline">us-east-1b</span> 有 2 台实例，<span class="code-inline">us-east-1e</span> 有 5 台实例。你发现 1b 的实例 CPU 更高，经过调查，流量是<em>均匀分配到两个 AZ</em> 的。如何解决？',
+en:'You have a NLB distributing traffic in us-east-1. There are 2 EC2 instances in us-east-1b and 5 in us-east-1e. CPU is higher in us-east-1b instances. Traffic is equally distributed across the two AZs. How do you solve this?',
+ch:['Enable Cross-Zone Load Balancing（跨区域负载均衡）','Enable Sticky Sessions（粘性会话）','Enable ELB Health Checks（健康检查）','Enable SSL Termination（SSL 终止）'],
+ench:['Enable Cross-Zone Load Balancing','Enable Sticky Sessions','Enable ELB Health Checks','Enable SSL Termination'],
+ans:0,exp:'<strong>问题根因：Cross-Zone Load Balancing 未开启</strong><br><br>不开启 Cross-Zone 时，流量被<strong>均匀分到各 AZ</strong>（每个 AZ 各 50%）。但 1b 只有 2 台实例，1e 有 5 台实例，所以：<br>• 1b：50% 流量 ÷ 2台 = <strong>每台 25%</strong><br>• 1e：50% 流量 ÷ 5台 = <strong>每台 10%</strong><br><br>→ 1b 每台实例压力是 1e 的 2.5 倍，CPU 自然更高！<br><br>开启 <strong>Cross-Zone Load Balancing</strong> 后，流量被均匀分配到<strong>所有 AZ 的所有实例</strong>（7台各约14.3%），CPU 压力平衡。<br><br>注意：NLB 的 Cross-Zone 默认关闭，开启后会收费。',ww:'Sticky Sessions 是让同一用户到同一实例（B 错）。Health Checks 是检测健康状态（C 错）。SSL Termination 是加密处理（D 错）。',rule:'各 AZ 实例数量不均 + CPU 不均衡 → 开启 Cross-Zone Load Balancing（均匀分流到所有实例）。'},
+
+{id:'ha_13',topic:'Load Balancer',diff:'high',
+text:'ALB 和 NLB 都支持哪个功能，可以在<em>同一个 Listener 上加载多个 SSL 证书</em>？',
+en:'Which feature in both ALB and NLB allows you to load multiple SSL certificates on one listener?',
+ch:['TLS Termination（TLS 终止）','Server Name Indication（SNI）','SSL Security Policies（SSL 安全策略）','Host Headers（主机头）'],
+ench:['TLS Termination','Server Name Indication (SNI)','SSL Security Policies','Host Headers'],
+ans:1,exp:'<strong>SNI（Server Name Indication）</strong>让一个 Listener 可以持有<strong>多个 SSL 证书</strong>，服务多个不同域名。<br><br>工作原理：客户端在 SSL 握手时告知目标 Hostname，LB 据此选择正确的证书返回。<br><br>支持 SNI 的 AWS 服务：<br>• ✅ ALB（v2）<br>• ✅ NLB（v2）<br>• ✅ CloudFront<br>• ❌ CLB（v1）—— 不支持 SNI，每个域名需要单独的 CLB<br><br>TLS Termination 是 LB 解密 HTTPS 的功能，不是多证书功能（A 错）。SSL Security Policies 是控制支持哪些 TLS 版本（C 错）。Host Headers 是 ALB 的路由规则之一（D 错）。',ww:'TLS Termination（A）、SSL Security Policies（C）、Host Headers（D）都不是多证书功能。',rule:'一个 Listener 支持多个 SSL 证书服务多域名 → SNI（ALB 和 NLB 都支持，CLB 不支持）。'},
+
+{id:'ha_14',topic:'Auto Scaling Group',diff:'high',
+text:'你有 ASG + ALB，配置了使用 ALB Health Checks。一台 EC2 实例刚被 ALB 报告为 Unhealthy（不健康）。ASG 会怎么处理？',
+en:'You have ASG + ALB with ALB Health Checks configured. One EC2 instance is reported unhealthy by the ALB. What will the ASG do?',
+ch:['ASG 保持实例运行，然后重启其中的应用程序','ASG 将该实例从组中分离（Detach），但保持其运行','ASG 终止（Terminate）该 EC2 实例，并启动新实例替换'],
+ench:['The ASG will keep the instance running and re-start the application','The ASG will detach the EC2 instance and leave it running','The ASG will terminate the EC2 instance and launch a new one'],
+ans:2,exp:'配置 ASG 使用 <strong>ALB Health Checks</strong> 后，当 ALB 检测到某实例不健康：<br>① ALB 停止向该实例发送流量<br>② ALB 将健康状态报告给 ASG<br>③ ASG <strong>终止（Terminate）该实例</strong><br>④ ASG 自动启动一个新实例替换，维持 Desired Capacity<br><br>ASG <strong>不会</strong>尝试重启应用（A 错）——它不知道是什么应用出了问题。<br>ASG <strong>不会</strong>只是 Detach（B 错）——Detach 是手动操作，自动处理是 Terminate + Replace。<br><br>这就是 ELB + ASG 实现<strong>自愈（Self-Healing）</strong>的机制。',ww:'ASG 不重启应用（A 错）。自动处理是终止并重建，不是分离（B 错）。',rule:'ASG + ALB Health Check：不健康实例 → ASG 自动 Terminate → 启动新实例替换 → 自愈完成。'},
+
+{id:'ha_15',topic:'Load Balancer',diff:'high',
+text:'你的 ALB 配置了路由到 3 个 Target Group，分别对应域名：<strong>users.example.com</strong>、<strong>api.external.example.com</strong>、<strong>checkout.example.com</strong>。你需要为每个域名配置 HTTPS。如何配置 ALB？',
+en:'Your ALB routes to 3 Target Groups based on hostnames: users.example.com, api.external.example.com, and checkout.example.com. You want HTTPS for each hostname. How do you configure the ALB?',
+ch:['使用 HTTP to HTTPS redirect rule（重定向规则）','使用 Security Group SSL Certificate','使用 Server Name Indication（SNI）'],
+ench:['Use an HTTP to HTTPS redirect rule','Use a security group SSL certificate','Use Server Name Indication (SNI)'],
+ans:2,exp:'<strong>SNI（Server Name Indication）</strong>正是为这种场景设计的——一个 ALB 的同一个 HTTPS Listener，通过 SNI 可以同时持有<strong>多个 SSL 证书</strong>，每个域名对应自己的证书。<br><br>• users.example.com → 证书 A<br>• api.external.example.com → 证书 B<br>• checkout.example.com → 证书 C<br><br>客户端在 SSL 握手时声明目标 Hostname，ALB 自动选择对应证书返回。<br><br>HTTP→HTTPS redirect 是强制跳转协议，不解决多证书问题（A 错）。Security Group 是网络访问控制，和证书无关（B 错）。',ww:'Redirect（A）是协议跳转。Security Group（B）是防火墙，不管证书。',rule:'一个 ALB + 多个域名 + 每个域名需要自己的 SSL 证书 → SNI。'},
+
+{id:'ha_16',topic:'Auto Scaling Group',diff:'high',
+text:'ASG 配置了 <em>Desired = 3，Maximum = 3</em>。同时创建了 CloudWatch Alarm：CPU 达到 60% 时触发 Scale Out。应用突然收到大量流量，CPU 升到 80%。会发生什么？',
+en:'ASG has Desired=3 and Maximum=3. A CloudWatch Alarm is set to scale out at 60% CPU. The app suddenly gets huge traffic and CPU hits 80%. What will happen?',
+ch:['什么都不发生——ASG 不能超过 Maximum Capacity（最大容量）','Desired 增加到 4，Maximum 保持在 3','Desired 增加到 4，Maximum 也增加到 4'],
+ench:['Nothing — ASG cannot exceed the Maximum Capacity you configured','The desired capacity will go up to 4 and the maximum capacity will stay at 3','The desired capacity will go up to 4 and the maximum capacity will stay at 4'],
+ans:0,exp:'<strong>关键规则：ASG 实例数永远不能超过 Maximum Capacity（最大容量）</strong><br><br>当前配置：Desired = 3，Max = 3<br>CloudWatch Alarm 触发 Scale Out → 想把 Desired 从 3 增加到 4<br><strong>但 Max = 3</strong>，ASG 不允许实例数超过 Max → <strong>什么都不发生</strong><br><br>即使 CPU 再高、Alarm 触发再多次，也无法突破 Maximum Capacity 上限。<br><br>Max 是保护性上限，防止无限扩展导致费用失控。如果想让 Scale Out 成功，必须先把 Max 调整到 &gt; 3（如改为 Max=6）。',ww:'ASG 不能自动修改 Maximum Capacity（B/C 错）。Max 是硬性上限，Alarm 无法突破它。',rule:'当前实例数 = Max 时，即使 Alarm 触发，ASG 也无法 Scale Out。Max 是不可逾越的硬上限。'},
+
+{id:'ha_17',topic:'Auto Scaling Group',diff:'high',
+text:'老板让你根据<em>应用每分钟向数据库发出的请求数</em>来扩缩 ASG。应该怎么做？',
+en:'Your boss wants you to scale your ASG based on the number of requests per minute your application makes to the database. What should you do?',
+ch:['创建 CloudWatch Custom Metric，然后基于该指标创建 CloudWatch Alarm 来触发 ASG 扩缩','礼貌地告诉老板这是不可能实现的','开启 EC2 Detailed Monitoring，然后创建 CloudWatch Alarm'],
+ench:['Create a CloudWatch custom metric, then create a CloudWatch Alarm on it to scale your ASG','Politely tell him it\'s impossible','Enable Detailed Monitoring then create a CloudWatch Alarm to scale your ASG'],
+ans:0,exp:'CloudWatch <strong>没有内置</strong>的"每分钟数据库请求数"指标（不是标准的 AWS 指标）。<br><br>解决方案：<strong>CloudWatch Custom Metric（自定义指标）</strong><br>① 在应用代码中统计每分钟的数据库请求数<br>② 通过 <strong>CloudWatch PutMetricData API</strong> 将这个指标推送到 CloudWatch<br>③ 基于这个自定义指标创建 CloudWatch Alarm<br>④ Alarm 触发 ASG Scaling Policy<br><br>这完全可以实现——ASG 可以基于任何 CloudWatch 指标扩缩，包括自定义指标（B 错）。Detailed Monitoring 只是让内置 EC2 指标从 5 分钟变成 1 分钟粒度，无法创建新的业务指标（C 错）。',ww:'这是完全可以实现的，不是不可能（B 错）。Detailed Monitoring 不能创建"DB请求数"指标（C 错）。',rule:'需要基于业务自定义指标扩缩 → CloudWatch Custom Metric（PutMetricData） + Alarm + ASG Scaling Policy。'},
+
+{id:'ha_18',topic:'Auto Scaling Group',diff:'high',
+text:'应用部署在 ALB + ASG 上。你希望定义 Scaling Policy，确保<em>每台 EC2 实例的平均连接数保持在 1000 左右</em>。应选哪种 Scaling Policy？',
+en:'An app is on ALB + ASG. You want a Scaling Policy to ensure the average number of connections per EC2 instance stays around 1000. Which Scaling Policy should you use?',
+ch:['Simple Scaling Policy','Step Scaling Policy','Target Tracking Policy（目标追踪策略）','Scheduled Scaling Policy'],
+ench:['Simple Scaling Policy','Step Scaling Policy','Target Tracking Policy','Scheduled Scaling Policy'],
+ans:2,exp:'<strong>Target Tracking Policy（目标追踪）</strong>完美匹配这个场景：你设定一个目标值（如平均连接数 = 1000），ASG 自动维持在目标附近，自动 Scale Out 或 Scale In。<br><br>具体指标：可以使用 <code class="code-inline">ALBRequestCountPerTarget</code>（ALB 提供），设定目标为每实例 1000 连接。<br><br>对比：<br>• Simple / Step：需要手动设定阈值 + 触发步长，不会"自动维持目标"<br>• Scheduled：基于时间，和连接数无关<br>• Target Tracking：最简单，直接设定目标值，AWS 自动计算扩缩步长',ww:'Simple（A）和 Step（B）需要手动配置 Alarm 和步长，不是"维持目标"。Scheduled（D）是时间驱动。',rule:'想维持某个指标在目标值附近 → Target Tracking Policy（最简单，设目标值即可）。'},
+
+{id:'ha_19',topic:'Load Balancer',diff:'high',
+text:'你有 ASG + NLB。应用支持 HTTP 协议，目前 NLB 使用 TCP Health Check。你想<em>迁移到 HTTP Health Check</em>。怎么做？',
+en:'You have ASG + NLB. The app supports HTTP. NLB currently uses TCP health checks. You want to migrate to HTTP health checks. What do you do?',
+ch:['迁移到 Application Load Balancer（ALB）','直接将 Health Check 修改为 HTTP'],
+ench:['Migrate to an Application Load Balancer','Migrate the health check to HTTP'],
+ans:1,exp:'<strong>NLB 的 Health Check 支持三种协议：TCP、HTTP 和 HTTPS</strong><br><br>很多人以为 NLB 只支持 TCP 健康检查（因为 NLB 是 Layer 4），但实际上 NLB 的 Target Group Health Check 支持：<br>• TCP<br>• HTTP ← 可以直接改<br>• HTTPS<br><br>因此，不需要迁移到 ALB，直接在 NLB 的 Target Group 配置中，<strong>把 Health Check Protocol 从 TCP 改为 HTTP 即可</strong>。<br><br>这是一个常见的误解——NLB 虽然是 Layer 4 LB，但健康检查协议可以是 HTTP/HTTPS，以更准确地检测应用层是否正常。',ww:'不需要迁移到 ALB（A 错）。NLB 本身就支持 HTTP Health Check，直接改配置即可。',rule:'NLB Health Check 支持：TCP / HTTP / HTTPS（三种）。不需要换 ALB 就能用 HTTP 健康检查。'},
+
+{id:'ha_20',topic:'Load Balancer',diff:'high',
+text:'网站部署在 ASG + ALB 上，目前用 HTTP 访问。你已在 ACM 中创建了证书并附加到 ALB。如何<em>强制用户只能用 HTTPS 访问</em>（而不是 HTTP）？',
+en:'Website on ASG + ALB. Currently served over HTTP. You created a certificate in ACM and attached it to the ALB. How do you force users to access using HTTPS instead of HTTP?',
+ch:['给所有用户发邮件，告知他们改用 HTTPS','配置 ALB 将 HTTP 流量重定向（Redirect）到 HTTPS','配置 DNS 记录将 HTTP 重定向到 HTTPS'],
+ench:['Send an email to all customers to use HTTPS instead of HTTP','Configure the Application Load Balancer to redirect HTTP to HTTPS','Configure the DNS record to redirect HTTP to HTTPS'],
+ans:1,exp:'<strong>在 ALB 上配置 HTTP → HTTPS Redirect Rule</strong>是正确方案：<br><br>ALB 支持配置 <strong>Listener Rules</strong>，可以将 80 端口（HTTP）的所有请求自动重定向到 443 端口（HTTPS），返回 301/302 重定向响应。用户访问 HTTP → 被 ALB 自动跳转到 HTTPS，无需改动任何代码或 DNS。<br><br>这样配置后：<br>• ALB 80 端口 Listener：收到 HTTP 请求 → 返回 301 重定向到 HTTPS<br>• ALB 443 端口 Listener：处理 HTTPS 请求（使用 ACM 证书）<br><br>发邮件（A）是不可能的方案。DNS 无法做协议级别的重定向（C 错，DNS 只能做域名解析）。',ww:'发邮件完全不现实（A 错）。DNS 不能做 HTTP→HTTPS 的协议重定向（C 错）。',rule:'强制 HTTPS → 在 ALB 配置 HTTP 80 端口 Listener Rule：将所有 HTTP 请求 Redirect 到 HTTPS（301）。'},
+
+/* ── RDS 题目 ── */
+{id:'rds_01',topic:'RDS',diff:'high',
+text:'一家公司有 RDS MySQL 数据库，<em>需要在不影响写操作的情况下运行报表查询</em>。最合适的方案是？',
+en:'A company has an RDS MySQL DB. They need to run reporting queries <em>without affecting write operations</em>. What is the best solution?',
+ch:['创建 Multi-AZ 部署，将报表指向 Standby 实例','创建 Read Replica，将报表查询指向它','将 RDS 放在 ALB 后面做水平扩展','升级 RDS 实例到更大规格'],
+ench:['Create Multi-AZ deployment and point reporting to Standby','Create a Read Replica and point reporting queries to it','Put RDS behind an ALB for horizontal scaling','Upgrade the RDS instance to a larger size'],
+ans:1,exp:'<strong>Read Replica（只读副本）</strong>专为分担读流量设计：<br><br>• 使用 <strong>异步复制</strong>，不影响主实例写入性能<br>• 可以有独立的 Endpoint，应用直接连接 Read Replica 跑报表<br>• 最多可创建 <strong>5 个</strong> Read Replica（MySQL/PostgreSQL）<br><br>Multi-AZ 的 Standby 是 <strong>同步复制的 HA 待机节点</strong>，<strong>不对外提供读服务</strong>，客户端无法连接它查询。这是最高频的考试陷阱。',ww:'Multi-AZ Standby 不可读（A 错）。ALB 不支持数据库连接的负载均衡（C 错）。升级规格不能隔离读写流量（D 错）。',rule:'分担读流量 / 报表查询 → Read Replica（异步，可读）。高可用故障转移 → Multi-AZ（同步，Standby 不可读）。'},
+
+{id:'rds_02',topic:'RDS',diff:'high',
+text:'Multi-AZ RDS 部署的主要目的是什么？当主实例发生故障时，<em>自动故障转移大约需要多久</em>？',
+en:'What is the main purpose of Multi-AZ RDS? When the primary fails, approximately how long does automatic failover take?',
+ch:['提升读取性能，故障转移约 10 秒','提供高可用性，故障转移约 60–120 秒','跨 Region 容灾，故障转移约 5 分钟','降低存储成本，故障转移约 30 秒'],
+ench:['Improve read performance, failover ~10 seconds','Provide high availability, failover ~60–120 seconds','Cross-region disaster recovery, failover ~5 minutes','Reduce storage costs, failover ~30 seconds'],
+ans:1,exp:'<strong>Multi-AZ 核心目的：高可用性（HA）</strong><br><br>• 主实例在 AZ-A，同步复制到 <strong>Standby</strong> 在 AZ-B<br>• 主实例故障时，AWS 自动将 DNS 切换到 Standby → <strong>约 60–120 秒</strong>完成故障转移<br>• 应用使用同一个 Endpoint（DNS），无需改代码<br>• Standby <strong>不对外提供读服务</strong>，仅作备用<br><br>Multi-AZ 不提升读性能，也不是跨 Region 方案（那是 Read Replica + 跨 Region 复制）。',ww:'Multi-AZ 不提升读性能（A 错）。跨 Region 容灾用 Read Replica Cross-Region（C 错）。不降低成本，反而更贵（D 错）。',rule:'Multi-AZ = HA 高可用（同步复制，Standby 不可读，DNS 自动切换，60–120s 故障转移）。'},
+
+{id:'rds_03',topic:'RDS',diff:'high',
+text:'公司需要 EC2 上的应用<em>不使用密码</em>连接 RDS，并要求网络传输加密。应选用什么方案？',
+en:'A company needs its EC2 application to connect to RDS <em>without a password</em>, with encrypted network traffic. What should be used?',
+ch:['在 RDS 安全组中允许 EC2 的 IP','启用 RDS IAM 数据库身份验证（IAM DB Authentication）','将数据库密码存入 EC2 环境变量','使用 VPC Peering 连接数据库'],
+ench:['Allow EC2 IP in RDS security group','Enable RDS IAM Database Authentication','Store DB password in EC2 environment variables','Use VPC Peering to connect to the DB'],
+ans:1,exp:'<strong>IAM DB Authentication</strong> 让 EC2 用 IAM Role 生成临时 Token 连接 RDS，无需存储密码：<br><br>• EC2 使用附加的 IAM Role，调用 <code>generate-db-auth-token</code> 获取 <strong>15 分钟有效</strong>的临时 Token<br>• Token 替代密码，通过 <strong>SSL 加密传输</strong>（满足网络加密要求）<br>• 不需要在任何地方存储数据库密码<br>• 支持 MySQL 和 PostgreSQL<br><br>适合场景关键词：<em>无密码、EC2 连 RDS、IAM 托管凭证、临时 Token</em>',ww:'安全组只控制网络访问，不能替代身份验证（A 错）。环境变量存密码是不安全的（C 错）。VPC Peering 是网络连接方案，不涉及身份验证（D 错）。',rule:'EC2 无密码连 RDS → IAM DB Authentication（IAM Role + 临时 Token + SSL）。'},
+
+{id:'rds_04',topic:'RDS',diff:'high',
+text:'什么是 <em>RDS Proxy</em>？在什么场景下强烈推荐使用它？',
+en:'What is <em>RDS Proxy</em>? In which scenario is it strongly recommended?',
+ch:['RDS 的只读副本，用于分担查询负载','管理数据库连接池的代理层，强烈推荐用于 Lambda 访问 RDS','跨 Region 复制 RDS 数据的组件','自动备份 RDS 数据的服务'],
+ench:['A read replica for RDS to offload queries','A connection pooling proxy, strongly recommended for Lambda accessing RDS','A component for cross-region RDS replication','A service that automatically backs up RDS data'],
+ans:1,exp:'<strong>RDS Proxy</strong> 是全托管的数据库<strong>连接池代理</strong>：<br><br><strong>为什么 Lambda 需要它？</strong><br>• Lambda 是无状态函数，每次调用都会新建数据库连接<br>• 高并发时可能同时有数千个 Lambda，直接连 RDS 会<strong>耗尽连接数</strong>（RDS 连接上限有限）<br>• RDS Proxy 在中间维护连接池，Lambda → Proxy → RDS，大幅减少 RDS 的实际连接数<br><br><strong>额外好处：</strong><br>• 故障转移时间缩短 <strong>66%</strong>（Proxy 自动重定向到新主实例）<br>• 支持 IAM Authentication 和 Secrets Manager<br><br>关键词：<em>Lambda + RDS、连接耗尽、Serverless 访问数据库</em>',ww:'Read Replica 是只读副本不是代理（A 错）。跨 Region 复制是另一功能（C 错）。自动备份是 Automated Backup（D 错）。',rule:'Lambda 访问 RDS → 必用 RDS Proxy（防止连接耗尽，提升故障转移速度）。'},
+
+{id:'rds_05',topic:'RDS',diff:'mid',
+text:'Amazon Aurora 相比标准 RDS MySQL/PostgreSQL，最主要的<em>性能和可用性优势</em>是什么？',
+en:'Compared to standard RDS MySQL/PostgreSQL, what are Aurora\'s main <em>performance and availability advantages</em>?',
+ch:['Aurora 比 RDS 便宜 20%，且不支持 Multi-AZ','Aurora 存储跨 3 个 AZ 6 份副本，性能比 MySQL 快 5x、比 PostgreSQL 快 3x','Aurora 只支持单 AZ 部署，但读写速度更快','Aurora 是 NoSQL 数据库，专为低延迟设计'],
+ench:['Aurora is 20% cheaper than RDS and does not support Multi-AZ','Aurora stores 6 copies across 3 AZs, 5x faster than MySQL, 3x faster than PostgreSQL','Aurora only supports single-AZ but with faster read/write','Aurora is a NoSQL DB designed for low latency'],
+ans:1,exp:'<strong>Amazon Aurora 核心优势：</strong><br><br>📦 <strong>存储层：</strong><br>• 数据自动跨 <strong>3 个 AZ</strong> 存储 <strong>6 份副本</strong>（2份/AZ）<br>• 4/6 写入成功 = 写入确认；3/6 读取成功 = 读取确认<br>• 自动修复损坏的数据块（Self-Healing）<br><br>⚡ <strong>性能：</strong><br>• 比标准 MySQL <strong>快 5 倍</strong>，比 PostgreSQL <strong>快 3 倍</strong><br>• 存储自动扩展，10GB 起步，最大 <strong>128TB</strong><br><br>🔌 <strong>端点：</strong><br>• Writer Endpoint（主写）<br>• Reader Endpoint（自动负载均衡到所有 Read Replica）<br>• 最多 <strong>15 个</strong> Read Replica（标准 RDS 最多 5 个）',ww:'Aurora 比 RDS 贵约 20%，不是更便宜（A 错）。Aurora 原生支持 Multi-AZ（C 错）。Aurora 是关系型数据库，不是 NoSQL（D 错）。',rule:'Aurora = MySQL/PostgreSQL 兼容 + 6副本3AZ + 5x/3x 性能 + 最多15个 Read Replica + 自动扩展至128TB。'},
+
+{id:'rds_06',topic:'RDS',diff:'high',
+text:'一个投票系统在直播期间，EC2 实例向 RDS 高速写入投票数据，<em>数据库无法跟上写入速度</em>。如何解决？',
+en:'A voting system during live broadcast: EC2 writes votes to RDS at high speed, <em>the database cannot keep up with write requests</em>. How to fix this?',
+ch:['在 RDS 前加 Read Replica 分担写压力','在 RDS 前加 SQS 队列，EC2 写入队列，异步处理写入 RDS','升级 RDS 到 Multi-AZ 部署','给 RDS 加更多 Read Replica'],
+ench:['Add Read Replica in front of RDS to offload writes','Add SQS queue in front of RDS; EC2 writes to queue, async writes to RDS','Upgrade RDS to Multi-AZ','Add more Read Replicas to RDS'],
+ans:1,exp:'<strong>SQS 队列 + 异步写入</strong> 是解决写入峰值的标准模式：<br><br>• EC2 将投票写入 <strong>SQS 队列</strong>（几乎瞬时完成，不等待 DB）<br>• 后端 Worker（EC2/Lambda）从队列消费，<strong>以数据库能承受的速度</strong>写入 RDS<br>• 峰值流量被队列"削峰填谷"，RDS 不会过载<br><br>这是 SAA 考试非常高频的<strong>解耦（Decoupling）</strong>模式。<br><br>Read Replica 只解决读扩展，对写入瓶颈无效。Multi-AZ 是高可用方案，不提升写入性能。',ww:'Read Replica 只能分担读流量，不能提升写入性能（A 错）。Multi-AZ 是 HA 方案，不解决写入瓶颈（C 错）。更多 Read Replica 同理（D 错）。',rule:'写入瓶颈 → SQS 队列削峰（Decouple）。读取瓶颈 → Read Replica。高可用 → Multi-AZ。'},
+
+/* ── ElastiCache 题目 ── */
+{id:'ec_01',topic:'ElastiCache',diff:'high',
+text:'需要为 Web 应用实现<em>分布式 Session 管理</em>，要求多个 EC2 实例共享 Session，并支持复杂数据结构。应选用哪种方案？',
+en:'Need <em>distributed session management</em> for a web app where multiple EC2 instances share sessions, supporting complex data structures. Which solution?',
+ch:['ElastiCache Memcached — 支持复杂数据结构','ElastiCache Redis — 支持复杂数据结构、持久化和 Pub/Sub','RDS MySQL — 将 Session 存入数据库','EC2 本地文件系统存储 Session'],
+ench:['ElastiCache Memcached — supports complex data structures','ElastiCache Redis — supports complex data structures, persistence, and Pub/Sub','RDS MySQL — store sessions in database','EC2 local file system to store sessions'],
+ans:1,exp:'<strong>Redis vs Memcached 关键区别：</strong><br><br>| 特性 | Redis | Memcached |<br>|------|-------|-----------|<br>| 数据结构 | String/List/Set/Hash/SortedSet | 仅 String |<br>| 持久化 | ✅ AOF/RDB | ❌ |<br>| Pub/Sub | ✅ | ❌ |<br>| 多线程 | ❌ 单线程 | ✅ 多线程 |<br>| Replication | ✅ 主从复制 | ❌ |<br><br>Session 数据通常需要存储对象（Hash），所以选 <strong>Redis</strong>。<br><br>Memcached 适合：纯字符串缓存、需要多线程的极致简单缓存场景。',ww:'Memcached 不支持复杂数据结构（A 错）。RDS 有写入延迟，不适合 Session 高频读写（C 错）。EC2 本地存储无法在多实例间共享（D 错）。',rule:'Session管理/排行榜/复杂结构/持久化/Pub-Sub → Redis。极简缓存/多线程 → Memcached。'},
+
+{id:'ec_02',topic:'ElastiCache',diff:'high',
+text:'公司使用 ElastiCache Redis 存储用户 Session。为了实现<em>跨 Region 的灾难恢复</em>，最少运维操作的方案是？',
+en:'Company uses ElastiCache Redis for user sessions. For <em>cross-Region DR</em> with least operational effort, what is the best solution?',
+ch:['在每个 Region 创建独立 Redis 集群，用 DMS 同步数据','使用 ElastiCache Global Datastore，在其他 Region 创建副本集群','手动拍 Redis 快照并复制到目标 Region，故障时从快照恢复','禁用 Cluster Mode，跨 Region 创建多个复制组'],
+ench:['Create separate Redis clusters per region, sync with DMS','Use ElastiCache Global Datastore, create replica clusters in other regions','Manually snapshot Redis and copy to target region, restore when DR needed','Disable Cluster Mode and create multiple replication groups across regions'],
+ans:1,exp:'<strong>ElastiCache Global Datastore</strong> 是专为跨 Region 场景设计的全托管方案：<br><br>• 一个主 Region 集群 + 最多 2 个副本 Region 集群<br>• <strong>低延迟跨 Region 复制</strong>（约 1 秒）<br>• 灾难恢复时，将副本 Region 的集群 <strong>Promote 为 Primary</strong><br>• 加密跨 Region 数据传输（满足安全要求）<br>• <strong>最少运维操作</strong>，全托管<br><br>手动快照复制方案（C）可行但运维复杂，且 RPO 较高（最后一次快照到故障时间内的数据会丢失）。',ww:'DMS 方案运维复杂（A 错）。手动快照复制有数据丢失风险且运维繁琐（C 错）。禁用 Cluster Mode 方案同样运维复杂（D 错）。',rule:'ElastiCache 跨 Region 灾难恢复 → Global Datastore（低延迟复制 + Promote + 最少运维）。'},
+
+{id:'ec_03',topic:'ElastiCache',diff:'mid',
+text:'一个电商网站数据库压力很大，大量请求是<em>重复读取同一份商品目录</em>。最适合的优化方案是？',
+en:'An e-commerce site has heavy DB load. Most requests are <em>repeated reads of the same product catalog</em>. What is the best optimization?',
+ch:['将 RDS 升级为 Multi-AZ 部署','在 RDS 前加 ElastiCache，缓存热点商品数据','为 RDS 增加更多 Read Replica','将商品目录迁移到 DynamoDB'],
+ench:['Upgrade RDS to Multi-AZ','Add ElastiCache in front of RDS to cache hot product data','Add more Read Replicas to RDS','Migrate product catalog to DynamoDB'],
+ans:1,exp:'<strong>ElastiCache 缓存模式（Lazy Loading）：</strong><br><br>1. 应用先查询 ElastiCache → <strong>Cache Hit</strong> → 直接返回，不查 DB<br>2. Cache Miss → 查 RDS → 将结果写入 ElastiCache → 返回给用户<br>3. 下次相同请求 → Cache Hit → 极低延迟<br><br>商品目录是典型的<strong>读多写少</strong>场景，数据变化不频繁，非常适合缓存。可以大幅降低 RDS 负载。<br><br>缓存策略：<br>• <strong>Lazy Loading</strong>：懒加载，有需求才写缓存（最常用）<br>• <strong>Write Through</strong>：写数据库时同步写缓存',ww:'Multi-AZ 是 HA，不降低读取负载（A 错）。Read Replica 有效但 ElastiCache 速度更快（C 可行但不是最优）。迁移到 DynamoDB 改造成本高（D 错）。',rule:'热点数据反复读取 → ElastiCache 缓存（Lazy Loading）。关键词：重复读取/读多写少/降低DB压力。'},
+
+{id:'ec_04',topic:'ElastiCache',diff:'mid',
+text:'应用使用 ElastiCache Memcached。随着数据量增长，<em>需要水平扩展缓存容量</em>。Memcached 如何扩展？',
+en:'App uses ElastiCache Memcached. As data grows, <em>horizontal scaling of cache capacity</em> is needed. How does Memcached scale?',
+ch:['Memcached 不支持水平扩展，必须换 Redis','添加更多 Memcached 节点（多节点集群），数据分片存储','启用 Memcached 主从复制','开启 Memcached Multi-AZ 自动故障转移'],
+ench:['Memcached does not support horizontal scaling, must switch to Redis','Add more Memcached nodes (multi-node cluster), data is sharded','Enable Memcached primary-replica replication','Enable Memcached Multi-AZ automatic failover'],
+ans:1,exp:'<strong>Memcached 扩展特性：</strong><br><br>✅ <strong>支持多节点水平扩展</strong>：<br>• 添加节点 → 数据通过一致性哈希（Consistent Hashing）分片到不同节点<br>• 总缓存容量 = 所有节点容量之和<br>• 这是 Memcached 相比 Redis 的一个优势（多线程 + 简单水平扩展）<br><br>❌ <strong>Memcached 不支持的：</strong><br>• 没有主从复制<br>• 没有 Multi-AZ 自动故障转移<br>• 节点故障时，该节点上的缓存数据<strong>全部丢失</strong>（无持久化）<br><br>所以 Memcached = <strong>纯缓存，简单粗暴，水平扩展容易，但不可靠</strong>。',ww:'Memcached 支持水平扩展（A 错）。Memcached 没有主从复制功能（C 错）。Memcached 不支持 Multi-AZ（D 错）。',rule:'Memcached 水平扩展 → 加节点 + 数据分片。但无持久化/复制/故障转移。需要这些特性 → 换 Redis。'}
 ];
 
 /* ═══════════════ QUIZ STATE ═══════════════ */
@@ -951,7 +1213,7 @@ function go(id,btn){
   document.querySelectorAll('.mobile-nav-btn').forEach(b=>b.classList.remove('active'));
   const mmap={'home':0,'compare':1,'quiz-home':2,'records':3};
   const mi=mmap[id];if(mi!==undefined){const mb=document.querySelectorAll('.mobile-nav-btn')[mi];if(mb)mb.classList.add('active');}
-  const renders={home:pgHome,compare:pgCompare,'quiz-home':pgQuizHome,records:pgRecords,iam:pgIAM,'instance-types':pgInstanceTypes,'security-groups':pgSecurityGroups,purchasing:pgPurchasing,'ec2-network':pgEC2Network,scalability:pgScalability,elb:pgELB,asg:pgASG,ebs:pgEBS,'ebs-types':pgEBSTypes,snapshot:pgSnapshot,istore:pgIStore,efs:pgEFS,ami:pgAMI};
+  const renders={home:pgHome,compare:pgCompare,'quiz-home':pgQuizHome,records:pgRecords,iam:pgIAM,'instance-types':pgInstanceTypes,'security-groups':pgSecurityGroups,purchasing:pgPurchasing,'ec2-network':pgEC2Network,scalability:pgScalability,elb:pgELB,asg:pgASG,ebs:pgEBS,'ebs-types':pgEBSTypes,snapshot:pgSnapshot,istore:pgIStore,efs:pgEFS,ami:pgAMI,rds:pgRDS,elasticache:pgElastiCache};
   const v=document.getElementById('view');
   v.style.opacity='0';
   setTimeout(()=>{v.innerHTML=(renders[id]||pgHome)();v.style.opacity='1';v.scrollTop=0;updateSbProgress();},80);
@@ -965,7 +1227,7 @@ function updateSbProgress(){
   if(bar)bar.style.width=pct+'%';
   if(txt)txt.textContent=pct+'% · '+ov.done+'/'+QS.length;
   // per-topic rates in sidebar
-  const tmap={'IAM':'sp-iam','Security Group':'sp-sg','Load Balancer':'sp-lb','Auto Scaling Group':'sp-asg','EBS':'sp-ebs'};
+  const tmap={'IAM':'sp-iam','Security Group':'sp-sg','Load Balancer':'sp-lb','Auto Scaling Group':'sp-asg','EBS':'sp-ebs','扩展性与高可用':'sp-ha','RDS':'sp-rds','ElastiCache':'sp-elasticache'};
   Object.entries(tmap).forEach(([tp,elId])=>{
     const el=document.getElementById(elId);
     if(!el)return;
@@ -1304,7 +1566,7 @@ function pgCompare(){return`
     <div style="text-align:center;font-size:18px;color:#94A3B8">↓ HTTP (private VPC)</div>
     <div style="border:2px dashed #4B5563;border-radius:10px;padding:16px;margin:0 0 0 0">
       <div style="text-align:center;color:#F97316;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:12px">📐 Auto Scaling Group</div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+      <div class="g2-sm">
         <div style="background:#1C3A2E;border:1px solid #166534;border-radius:8px;padding:10px;text-align:center">
           <div style="color:#86EFAC;font-size:11px;font-weight:700">🟢 AZ-A (ap-northeast-1a)</div>
           <div style="display:flex;gap:6px;justify-content:center;margin-top:8px">
@@ -1425,7 +1687,7 @@ function pgCompare(){return`
 </div>
 <div class="s-card">
   <h3>📋 SSL / SNI 快速记忆卡</h3>
-  <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+  <div class="g2">
     <div style="background:var(--red-bg);border:1.5px solid var(--red-border);border-radius:var(--r);padding:14px">
       <div style="font-weight:700;color:var(--red);margin-bottom:8px">CLB — SSL 限制</div>
       <div style="font-size:13px;color:var(--ink2)">一个 CLB 只能有<strong>1个 SSL 证书</strong><br>10个域名 = 需要10个 CLB<br>❌ 不支持 SNI</div>
@@ -1447,45 +1709,44 @@ function pgCompare(){return`
 <!-- ══════════════ TAB: ASG POLICIES ══════════════ -->
 <div class="tab-panel" id="tab-asgpol">
 <div class="s-card">
-  <h3>ASG 三种 Scaling Policy 对比</h3>
+  <h3>ASG 四种 Scaling Policy 完整对比</h3>
   <div class="tbl-wrap"><table class="tbl">
-  <tr><th>策略类型</th><th>触发方式</th><th>响应速度</th><th>适用场景</th><th>配置复杂度</th></tr>
-  <tr><td><strong>Target Tracking</strong><br><span style="font-size:11px;color:var(--green)">目标追踪（最推荐）</span></td><td>设定目标指标值<br>（如 CPU=40%）<br>ASG 自动维持</td><td class="good">快（自动持续调整）</td><td>不规律的动态负载<br>不知道流量什么时候来<br><strong>最常用，最简单</strong></td><td class="good">⭐ 最简单</td></tr>
-  <tr><td><strong>Step / Simple Scaling</strong><br><span style="font-size:11px;color:var(--blue)">步进/简单扩缩</span></td><td>CloudWatch Alarm<br>超过阈值时触发</td><td class="mid">中等<br>（等 Alarm 触发）</td><td>需要精细控制<br>不同触发幅度对应不同扩缩步长<br>（如 CPU 70%+2台，90%+4台）</td><td class="mid">⭐⭐⭐ 中等</td></tr>
-  <tr><td><strong>Scheduled Scaling</strong><br><span style="font-size:11px;color:var(--amber)">计划性扩缩</span></td><td>设定时间计划<br>（Cron / 固定时间）</td><td class="good">提前扩容，零延迟</td><td><strong>已知时间规律的流量高峰</strong><br>如：每天9点、每周五、黑五促销</td><td class="mid">⭐⭐ 简单</td></tr>
+  <tr><th>策略类型</th><th>触发方式</th><th>响应速度</th><th>适用场景</th><th>难度</th></tr>
+  <tr><td><strong>Target Tracking</strong><br><span style="font-size:11px;color:var(--green)">目标追踪 ★最推荐</span></td><td>设定目标指标值<br>ASG 自动维持</td><td class="good">快·持续调整</td><td>不规律动态负载<br><strong>大多数情况首选</strong></td><td class="good">⭐ 最简单</td></tr>
+  <tr><td><strong>Step / Simple Scaling</strong><br><span style="font-size:11px;color:var(--blue)">步进/简单</span></td><td>CloudWatch Alarm<br>超阈值触发</td><td class="mid">中·等Alarm触发</td><td>需精细控制<br>按严重程度分阶梯扩缩</td><td class="mid">⭐⭐⭐</td></tr>
+  <tr><td><strong>Scheduled Scaling</strong><br><span style="font-size:11px;color:var(--amber)">计划性</span></td><td>固定时间/Cron</td><td class="good">提前·零延迟</td><td><strong>已知时间规律高峰</strong><br>如每天9点、每周五</td><td class="mid">⭐⭐</td></tr>
+  <tr><td><strong>Predictive Scaling</strong><br><span style="font-size:11px;color:var(--purple)">ML预测</span></td><td>ML分析历史负载<br>自动预测+调度</td><td class="good">提前·自动学习</td><td>周期性规律<br>但 pattern 复杂，不想手动配</td><td class="good">⭐⭐ 配好即自动</td></tr>
   </table></div>
 </div>
 <div class="s-card">
   <h3>🎯 选策略决策树</h3>
   <div style="display:grid;gap:6px;font-size:13px">
     ${[
-      ['流量没有规律，需要动态伸缩，想用最简单的方式','→ Target Tracking Scaling（设 CPU 目标值）','green'],
-      ['明确知道哪个时间段流量高（如每天9点、每周五）','→ Scheduled Scaling（提前扩容）','amber'],
-      ['需要根据报警的严重程度分阶段扩缩（超70%+2台，超90%+4台）','→ Step Scaling','blue'],
-      ['题目问"最简单/建议的扩缩方式"','→ Target Tracking（考试最常见答案）','green'],
+      ['流量没规律，想用最简单的方式弹性扩缩','→ Target Tracking Scaling','green'],
+      ['明确知道哪个时间段流量高（如每天9点、每周五下午5点）','→ Scheduled Scaling（提前手动设置）','amber'],
+      ['流量有周期性规律，但不想手动维护时间计划','→ Predictive Scaling（AWS ML 自动预测）','purple'],
+      ['需要根据 Alarm 严重程度分阶梯加实例','→ Step Scaling','blue'],
+      ['题目问"最简单/最推荐的扩缩方式"','→ Target Tracking（考试高频正确答案）','green'],
     ].map(([q,a,c])=>`<div style="display:grid;grid-template-columns:1fr auto;gap:8px;align-items:center;padding:10px 12px;background:var(--surface2);border-radius:8px"><span style="color:var(--ink2)">${q}</span><span style="background:var(--${c}-bg);color:var(--${c});padding:4px 12px;border-radius:6px;font-weight:700;font-size:12px;white-space:nowrap">${a}</span></div>`).join('')}
   </div>
 </div>
 <div class="s-card">
-  <h3>ASG 关键参数速查卡</h3>
-  <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:14px">
-    <div style="background:var(--green-bg);border:2px solid var(--green-border);border-radius:var(--r);padding:14px;text-align:center">
-      <div style="font-size:24px;font-weight:700;color:var(--green)">Min</div>
-      <div style="font-size:12px;color:var(--ink2);margin-top:4px">最小容量<br>再闲也不低于此</div>
+  <h3>⏱️ Scaling Cooldown — 冷却期速查</h3>
+  <div class="g2" style="margin-bottom:12px">
+    <div style="background:var(--blue-bg);border:1.5px solid var(--blue-border);border-radius:var(--r);padding:14px">
+      <div style="font-weight:700;color:var(--blue);margin-bottom:6px">默认冷却时间</div>
+      <div style="font-size:28px;font-weight:700;color:var(--blue)">300 秒</div>
+      <div style="font-size:12px;color:var(--ink3);margin-top:4px">每次扩缩后进入冷却期</div>
     </div>
-    <div style="background:var(--blue-bg);border:2px solid var(--blue-border);border-radius:var(--r);padding:14px;text-align:center">
-      <div style="font-size:24px;font-weight:700;color:var(--blue)">Desired</div>
-      <div style="font-size:12px;color:var(--ink2);margin-top:4px">期望容量<br>被 Policy 动态调整</div>
-    </div>
-    <div style="background:var(--red-bg);border:2px solid var(--red-border);border-radius:var(--r);padding:14px;text-align:center">
-      <div style="font-size:24px;font-weight:700;color:var(--red)">Max</div>
-      <div style="font-size:12px;color:var(--ink2);margin-top:4px">最大容量<br>硬性上限，不可超</div>
+    <div style="background:var(--green-bg);border:1.5px solid var(--green-border);border-radius:var(--r);padding:14px">
+      <div style="font-weight:700;color:var(--green);margin-bottom:6px">如何缩短冷却</div>
+      <div style="font-size:13px;color:var(--ink2);margin-top:4px">使用 <strong>Ready-to-use AMI</strong><br>新实例启动更快 → 指标更快稳定</div>
     </div>
   </div>
   <div class="tbl-wrap"><table class="tbl">
-  <tr><th>Health Check 类型</th><th>检测范围</th><th>能检测应用崩溃？</th><th>推荐程度</th></tr>
-  <tr><td>EC2 Status Check（默认）</td><td>OS / 虚拟机层面</td><td class="bad">❌ 不能</td><td class="mid">基础，不够用</td></tr>
-  <tr><td><strong>ELB Health Check</strong></td><td>应用层 HTTP 响应</td><td class="good">✅ 能</td><td class="good">生产环境必用</td></tr>
+  <tr><th>Health Check 类型</th><th>检测范围</th><th>能检测应用崩溃？</th><th>推荐</th></tr>
+  <tr><td>EC2 Status Check（默认）</td><td>OS/虚拟机层面</td><td class="bad">❌ 不能</td><td class="mid">不够用</td></tr>
+  <tr><td><strong>ELB Health Check</strong></td><td>HTTP响应（应用层）</td><td class="good">✅ 能</td><td class="good">生产必用</td></tr>
   </table></div>
 </div>
 </div>
@@ -2000,6 +2261,342 @@ function pgAMI(){return`${back()}
   ${trapdiv('amber','中频','删除 AMI 不会自动删除底层 Snapshot','AMI 删除后，底层的 EBS Snapshot 不会自动清除，需要手动删除，否则继续计费。')}
 </div>`}
 
+/* ═══════════════ RDS PAGE ═══════════════ */
+function pgRDS(){return`${back()}
+<div class="pg-title">Amazon RDS & Aurora</div>
+<div class="pg-tags">
+  <span class="tag tag-high">⭐ 高频考点</span>
+  <span class="tag tag-mid">Section 9</span>
+  <span class="tag tag-low">关系型数据库</span>
+</div>
+
+<div class="s-card">
+  <h3>🗄️ RDS 是什么？</h3>
+  <p style="color:var(--ink2);font-size:15px;line-height:1.8">RDS（Relational Database Service）是 AWS 的<strong>托管关系型数据库服务</strong>。AWS 负责操作系统打补丁、数据库软件升级、备份、监控——你只需管理数据和应用。</p>
+  <div class="g2" style="margin-top:12px">
+    <div style="background:var(--aws-bg);border:1.5px solid var(--aws-border);border-radius:8px;padding:12px">
+      <div style="font-size:12px;font-weight:700;color:var(--aws);margin-bottom:8px">✅ 支持的数据库引擎</div>
+      <div class="bl">
+        <div class="bl-item"><span class="bl-dot"></span>PostgreSQL</div>
+        <div class="bl-item"><span class="bl-dot"></span>MySQL</div>
+        <div class="bl-item"><span class="bl-dot"></span>MariaDB</div>
+        <div class="bl-item"><span class="bl-dot"></span>Oracle</div>
+        <div class="bl-item"><span class="bl-dot"></span>Microsoft SQL Server</div>
+        <div class="bl-item"><span class="bl-dot"></span>IBM DB2</div>
+      </div>
+    </div>
+    <div style="background:var(--red-bg);border:1.5px solid var(--red-border);border-radius:8px;padding:12px">
+      <div style="font-size:12px;font-weight:700;color:var(--red);margin-bottom:8px">❌ RDS 做不到</div>
+      <div class="bl">
+        <div class="bl-item"><span class="bl-dot" style="background:var(--red)"></span>SSH 登录数据库实例</div>
+        <div class="bl-item"><span class="bl-dot" style="background:var(--red)"></span>自定义 OS 配置（用 RDS Custom）</div>
+        <div class="bl-item"><span class="bl-dot" style="background:var(--red)"></span>访问底层服务器文件</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="s-card">
+  <h3>🔁 Read Replica vs Multi-AZ — 最高频考点</h3>
+  ${trapdiv('red','极高频','Multi-AZ Standby 不对外提供读服务','这是最常见的陷阱！Standby 实例只作备用，客户端无法连接它查询。想分担读流量 → Read Replica。')}
+  <div style="overflow-x:auto;margin-top:12px">
+  <table class="tbl">
+    <tr><th>对比维度</th><th>Read Replica</th><th>Multi-AZ</th></tr>
+    <tr><td>主要目的</td><td class="good">读扩展（分担读流量）</td><td class="good">高可用（HA / 故障转移）</td></tr>
+    <tr><td>复制方式</td><td>异步复制（Async）</td><td>同步复制（Sync）</td></tr>
+    <tr><td>副本可读？</td><td class="good">✅ 可以直接查询</td><td class="bad">❌ Standby 不可读</td></tr>
+    <tr><td>故障转移</td><td class="bad">❌ 不自动</td><td class="good">✅ 自动（60–120 秒）</td></tr>
+    <tr><td>副本数量</td><td>最多 5 个</td><td>1 个 Standby</td></tr>
+    <tr><td>跨 Region</td><td class="good">✅ 支持</td><td class="bad">❌ 同 Region</td></tr>
+    <tr><td>网络费用</td><td>跨 AZ 有费用；同 AZ 免费</td><td>无额外网络费用</td></tr>
+    <tr><td>典型场景</td><td>报表查询、读多写少</td><td>生产数据库、高可用要求</td></tr>
+  </table>
+  </div>
+
+  <div style="margin-top:16px">
+  <div style="font-size:13px;font-weight:700;color:var(--ink);margin-bottom:10px">📊 架构流程图</div>
+  <div class="flow">
+    <div class="flow-step">
+      <div><div class="flow-n">1</div></div>
+      <div class="flow-body"><strong>应用层（EC2）</strong> — 写入请求全部发往 <strong>主实例（Primary）</strong></div>
+    </div>
+    <div class="flow-step">
+      <div><div class="flow-n">2</div></div>
+      <div class="flow-body"><strong>Multi-AZ Standby</strong>（AZ-B）：同步复制，<em>等待主确认</em>，不对外服务 → <strong>仅备用</strong></div>
+    </div>
+    <div class="flow-step">
+      <div><div class="flow-n">3</div></div>
+      <div class="flow-body"><strong>Read Replica × N</strong>：异步复制，暴露独立 Endpoint → 应用的<em>报表/只读查询</em>直连 Read Replica</div>
+    </div>
+    <div class="flow-step">
+      <div><div class="flow-n">4</div></div>
+      <div class="flow-body"><strong>主实例故障</strong> → Multi-AZ：DNS 自动切换到 Standby（60–120s）。Read Replica 可手动 Promote 成主实例（需人工操作）</div>
+    </div>
+  </div>
+  </div>
+</div>
+
+<div class="s-card">
+  <h3>🔒 RDS Security</h3>
+  <div class="g2" style="margin-top:8px">
+    <div style="background:var(--surface2);border-radius:8px;padding:12px">
+      <div style="font-size:12px;font-weight:700;color:var(--ink);margin-bottom:8px">传输加密</div>
+      <div class="bl">
+        <div class="bl-item"><span class="bl-dot"></span>支持 SSL/TLS 加密连接</div>
+        <div class="bl-item"><span class="bl-dot"></span>可强制要求客户端必须用 SSL</div>
+      </div>
+    </div>
+    <div style="background:var(--surface2);border-radius:8px;padding:12px">
+      <div style="font-size:12px;font-weight:700;color:var(--ink);margin-bottom:8px">静态加密</div>
+      <div class="bl">
+        <div class="bl-item"><span class="bl-dot"></span>KMS 加密（创建时开启）</div>
+        <div class="bl-item"><span class="bl-dot"></span>加密后 Snapshot、Read Replica 也自动加密</div>
+      </div>
+    </div>
+    <div style="background:var(--green-bg);border:1.5px solid var(--green-border);border-radius:8px;padding:12px">
+      <div style="font-size:12px;font-weight:700;color:var(--green);margin-bottom:8px">IAM DB Authentication ⭐</div>
+      <div class="bl">
+        <div class="bl-item"><span class="bl-dot" style="background:var(--green)"></span>EC2 用 IAM Role 获取临时 Token（15 分钟有效）</div>
+        <div class="bl-item"><span class="bl-dot" style="background:var(--green)"></span><strong>无需存储数据库密码</strong></div>
+        <div class="bl-item"><span class="bl-dot" style="background:var(--green)"></span>支持 MySQL / PostgreSQL</div>
+        <div class="bl-item"><span class="bl-dot" style="background:var(--green)"></span>配合 SSL 确保传输加密</div>
+      </div>
+    </div>
+    <div style="background:var(--surface2);border-radius:8px;padding:12px">
+      <div style="font-size:12px;font-weight:700;color:var(--ink);margin-bottom:8px">网络访问控制</div>
+      <div class="bl">
+        <div class="bl-item"><span class="bl-dot"></span>部署在 VPC 私有子网</div>
+        <div class="bl-item"><span class="bl-dot"></span>Security Group 控制入站端口（MySQL: 3306，PostgreSQL: 5432）</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="s-card">
+  <h3>🔌 RDS Proxy — Lambda 场景必考</h3>
+  <div style="font-size:15px;color:var(--ink2);line-height:1.8;margin-bottom:12px">
+    <strong>问题场景：</strong>Lambda 是无状态的，每次调用都新建数据库连接。高并发时数千个 Lambda 同时运行 → RDS 连接数被耗尽。
+  </div>
+  <div class="flow">
+    <div class="flow-step">
+      <div><div class="flow-n" style="background:var(--purple-bg,#F2EEFF);border-color:var(--purple,#7C3AED);color:var(--purple,#7C3AED)">λ</div></div>
+      <div class="flow-body"><strong>数千个 Lambda 并发</strong> → 每个都尝试连接数据库</div>
+    </div>
+    <div class="flow-step">
+      <div><div class="flow-n" style="background:var(--green-bg);border-color:var(--green-border);color:var(--green)">P</div></div>
+      <div class="flow-body"><strong>RDS Proxy（连接池）</strong> → 将数千连接合并为少量长连接 → 大幅减少 RDS 实际连接数</div>
+    </div>
+    <div class="flow-step">
+      <div><div class="flow-n">DB</div></div>
+      <div class="flow-body"><strong>RDS 实例</strong> → 只看到来自 Proxy 的少量连接，不会过载</div>
+    </div>
+  </div>
+  <div class="g2-sm" style="margin-top:12px">
+    <div style="background:var(--green-bg);border:1.5px solid var(--green-border);border-radius:8px;padding:10px;font-size:13px">
+      <div style="font-weight:700;color:var(--green);margin-bottom:6px">✅ RDS Proxy 优势</div>
+      <div>• 防止连接耗尽</div>
+      <div>• 故障转移时间缩短 <strong>66%</strong></div>
+      <div>• 支持 IAM Auth + Secrets Manager</div>
+      <div>• Serverless，全托管</div>
+    </div>
+    <div style="background:var(--aws-bg);border:1.5px solid var(--aws-border);border-radius:8px;padding:10px;font-size:13px">
+      <div style="font-weight:700;color:var(--aws);margin-bottom:6px">🎯 适用场景关键词</div>
+      <div>• Lambda + RDS</div>
+      <div>• 连接数耗尽</div>
+      <div>• Serverless 访问数据库</div>
+      <div>• 需要提升故障转移速度</div>
+    </div>
+  </div>
+  ${trapdiv('amber','高频','RDS Proxy 只能在 VPC 内访问','RDS Proxy 没有公网访问端点，只能在 VPC 私有网络内使用。Lambda 也应部署在 VPC 内。')}
+</div>
+
+<div class="s-card">
+  <h3>⚡ Amazon Aurora — AWS 自研云原生数据库</h3>
+  <div style="font-size:15px;color:var(--ink2);line-height:1.8;margin-bottom:14px">Aurora 与标准 RDS 兼容，但针对云环境进行了架构级优化：</div>
+  <div class="g3" style="margin-bottom:16px">
+    <div style="background:var(--aws-bg);border:1.5px solid var(--aws-border);border-radius:8px;padding:12px;text-align:center">
+      <div style="font-size:24px;margin-bottom:4px">⚡</div>
+      <div style="font-size:13px;font-weight:700;color:var(--aws)">5x 快于 MySQL</div>
+      <div style="font-size:12px;color:var(--ink3);margin-top:4px">3x 快于 PostgreSQL</div>
+    </div>
+    <div style="background:var(--green-bg);border:1.5px solid var(--green-border);border-radius:8px;padding:12px;text-align:center">
+      <div style="font-size:24px;margin-bottom:4px">🔒</div>
+      <div style="font-size:13px;font-weight:700;color:var(--green)">6 副本 × 3 AZ</div>
+      <div style="font-size:12px;color:var(--ink3);margin-top:4px">写4/6确认，读3/6确认</div>
+    </div>
+    <div style="background:var(--blue-bg);border:1.5px solid var(--blue-border);border-radius:8px;padding:12px;text-align:center">
+      <div style="font-size:24px;margin-bottom:4px">📦</div>
+      <div style="font-size:13px;font-weight:700;color:var(--blue)">10GB → 128TB</div>
+      <div style="font-size:12px;color:var(--ink3);margin-top:4px">存储自动扩展</div>
+    </div>
+  </div>
+  <div style="overflow-x:auto">
+  <table class="tbl">
+    <tr><th>Aurora vs RDS</th><th>Aurora</th><th>标准 RDS</th></tr>
+    <tr><td>Read Replica 上限</td><td class="good"><strong>15 个</strong></td><td>5 个</td></tr>
+    <tr><td>存储副本数</td><td class="good">6 份（3 AZ）</td><td>2 份（Multi-AZ）</td></tr>
+    <tr><td>存储扩展</td><td class="good">自动（最大 128TB）</td><td>手动调整</td></tr>
+    <tr><td>费用</td><td class="bad">约贵 20%</td><td>较便宜</td></tr>
+    <tr><td>兼容性</td><td>MySQL / PostgreSQL</td><td>多种引擎</td></tr>
+  </table>
+  </div>
+  <div style="margin-top:14px;background:var(--surface2);border-radius:8px;padding:12px;font-size:14px">
+    <div style="font-weight:700;margin-bottom:8px">🔌 Aurora Endpoints（端点）</div>
+    <div class="bl">
+      <div class="bl-item"><span class="bl-dot" style="background:var(--aws)"></span><strong>Writer Endpoint</strong>：永远指向当前主实例（故障转移后自动更新），用于所有写操作</div>
+      <div class="bl-item"><span class="bl-dot" style="background:var(--green)"></span><strong>Reader Endpoint</strong>：自动负载均衡到所有 Read Replica，用于读操作</div>
+      <div class="bl-item"><span class="bl-dot" style="background:var(--blue)"></span><strong>Custom Endpoint</strong>：指向部分实例（如高性能实例组），用于分析查询</div>
+    </div>
+  </div>
+  ${trapdiv('amber','中频','Aurora 比标准 RDS 贵约 20%','如果题目强调"成本最优"且对高可用要求不极致，标准 RDS Multi-AZ 可能是更好答案。Aurora 更适合"高性能/高可用/无缝扩展"场景。')}
+</div>
+
+<div class="s-card">
+  <h3>⚠️ 高频考试陷阱总结</h3>
+  ${trapdiv('red','极高频','Read Replica vs Multi-AZ 混淆','读扩展/报表查询 → Read Replica。高可用/故障转移 → Multi-AZ。Standby 永远不可读！')}
+  ${trapdiv('red','高频','Lambda + RDS → 必须用 RDS Proxy','Lambda 并发高，直连 RDS 会耗尽连接数。看到 Lambda + 数据库 → 首选 RDS Proxy。')}
+  ${trapdiv('amber','高频','IAM DB Auth 使用临时 Token，15 分钟有效','不是永久凭证，每次需要重新生成。适合 EC2 无密码连接 RDS 的场景。')}
+  ${trapdiv('amber','中频','Aurora Read Replica 最多 15 个（RDS 只有 5 个）','题目如果说"需要大量只读副本"→ Aurora 更合适。')}
+  ${trapdiv('amber','中频','RDS 备份：自动备份（1–35天）vs 手动快照（永久保留）','题目问"保留超过 35 天"→ 必须用手动快照（Manual Snapshot），不能用自动备份。')}
+</div>`}
+
+/* ═══════════════ ELASTICACHE PAGE ═══════════════ */
+function pgElastiCache(){return`${back()}
+<div class="pg-title">Amazon ElastiCache</div>
+<div class="pg-tags">
+  <span class="tag tag-high">⭐ 高频考点</span>
+  <span class="tag tag-mid">Section 9</span>
+  <span class="tag tag-low">内存缓存</span>
+</div>
+
+<div class="s-card">
+  <h3>💡 ElastiCache 是什么？</h3>
+  <p style="color:var(--ink2);font-size:15px;line-height:1.8">ElastiCache 是 AWS 的<strong>托管内存缓存服务</strong>，基于 Redis 或 Memcached。核心价值：将热点数据放在内存中，响应速度比读取数据库快 <strong>100–1000 倍</strong>，同时大幅降低数据库负载。</p>
+  <div class="flow" style="margin-top:14px">
+    <div class="flow-step">
+      <div><div class="flow-n">1</div></div>
+      <div class="flow-body"><strong>应用请求数据</strong> → 先查 ElastiCache</div>
+    </div>
+    <div class="flow-step">
+      <div><div class="flow-n">✅</div></div>
+      <div class="flow-body"><strong>Cache Hit（命中）</strong> → 直接从内存返回，极低延迟，<em>数据库不参与</em></div>
+    </div>
+    <div class="flow-step">
+      <div><div class="flow-n">❌</div></div>
+      <div class="flow-body"><strong>Cache Miss（未命中）</strong> → 查 RDS → 将结果写入 ElastiCache → 返回给用户（Lazy Loading 模式）</div>
+    </div>
+  </div>
+</div>
+
+<div class="s-card">
+  <h3>🆚 Redis vs Memcached — 必考对比</h3>
+  ${trapdiv('red','极高频','分不清 Redis 和 Memcached 适用场景','Session、排行榜、复杂结构、持久化 → Redis。纯字符串缓存、需要多线程 → Memcached。')}
+  <div style="overflow-x:auto;margin-top:12px">
+  <table class="tbl">
+    <tr><th>特性</th><th>Redis ✅</th><th>Memcached</th></tr>
+    <tr><td>数据结构</td><td class="good">String/List/Set/Hash/SortedSet/Bitmap</td><td class="bad">仅 String</td></tr>
+    <tr><td>持久化</td><td class="good">✅ AOF / RDB 快照</td><td class="bad">❌ 断电全丢</td></tr>
+    <tr><td>主从复制</td><td class="good">✅ 支持</td><td class="bad">❌ 不支持</td></tr>
+    <tr><td>Multi-AZ 故障转移</td><td class="good">✅ 自动</td><td class="bad">❌ 不支持</td></tr>
+    <tr><td>Pub/Sub 消息</td><td class="good">✅ 支持</td><td class="bad">❌ 不支持</td></tr>
+    <tr><td>Global Datastore</td><td class="good">✅ 跨 Region</td><td class="bad">❌ 不支持</td></tr>
+    <tr><td>线程模型</td><td>单线程</td><td class="good">多线程（简单场景更快）</td></tr>
+    <tr><td>水平扩展</td><td class="good">✅ Cluster Mode</td><td class="good">✅ 多节点分片</td></tr>
+    <tr><td>典型场景</td><td>Session / 排行榜 / 计数器 / 实时分析</td><td>简单 Key-Value 缓存</td></tr>
+  </table>
+  </div>
+
+  <div class="g2" style="margin-top:14px">
+    <div style="background:var(--green-bg);border:1.5px solid var(--green-border);border-radius:8px;padding:12px">
+      <div style="font-size:12px;font-weight:700;color:var(--green);margin-bottom:8px">选 Redis 的关键词</div>
+      <div class="bl">
+        <div class="bl-item"><span class="bl-dot" style="background:var(--green)"></span>Session 管理（需要对象/Hash）</div>
+        <div class="bl-item"><span class="bl-dot" style="background:var(--green)"></span>排行榜（Sorted Set）</div>
+        <div class="bl-item"><span class="bl-dot" style="background:var(--green)"></span>需要持久化</div>
+        <div class="bl-item"><span class="bl-dot" style="background:var(--green)"></span>Pub/Sub 消息</div>
+        <div class="bl-item"><span class="bl-dot" style="background:var(--green)"></span>需要 Multi-AZ 高可用</div>
+        <div class="bl-item"><span class="bl-dot" style="background:var(--green)"></span>跨 Region 复制（Global Datastore）</div>
+      </div>
+    </div>
+    <div style="background:var(--surface2);border-radius:8px;padding:12px">
+      <div style="font-size:12px;font-weight:700;color:var(--ink);margin-bottom:8px">选 Memcached 的关键词</div>
+      <div class="bl">
+        <div class="bl-item"><span class="bl-dot"></span>纯粹的简单缓存</div>
+        <div class="bl-item"><span class="bl-dot"></span>Key-Value 均为字符串</div>
+        <div class="bl-item"><span class="bl-dot"></span>多线程，单节点性能更高</div>
+        <div class="bl-item"><span class="bl-dot"></span>不在乎数据丢失</div>
+        <div class="bl-item"><span class="bl-dot"></span>简单水平分片扩展</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="s-card">
+  <h3>🏗️ 常见架构模式</h3>
+  <div style="font-size:13px;font-weight:700;color:var(--ink);margin-bottom:10px">① DB Cache（数据库缓存）— 最常见</div>
+  <div class="flow">
+    <div class="flow-step">
+      <div><div class="flow-n">Q</div></div>
+      <div class="flow-body">应用查询 → 先问 <strong>ElastiCache</strong></div>
+    </div>
+    <div class="flow-step">
+      <div><div class="flow-n">H</div></div>
+      <div class="flow-body"><strong>Hit</strong>：直接返回缓存结果（微秒级延迟）</div>
+    </div>
+    <div class="flow-step">
+      <div><div class="flow-n">M</div></div>
+      <div class="flow-body"><strong>Miss</strong>：查 RDS → 写入 ElastiCache → 返回（<em>Lazy Loading</em>）</div>
+    </div>
+  </div>
+
+  <div style="font-size:13px;font-weight:700;color:var(--ink);margin:16px 0 10px">② User Session Store（Session 共享）</div>
+  <div style="background:var(--surface2);border-radius:8px;padding:12px;font-size:14px;color:var(--ink2);line-height:1.8">
+    多台 EC2 后面有 ALB（负载均衡）。用户登录后，Session 写入 <strong>ElastiCache Redis</strong>。<br>
+    无论请求被路由到哪台 EC2，都能从 Redis 读到相同的 Session → <strong>无状态架构</strong><br>
+    关键词：<em>sticky session 的替代方案 / 无状态 / 水平扩展</em>
+  </div>
+
+  <div style="font-size:13px;font-weight:700;color:var(--ink);margin:16px 0 10px">③ 缓存策略对比</div>
+  <div style="overflow-x:auto">
+  <table class="tbl">
+    <tr><th>策略</th><th>Lazy Loading（懒加载）</th><th>Write Through（同步写）</th></tr>
+    <tr><td>写入时机</td><td>Cache Miss 时才写缓存</td><td>写 DB 时同步写缓存</td></tr>
+    <tr><td>数据新鲜度</td><td class="bad">可能读到过期数据（Stale）</td><td class="good">缓存始终是最新的</td></tr>
+    <tr><td>冷启动</td><td class="bad">刚启动时大量 Cache Miss</td><td class="good">缓存提前预热</td></tr>
+    <tr><td>写性能</td><td class="good">写 DB 不受影响</td><td class="bad">每次写都要更新缓存</td></tr>
+    <tr><td>适合场景</td><td>读多写少、可容忍短暂数据过时</td><td>数据一致性要求高</td></tr>
+  </table>
+  </div>
+</div>
+
+<div class="s-card">
+  <h3>🌍 ElastiCache Global Datastore（跨 Region）</h3>
+  <div style="font-size:15px;color:var(--ink2);line-height:1.8;margin-bottom:12px">仅 <strong>Redis</strong> 支持。用于跨 Region 灾难恢复和低延迟全球读取。</div>
+  <div class="flow">
+    <div class="flow-step">
+      <div><div class="flow-n">P</div></div>
+      <div class="flow-body"><strong>Primary Region</strong>（us-east-1）：主集群，处理写操作</div>
+    </div>
+    <div class="flow-step">
+      <div><div class="flow-n">R</div></div>
+      <div class="flow-body"><strong>Replica Region</strong>（ap-northeast-1）：副本集群，处理本地读取，约 <strong>1 秒</strong>延迟复制</div>
+    </div>
+    <div class="flow-step">
+      <div><div class="flow-n">🆘</div></div>
+      <div class="flow-body"><strong>灾难恢复</strong>：将副本 Region 集群 <strong>Promote 为 Primary</strong> → 新的写入端点生效</div>
+    </div>
+  </div>
+  ${trapdiv('amber','高频','Global Datastore 是 Redis 专属功能','Memcached 不支持跨 Region 复制。题目出现"跨 Region ElastiCache"→ 答案必须是 Redis。')}
+</div>
+
+<div class="s-card">
+  <h3>⚠️ 高频考试陷阱</h3>
+  ${trapdiv('red','极高频','Session 管理 → Redis（不是 Memcached）','Session 对象需要 Hash 数据结构，只有 Redis 支持。Memcached 只支持 String。')}
+  ${trapdiv('red','高频','ElastiCache 不能持久化 → 只有 Redis 可以','题目问"缓存数据需要持久化/不能丢"→ 必须选 Redis，Memcached 断电全丢。')}
+  ${trapdiv('amber','高频','降低 DB 负载 → ElastiCache（不是 Read Replica）','Read Replica 也能分担读，但 ElastiCache 速度更快（内存 vs 磁盘）。强调"极低延迟缓存"→ ElastiCache。')}
+  ${trapdiv('amber','中频','ElastiCache 不支持 SQL 查询','ElastiCache 是 Key-Value 缓存，不是数据库。需要 SQL 查询 → RDS/Aurora。')}
+</div>`}
+
 /* ═══════════════ RECORDS PAGE ═══════════════ */
 function pgRecords(){
   const ov=Store.overall();
@@ -2022,7 +2619,7 @@ function pgRecords(){
 
 ${ov.done===0?`<div class="s-card" style="text-align:center;padding:40px"><div style="font-size:36px;margin-bottom:12px">📝</div><div style="font-size:16px;color:var(--ink3)">还没有答题记录</div><div style="margin-top:16px"><button class="btn btn-primary" onclick="go('quiz-home')">去做练习题 →</button></div></div>`:`
 
-<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:20px">
+<div class="g3" style="margin-bottom:20px">
   <div class="s-card" style="text-align:center;padding:20px">
     <div style="font-size:32px;font-weight:700;color:var(--aws)">${ov.done}</div>
     <div style="font-size:13px;color:var(--ink3);margin-top:4px">已练习题数 / ${QS.length}</div>
@@ -2343,7 +2940,7 @@ function pgScalability(){return`${back()}
 
 <div class="s-card" style="background:var(--blue-bg);border-color:var(--blue-border)">
   <h3 style="color:var(--blue)">💡 先建立一个直觉：用呼叫中心来理解</h3>
-  <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-top:8px">
+  <div class="g3" style="margin-top:8px">
     <div style="background:var(--surface);border-radius:var(--r);padding:14px;text-align:center">
       <div style="font-size:24px;margin-bottom:8px">🧑‍💼→👨‍💼</div>
       <div style="font-size:13px;font-weight:700;color:var(--ink);margin-bottom:4px">垂直扩展</div>
@@ -2420,7 +3017,7 @@ function pgELB(){return`${back()}
 
 <div class="s-card">
   <h3>为什么要用 Load Balancer？</h3>
-  <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+  <div class="g2-sm">
     ${[
       ['📦','分散负载','把请求均匀分配到多台下游实例'],
       ['🔗','单一入口','暴露一个 DNS 名称，用户不需要知道实例 IP'],
@@ -2545,7 +3142,7 @@ function pgELB(){return`${back()}
 
 <div class="s-card">
   <h3>Cross-Zone Load Balancing（跨可用区负载均衡）</h3>
-  <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px">
+  <div class="g2" style="margin-bottom:16px">
     <div style="background:var(--surface2);border-radius:var(--r);padding:14px;font-size:13px">
       <div style="font-weight:700;color:var(--green);margin-bottom:6px">✅ With Cross-Zone LB（开启后）</div>
       <div style="color:var(--ink2)">每个 LB 节点把流量<strong>平均分发到所有 AZ 的所有实例</strong>。<br>例：2个AZ，AZ1有2台，AZ2有8台 → 每台实例各收到 10% 流量。</div>
@@ -2567,7 +3164,7 @@ function pgELB(){return`${back()}
 <div class="s-card">
   <h3>Sticky Sessions / Session Affinity（粘性会话）</h3>
   <p style="font-size:15px;color:var(--ink2);line-height:1.8;margin-bottom:14px">Sticky Sessions 让<strong>同一个客户端每次都被路由到同一台后端实例</strong>，通过 Cookie 实现。支持的 LB：<strong>CLB、ALB、NLB</strong>。</p>
-  <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px">
+  <div class="g2" style="margin-bottom:16px">
     <div style="background:var(--green-bg);border:1px solid var(--green-border);border-radius:var(--r);padding:12px">
       <div style="font-weight:700;color:var(--green);font-size:13px;margin-bottom:4px">✅ 使用场景</div>
       <div style="font-size:13px;color:var(--ink2)">确保用户的 Session 数据不丢失（如购物车、登录状态），用户体验一致</div>
@@ -2658,7 +3255,7 @@ function pgASG(){return`${back()}
 
 <div class="s-card">
   <h3>ASG 的核心目标（Goals）</h3>
-  <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+  <div class="g2-sm">
     ${[
       ['📈','Scale Out','增加 EC2 实例数量，应对流量增加 (Add instances to match increased load)'],
       ['📉','Scale In','减少 EC2 实例数量，节省成本 (Remove instances to match decreased load)'],
@@ -2704,7 +3301,7 @@ function pgASG(){return`${back()}
   <h3>Launch Template（启动模板）</h3>
   <p style="font-size:15px;color:var(--ink2);line-height:1.8;margin-bottom:14px">Launch Template 是 ASG 的<strong>"员工入职手册"</strong>——告诉 ASG：每台新实例应该长什么样、装什么软件、配什么权限。<br>
   <span style="font-size:13px;color:var(--ink3)">⚠️ 旧版 "Launch Configurations" 已废弃（Deprecated），考试只认 Launch Template。</span></p>
-  <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+  <div class="g2-sm">
     ${[
       ['🖼️','AMI + Instance Type','用哪个镜像、什么机器规格'],
       ['📜','EC2 User Data','首次启动时执行的初始化脚本'],
@@ -2749,58 +3346,160 @@ function pgASG(){return`${back()}
 </div>
 
 <div class="s-card">
-  <h3>Scaling Policies — 三种触发扩缩的方式</h3>
-  <div style="display:grid;gap:12px">
+  <h3>Scaling Policies — 四种扩缩策略</h3>
+  <div style="display:grid;gap:10px">
+
     <div style="border:1.5px solid var(--blue-border);border-radius:var(--r);padding:16px;background:var(--blue-bg)">
-      <div style="font-weight:700;color:var(--blue);margin-bottom:8px;font-size:15px">① Dynamic Scaling — Target Tracking Scaling（最常用）</div>
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
+        <span style="background:var(--blue);color:#fff;font-size:11px;font-weight:700;padding:3px 9px;border-radius:5px">① 最常用</span>
+        <span style="font-size:15px;font-weight:700;color:var(--blue)">Target Tracking Scaling</span>
+      </div>
       <div style="font-size:14px;color:var(--ink2);line-height:1.8">
-        设定一个<strong>目标指标值</strong>，ASG 自动维持在该目标附近。<br>
-        例：「保持 ASG 平均 CPU 使用率在 40%」→ 超过 40% 就 Scale Out，低于则 Scale In<br>
-        <span style="font-size:12px;color:var(--ink3)">类比：空调恒温模式——你设 26°C，它自动加热/制冷维持在目标温度</span>
+        设定一个<strong>目标指标值</strong>，ASG 自动维持在目标附近，无需手动设置 Alarm。<br>
+        例：「I want the average ASG CPU to stay at around 40%」<br>
+        → 超过 40% 自动 Scale Out，低于自动 Scale In<br>
+        <span style="background:var(--surface);border-radius:6px;padding:4px 10px;display:inline-block;margin-top:6px;font-size:12px;color:var(--ink3)">💡 类比：空调恒温模式，设好目标温度，它自动调节</span>
       </div>
     </div>
+
     <div style="border:1.5px solid var(--border);border-radius:var(--r);padding:16px">
-      <div style="font-weight:700;color:var(--ink);margin-bottom:8px;font-size:15px">② Dynamic Scaling — Simple / Step Scaling</div>
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
+        <span style="background:var(--surface2);color:var(--ink2);font-size:11px;font-weight:700;padding:3px 9px;border-radius:5px;border:1px solid var(--border)">②</span>
+        <span style="font-size:15px;font-weight:700">Simple / Step Scaling</span>
+      </div>
       <div style="font-size:14px;color:var(--ink2);line-height:1.8">
-        基于 <strong>CloudWatch Alarm</strong>（报警）触发，你定义：<br>
-        • 当 CPU &gt; 70% → 加 2 台实例（Scale Out）<br>
-        • 当 CPU &lt; 30% → 减 1 台实例（Scale In）<br>
-        <span style="font-size:12px;color:var(--ink3)">Step：可以按超出幅度分阶段调整（超出越多加越多）</span>
+        基于 <strong>CloudWatch Alarm</strong> 触发，按你定义的规则扩缩：<br>
+        • CPU &gt; 70% → Alarm 触发 → 加 2 台实例（Scale Out）<br>
+        • CPU &lt; 30% → Alarm 触发 → 减 1 台实例（Scale In）<br>
+        <span style="font-size:12px;color:var(--ink3)">Step：超出幅度越大扩越多（分阶梯）；Simple：固定步长</span>
       </div>
     </div>
-    <div style="border:1.5px solid var(--border);border-radius:var(--r);padding:16px">
-      <div style="font-weight:700;color:var(--ink);margin-bottom:8px;font-size:15px">③ Scheduled Scaling（计划性扩缩）</div>
+
+    <div style="border:1.5px solid var(--amber-border);border-radius:var(--r);padding:16px;background:var(--amber-bg)">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
+        <span style="background:var(--amber);color:#fff;font-size:11px;font-weight:700;padding:3px 9px;border-radius:5px">③ 时间规律</span>
+        <span style="font-size:15px;font-weight:700;color:var(--amber)">Scheduled Scaling</span>
+      </div>
       <div style="font-size:14px;color:var(--ink2);line-height:1.8">
-        基于<strong>已知的时间规律</strong>提前扩缩。<br>
-        例：「每周五 17:00 把 Min 提升到 10 台，因为周末流量高」<br>
-        <span style="font-size:12px;color:var(--ink3)">类比：外卖店提前在高峰期开始备餐，而不是等客人排队了才做</span>
+        基于<strong>已知的时间规律</strong>，提前扩缩，不等 Alarm 触发。<br>
+        例：「每周五下午 5 点把 Min 提升到 10（because new users come on Fridays）」<br>
+        <span style="font-size:12px;color:var(--ink3)">💡 类比：外卖店提前在高峰前备餐，不等订单堆满才开始做</span>
+      </div>
+    </div>
+
+    <div style="border:1.5px solid var(--purple-bg);border-radius:var(--r);padding:16px;background:var(--purple-bg)">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
+        <span style="background:var(--purple);color:#fff;font-size:11px;font-weight:700;padding:3px 9px;border-radius:5px">④ AI预测</span>
+        <span style="font-size:15px;font-weight:700;color:var(--purple)">Predictive Scaling</span>
+        <span style="font-size:11px;color:var(--ink3)">（较新）</span>
+      </div>
+      <div style="font-size:14px;color:var(--ink2);line-height:1.8">
+        <strong>持续分析历史负载数据 → 自动预测未来流量 → 提前调度扩缩</strong>。不需要手动设定时间，AWS ML 模型自动学习规律。<br>
+        <div class="g3-sm" style="margin-top:10px">
+          <div style="background:var(--surface);border-radius:6px;padding:8px">
+            <div style="font-size:16px">📊</div>
+            <div style="font-weight:700;color:var(--ink);margin:2px 0">Analyze</div>
+            <div style="color:var(--ink3)">分析历史负载</div>
+          </div>
+          <div style="background:var(--surface);border-radius:6px;padding:8px">
+            <div style="font-size:16px">🔮</div>
+            <div style="font-weight:700;color:var(--ink);margin:2px 0">Forecast</div>
+            <div style="color:var(--ink3)">生成预测曲线</div>
+          </div>
+          <div style="background:var(--surface);border-radius:6px;padding:8px">
+            <div style="font-size:16px">⚡</div>
+            <div style="font-weight:700;color:var(--ink);margin:2px 0">Schedule</div>
+            <div style="color:var(--ink3)">提前扩缩动作</div>
+          </div>
+        </div>
+        <span style="font-size:12px;color:var(--purple);font-weight:600">适合：有周期性规律但 pattern 复杂，懒得手动配 Scheduled Scaling 的场景</span>
       </div>
     </div>
   </div>
 </div>
 
 <div class="s-card">
-  <h3>CloudWatch Alarms — 扩缩触发器</h3>
-  <p style="font-size:15px;color:var(--ink2);line-height:1.8;margin-bottom:12px">ASG 可以基于 <strong>CloudWatch Alarm</strong> 来自动触发扩缩策略。Alarm 监控指标（Metric）——当指标触发 Alarm，ASG 执行 Scaling Policy。</p>
+  <h3>Good Metrics to Scale On — 扩缩的好指标</h3>
+  <p style="font-size:14px;color:var(--ink3);margin-bottom:14px">选对 Metric 是 ASG 精准扩缩的关键。以下是 SAA 考试中最常见的 4 种指标：</p>
+  <div class="tbl-wrap"><table class="tbl">
+    <tr><th>指标名称</th><th>English Name</th><th>监控的内容</th><th>适合场景</th></tr>
+    <tr>
+      <td><strong>CPU 使用率</strong></td>
+      <td><code class="code-inline">CPUUtilization</code></td>
+      <td>整个 ASG 所有实例的<strong>平均 CPU 使用率</strong></td>
+      <td>最通用，大多数计算密集型应用</td>
+    </tr>
+    <tr>
+      <td><strong>每目标请求数</strong></td>
+      <td><code class="code-inline">RequestCountPerTarget</code></td>
+      <td>每台 EC2 实例收到的<strong>平均请求数</strong>（由 ALB 提供）</td>
+      <td>Web 应用 + ALB 场景，保证每台实例请求数稳定</td>
+    </tr>
+    <tr>
+      <td><strong>网络流量</strong></td>
+      <td><code class="code-inline">Average Network In / Out</code></td>
+      <td>所有实例的平均<strong>入站/出站网络流量</strong></td>
+      <td>应用是 Network Bound（网络密集型），如视频流</td>
+    </tr>
+    <tr>
+      <td><strong>自定义指标</strong></td>
+      <td><code class="code-inline">Any Custom Metric</code></td>
+      <td>你通过 <strong>CloudWatch PutMetricData</strong> 推送的任意业务指标</td>
+      <td>队列长度、活跃用户数、订单数等业务场景</td>
+    </tr>
+  </table></div>
+  <div style="background:var(--green-bg);border:1.5px solid var(--green-border);border-radius:var(--r);padding:12px 16px;margin-top:10px;font-size:13.5px;color:var(--ink2)">
+    <strong style="color:var(--green)">📌 记忆要点：</strong> CPUUtilization 和 RequestCountPerTarget 是考试最常出现的两个。RequestCountPerTarget 需要搭配 <strong>ALB</strong> 使用（ALB 才能提供该指标）。
+  </div>
+</div>
+
+<div class="s-card">
+  <h3>Scaling Cooldowns — 扩缩冷却期</h3>
+  <div style="background:var(--blue-bg);border:1.5px solid var(--blue-border);border-radius:var(--r);padding:14px 16px;margin-bottom:14px;font-size:14px;color:var(--ink2);line-height:1.85">
+    <strong style="color:var(--blue)">💡 类比：健身后的冷却时间</strong><br>
+    你刚做完剧烈运动（扩缩动作），身体需要时间恢复（指标稳定）再决定下一步。Cooldown 就是让 ASG"等一等"，不要马上再次扩缩。
+  </div>
   <div class="pl">
-    <div class="pl-row"><span class="pl-k">可监控的指标</span><span class="pl-v"><strong>Average CPU Utilization</strong>（最常用）、每秒请求数、网络流量、或<strong>自定义指标（Custom Metric）</strong></span></div>
-    <div class="pl-row"><span class="pl-k">指标计算范围</span><span class="pl-v">Average CPU 等指标是对<strong>整个 ASG 内所有实例</strong>的平均值（不是单台）</span></div>
-    <div class="pl-row"><span class="pl-k">触发 Scale Out</span><span class="pl-v">当指标超过阈值（如 CPU &gt; 70%）→ Alarm 触发 → ASG 增加实例</span></div>
-    <div class="pl-row"><span class="pl-k">触发 Scale In</span><span class="pl-v">当指标低于阈值（如 CPU &lt; 30%）→ Alarm 触发 → ASG 减少实例</span></div>
+    <div class="pl-row"><span class="pl-k">默认冷却时间</span><span class="pl-v"><strong>300 秒（5 分钟）</strong>—— 每次扩缩动作后进入冷却期</span></div>
+    <div class="pl-row"><span class="pl-k">冷却期间行为</span><span class="pl-v">ASG <strong>不会启动或终止</strong>额外的实例（即使 Alarm 再次触发），等待指标稳定后再决策</span></div>
+    <div class="pl-row"><span class="pl-k">为什么需要它</span><span class="pl-v">防止 ASG 反复快速扩缩（称为 Scaling Thrashing 或 Flapping），避免浪费资源</span></div>
+    <div class="pl-row"><span class="pl-k">如何缩短冷却</span><span class="pl-v">使用<strong>预装好环境的 AMI（Ready-to-use AMI）</strong>——新实例启动更快，更快开始处理请求，指标更快稳定，冷却期可以更短</span></div>
   </div>
-  <div style="background:var(--surface2);border-radius:var(--r);padding:14px;margin-top:12px;font-size:13.5px;color:var(--ink2)">
-    <strong>完整扩缩流程：</strong><br>
-    流量增加 → CPU 升高 → CloudWatch 指标超阈值 → Alarm 触发 → ASG Scale Out Policy → 新 EC2 启动 → 注册到 LB → CPU 回落 → Alarm 解除
+  <!-- Cooldown flow diagram -->
+  <div style="background:var(--surface2);border-radius:var(--r);padding:14px;margin-top:12px">
+    <div style="font-size:11px;font-weight:700;color:var(--ink3);text-transform:uppercase;letter-spacing:.8px;margin-bottom:10px">冷却期决策流程</div>
+    <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;font-size:13px">
+      <div style="background:var(--blue);color:#fff;padding:7px 12px;border-radius:8px;font-weight:600">Scaling Action<br>扩缩动作触发</div>
+      <div style="font-size:18px;color:var(--ink3)">→</div>
+      <div style="background:var(--amber-bg);border:2px solid var(--amber);color:var(--amber);padding:7px 12px;border-radius:8px;font-weight:600">是否在冷却期？<br>Default Cooldown?</div>
+      <div style="display:flex;flex-direction:column;gap:6px;font-size:12px">
+        <div style="display:flex;align-items:center;gap:4px"><span style="color:var(--green);font-weight:700">No →</span><div style="background:var(--red-bg);border:1px solid var(--red-border);color:var(--red);padding:5px 10px;border-radius:6px;font-weight:600">执行：Launch / Terminate</div></div>
+        <div style="display:flex;align-items:center;gap:4px"><span style="color:var(--red);font-weight:700">Yes →</span><div style="background:var(--surface);border:1px solid var(--border);color:var(--ink3);padding:5px 10px;border-radius:6px">忽略 Ignore Action</div></div>
+      </div>
+    </div>
   </div>
+</div>
+
+<div class="s-card">
+  <h3>四种 Scaling Policy 一眼对比</h3>
+  <div class="tbl-wrap"><table class="tbl">
+    <tr><th>策略</th><th>触发方式</th><th>响应延迟</th><th>配置难度</th><th>最适合场景</th></tr>
+    <tr><td><strong>Target Tracking</strong></td><td>目标指标自动维持</td><td class="good">快（持续调整）</td><td class="good">⭐ 最简单</td><td>不规律动态负载（<strong>首选</strong>）</td></tr>
+    <tr><td><strong>Simple / Step</strong></td><td>CloudWatch Alarm</td><td class="mid">中（等Alarm触发）</td><td class="mid">⭐⭐⭐</td><td>需精细控制扩缩步长</td></tr>
+    <tr><td><strong>Scheduled</strong></td><td>固定时间计划</td><td class="good">提前，零延迟</td><td class="mid">⭐⭐</td><td>已知时间规律的高峰</td></tr>
+    <tr><td><strong>Predictive</strong></td><td>ML 预测历史负载</td><td class="good">提前，自动学习</td><td class="good">⭐⭐ 配好即自动</td><td>周期性规律 + 不想手动配置</td></tr>
+  </table></div>
 </div>
 
 <div class="s-card">
   <h3>⚠️ 考试高频陷阱</h3>
-  ${trapdiv('red','高频','ASG 本身免费，但 Launch Configurations 已废弃','ASG 是 free service，你只为 EC2 实例付费。旧版 Launch Configurations 已 Deprecated，考试题中如果让你选配置方式 → 选 Launch Template。')}
-  ${trapdiv('red','高频','LB Health Check 失败 → ASG 终止实例并重建','如果只用 EC2 Status Check（EC2 层面的健康检查），应用挂了但 OS 还在，ASG 不会替换它。必须配合 <strong>ELB Health Check</strong> 才能检测应用级别的故障。')}
-  ${trapdiv('red','高频','Scale In 时默认终止哪台实例？','默认策略（Default Termination Policy）：ASG 优先终止<strong>启动配置最老</strong>的实例，以及在拥有最多实例的 AZ 中终止，来保持 AZ 之间的平衡（Balance）。')}
-  ${trapdiv('amber','中频','Desired Capacity 是动态的，会被 Scaling Policy 改变','Desired 不是固定不变的——Scaling Policy 触发时会调整 Desired（在 Min~Max 范围内）。很多人以为 Desired 一直等于初始值。')}
-  ${trapdiv('amber','中频','ASG 在 Multi-AZ 中的行为','如果某个 AZ 中的实例被终止，ASG 会在<strong>实例数量最少的 AZ</strong> 启动新实例，以维持跨 AZ 的平衡。')}
+  ${trapdiv('red','高频','ASG 本身免费，Launch Configurations 已废弃','ASG 是 free service，你只为 EC2 实例付费。旧版 Launch Configurations 已 Deprecated → 考试选 <strong>Launch Template</strong>。')}
+  ${trapdiv('red','高频','ELB Health Check 失败 → ASG 终止实例并重建','只用 EC2 Status Check 检测不到应用崩溃。生产环境必须配 <strong>ELB Health Check</strong> 才能实现应用级别自愈。')}
+  ${trapdiv('red','高频','Cooldown 默认 300 秒，期间忽略所有扩缩 Alarm','冷却期内 ASG 不会执行任何新的扩缩动作，即使 CloudWatch Alarm 多次触发也会被忽略。')}
+  ${trapdiv('red','高频','缩短 Cooldown 的方法 → 使用 Ready-to-use AMI','预装好所有软件的 AMI 让新实例启动更快 → 更快处理流量 → 指标更快稳定 → 可以设置更短的冷却期。')}
+  ${trapdiv('amber','中频','RequestCountPerTarget 需要搭配 ALB','这个指标由 ALB 提供，NLB 没有。如果题目说"按每实例请求数扩缩" → ALB + ASG + RequestCountPerTarget。')}
+  ${trapdiv('amber','中频','Scale In 默认终止策略：最老配置 + AZ 平衡','ASG 优先终止启动配置最老的实例，并选择实例最多的 AZ 中的实例，以维持跨 AZ 平衡。')}
+  ${trapdiv('amber','中频','Predictive Scaling vs Scheduled Scaling 的区别','Scheduled：你手动指定时间和容量。Predictive：AWS ML 自动分析历史 pattern，自动预测并调度——更智能，但需要足够的历史数据。')}
 </div>`}
 
 /* ═══════════════ EC2 NETWORK PAGE ═══════════════ */
