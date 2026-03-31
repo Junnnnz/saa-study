@@ -1165,7 +1165,28 @@ text:'应用使用 ElastiCache Memcached。随着数据量增长，<em>需要水
 en:'App uses ElastiCache Memcached. As data grows, <em>horizontal scaling of cache capacity</em> is needed. How does Memcached scale?',
 ch:['Memcached 不支持水平扩展，必须换 Redis','添加更多 Memcached 节点（多节点集群），数据分片存储','启用 Memcached 主从复制','开启 Memcached Multi-AZ 自动故障转移'],
 ench:['Memcached does not support horizontal scaling, must switch to Redis','Add more Memcached nodes (multi-node cluster), data is sharded','Enable Memcached primary-replica replication','Enable Memcached Multi-AZ automatic failover'],
-ans:1,exp:'<strong>Memcached 扩展特性：</strong><br><br>✅ <strong>支持多节点水平扩展</strong>：<br>• 添加节点 → 数据通过一致性哈希（Consistent Hashing）分片到不同节点<br>• 总缓存容量 = 所有节点容量之和<br>• 这是 Memcached 相比 Redis 的一个优势（多线程 + 简单水平扩展）<br><br>❌ <strong>Memcached 不支持的：</strong><br>• 没有主从复制<br>• 没有 Multi-AZ 自动故障转移<br>• 节点故障时，该节点上的缓存数据<strong>全部丢失</strong>（无持久化）<br><br>所以 Memcached = <strong>纯缓存，简单粗暴，水平扩展容易，但不可靠</strong>。',ww:'Memcached 支持水平扩展（A 错）。Memcached 没有主从复制功能（C 错）。Memcached 不支持 Multi-AZ（D 错）。',rule:'Memcached 水平扩展 → 加节点 + 数据分片。但无持久化/复制/故障转移。需要这些特性 → 换 Redis。'}
+ans:1,exp:'<strong>Memcached 扩展特性：</strong><br><br>✅ <strong>支持多节点水平扩展</strong>：<br>• 添加节点 → 数据通过一致性哈希（Consistent Hashing）分片到不同节点<br>• 总缓存容量 = 所有节点容量之和<br>• 这是 Memcached 相比 Redis 的一个优势（多线程 + 简单水平扩展）<br><br>❌ <strong>Memcached 不支持的：</strong><br>• 没有主从复制<br>• 没有 Multi-AZ 自动故障转移<br>• 节点故障时，该节点上的缓存数据<strong>全部丢失</strong>（无持久化）<br><br>所以 Memcached = <strong>纯缓存，简单粗暴，水平扩展容易，但不可靠</strong>。',ww:'Memcached 支持水平扩展（A 错）。Memcached 没有主从复制功能（C 错）。Memcached 不支持 Multi-AZ（D 错）。',rule:'Memcached 水平扩展 → 加节点 + 数据分片。但无持久化/复制/故障转移。需要这些特性 → 换 Redis。'},
+
+{id:'rds_07',topic:'RDS',diff:'high',
+text:'公司 RDS MySQL 数据库存储<em>即将耗尽</em>，工作负载不可预测，希望<em>无需人工干预</em>自动扩容存储。应启用哪个功能？',
+en:'Company RDS MySQL storage is <em>almost full</em>. Workload is unpredictable and they want storage to <em>expand automatically without manual intervention</em>. Which feature should be enabled?',
+ch:['创建 Read Replica 分担写入压力','启用 RDS Storage Auto Scaling 并设置 Maximum Storage Threshold','将 RDS 迁移到 Aurora 以获得自动扩展','手动每周检查存储并升级实例规格'],
+ench:['Create Read Replica to offload writes','Enable RDS Storage Auto Scaling with Maximum Storage Threshold','Migrate RDS to Aurora for auto scaling','Manually check storage weekly and upgrade instance'],
+ans:1,exp:'<strong>RDS Storage Auto Scaling</strong> 专为此场景设计：<br><br>触发扩容的三个条件（同时满足）：<br>① 剩余空间 &lt; 已分配存储的 <strong>10%</strong><br>② 低存储持续 <strong>至少 5 分钟</strong><br>③ 距离上次扩容 <strong>已过 6 小时</strong><br><br>必须设置 <strong>Maximum Storage Threshold</strong> 作为上限，防止无限扩容。支持所有 RDS 引擎。',ww:'Read Replica 分担读流量，不解决存储不足（A 错）。Aurora 迁移成本高（C 错）。手动检查不符合"无需干预"（D 错）。',rule:'存储自动扩容 → RDS Storage Auto Scaling + Maximum Storage Threshold。触发：<10% + 持续5min + 距上次6h。'},
+
+{id:'rds_08',topic:'RDS',diff:'high',
+text:'以下关于 RDS Read Replica <em>网络传输费用</em>的说法，哪个是正确的？',
+en:'Which statement about RDS Read Replica <em>network replication costs</em> is correct?',
+ch:['所有 Read Replica 复制（同 AZ、跨 AZ、跨 Region）都免费','同 Region 内复制（无论是否跨 AZ）免费；跨 Region 复制收费','同 AZ 免费，跨 AZ 和跨 Region 都收费','只有跨 Region 免费，其他都收费'],
+ench:['All Read Replica replication is free regardless of AZ or Region','Same-region replication (any AZ) is free; cross-region replication is charged','Same-AZ free, cross-AZ and cross-region are charged','Only cross-region is free, others are charged'],
+ans:1,exp:'<strong>RDS Read Replica 网络费用规则：</strong><br><br>✅ <strong>同 Region 内 → 免费</strong><br>主实例和 Read Replica 在同一个 Region 内，无论是否跨 AZ（如 us-east-1a → us-east-1b），复制的网络传输费用均为免费。<br><br>❌ <strong>跨 Region → 收费 $$$</strong><br>如主实例在 us-east-1，Read Replica 在 eu-west-1，会产生跨 Region 网络传输费。<br><br>记忆口诀：同 Region = 免费，跨 Region = 付钱。',ww:'跨 Region 复制是收费的（A 错）。同 AZ 并不比跨 AZ 特殊，同 Region 都免费（C 错）。D 完全颠倒。',rule:'Read Replica 网络费：同 Region（任意 AZ）= Free。跨 Region = $$$。'},
+
+{id:'rds_10',topic:'RDS',diff:'mid',
+text:'公司要将 Single-AZ RDS 升级为 Multi-AZ，<em>不能有停机时间</em>。正确的操作是？',
+en:'A company wants to upgrade Single-AZ RDS to Multi-AZ <em>with no downtime</em>. What is the correct approach?',
+ch:['停止数据库 → 备份 → 创建 Multi-AZ 新实例 → 恢复数据','直接在 Console 点击 Modify → 勾选 Multi-AZ → 确认，无需停机','使用 DMS 将数据迁移到新的 Multi-AZ 实例','只能在创建数据库时选择 Multi-AZ，事后无法修改'],
+ench:['Stop DB → backup → create new Multi-AZ instance → restore','Click Modify in Console → enable Multi-AZ → confirm, no downtime needed','Use DMS to migrate data to new Multi-AZ instance','Multi-AZ can only be set at creation time, cannot be changed later'],
+ans:1,exp:'<strong>Single-AZ → Multi-AZ 是零停机（Zero Downtime）操作：</strong><br><br>操作：Console → 选择 DB → Modify → 勾选 Multi-AZ → 应用<br><br>AWS 内部自动完成：<br>① 对主实例<strong>拍快照（Snapshot）</strong><br>② 在新 AZ 从快照<strong>恢复 Standby DB</strong><br>③ 建立两者之间的 <strong>SYNC 同步复制</strong><br><br>应用的 DNS Endpoint 不变，<strong>完全无感知，无停机</strong>。',ww:'不需要停机（A 错）。DMS 用于异构数据库迁移，不适合此场景（C 错）。Multi-AZ 可以在事后随时开启（D 错）。',rule:'Single-AZ → Multi-AZ：零停机，点 Modify 即可。内部快照 → 新 AZ 恢复 → SYNC 同步。'}
 ];
 
 /* ═══════════════ QUIZ STATE ═══════════════ */
@@ -1264,6 +1285,11 @@ function pgHome(){
     '💡 <strong>存储选型</strong>：多EC2共享文件 → EFS；极高IOPS且数据可丢 → Instance Store；持久单实例 → EBS。',
     '💡 <strong>SNI 记忆</strong>：CLB 一个证书，ALB/NLB 多个证书（用SNI）。多域名 HTTPS → 用 ALB，不用 CLB。',
     '💡 <strong>Cross-Zone</strong>：ALB 默认开启且免费；NLB/GWLB 默认关闭，开启后收费。CLB 默认关闭但免费。',
+    '💡 <strong>RDS 陷阱①</strong>：Multi-AZ Standby 不可读！报表查询 → Read Replica（ASYNC，可读）。',
+    '💡 <strong>RDS 陷阱②</strong>：Read Replica 只支持 SELECT，不支持 INSERT/UPDATE/DELETE。',
+    '💡 <strong>RDS 网络费</strong>：同 Region 内 Read Replica 复制免费，跨 Region 才收费 $$$。',
+    '💡 <strong>Lambda + DB</strong>：Lambda 高并发直连 RDS 会耗尽连接数 → 必须加 RDS Proxy 做连接池。',
+    '💡 <strong>缓存选型</strong>：Session/排行榜/持久化 → Redis；简单字符串缓存/多线程 → Memcached。',
   ];
   const todayTip=tips[new Date().getDay()%tips.length];
   const chapters=[
@@ -1286,7 +1312,11 @@ function pgHome(){
       {id:'istore',icon:'⚡',name:'Instance Store',desc:'物理磁盘 · 百万IOPS · Ephemeral · Reboot保留',tags:[{t:'Ephemeral',c:'#C0392B',bg:'#FEF0EE'}]},
       {id:'efs',icon:'🗂️',name:'EFS',desc:'Managed NFS · Multi-AZ · Linux Only · Bursting/Provisioned',tags:[{t:'NFS',c:'#0F766E',bg:'#EDFAF8'},{t:'Multi-AZ',c:'#1A7A4A',bg:'#EBF7F1'}]}
     ]},
-    {label:'EC2 镜像',color:'#C0392B',items:[{id:'ami',icon:'🖼️',name:'AMI',desc:'Region级别 · Public / Private / Marketplace · Golden AMI',tags:[{t:'Region级别',c:'#B45309',bg:'#FEF9EB'}]}]}
+    {label:'EC2 镜像',color:'#C0392B',items:[{id:'ami',icon:'🖼️',name:'AMI',desc:'Region级别 · Public / Private / Marketplace · Golden AMI',tags:[{t:'Region级别',c:'#B45309',bg:'#FEF9EB'}]}]},
+    {label:'数据库',color:'#C084FC',items:[
+      {id:'rds',icon:'🗄️',name:'RDS & Aurora',desc:'Read Replica · Multi-AZ · RDS Proxy · Storage Auto Scaling',tags:[{t:'⭐极高频',c:'#C0392B',bg:'#FEF0EE'},{t:'ASYNC/SYNC',c:'#7C3AED',bg:'#F5F3FF'}]},
+      {id:'elasticache',icon:'🔴',name:'ElastiCache',desc:'Redis vs Memcached · Lazy Loading · Session · Global Datastore',tags:[{t:'Redis',c:'#DC2626',bg:'#FEF2F2'},{t:'缓存层',c:'#0369A1',bg:'#EFF6FF'}]}
+    ]}
   ];
   return `
 <div style="margin-bottom:28px">
@@ -2272,7 +2302,7 @@ function pgRDS(){return`${back()}
 
 <div class="s-card">
   <h3>🗄️ RDS 是什么？</h3>
-  <p style="color:var(--ink2);font-size:15px;line-height:1.8">RDS（Relational Database Service）是 AWS 的<strong>托管关系型数据库服务</strong>。AWS 负责操作系统打补丁、数据库软件升级、备份、监控——你只需管理数据和应用。</p>
+  <p style="color:var(--ink2);font-size:15px;line-height:1.8">RDS（Relational Database Service）是 AWS 的<strong>托管关系型数据库服务</strong>，使用 SQL 作为查询语言。AWS 负责 OS 打补丁、数据库升级、备份、监控——你只需管理数据和应用。</p>
   <div class="g2" style="margin-top:12px">
     <div style="background:var(--aws-bg);border:1.5px solid var(--aws-border);border-radius:8px;padding:12px">
       <div style="font-size:12px;font-weight:700;color:var(--aws);margin-bottom:8px">✅ 支持的数据库引擎</div>
@@ -2283,56 +2313,240 @@ function pgRDS(){return`${back()}
         <div class="bl-item"><span class="bl-dot"></span>Oracle</div>
         <div class="bl-item"><span class="bl-dot"></span>Microsoft SQL Server</div>
         <div class="bl-item"><span class="bl-dot"></span>IBM DB2</div>
+        <div class="bl-item"><span class="bl-dot"></span>Aurora（AWS 自研）</div>
       </div>
     </div>
-    <div style="background:var(--red-bg);border:1.5px solid var(--red-border);border-radius:8px;padding:12px">
-      <div style="font-size:12px;font-weight:700;color:var(--red);margin-bottom:8px">❌ RDS 做不到</div>
+    <div style="background:var(--green-bg);border:1.5px solid var(--green-border);border-radius:8px;padding:12px">
+      <div style="font-size:12px;font-weight:700;color:var(--green);margin-bottom:8px">✅ RDS 托管优势（vs 自己在 EC2 装 DB）</div>
       <div class="bl">
-        <div class="bl-item"><span class="bl-dot" style="background:var(--red)"></span>SSH 登录数据库实例</div>
-        <div class="bl-item"><span class="bl-dot" style="background:var(--red)"></span>自定义 OS 配置（用 RDS Custom）</div>
-        <div class="bl-item"><span class="bl-dot" style="background:var(--red)"></span>访问底层服务器文件</div>
+        <div class="bl-item"><span class="bl-dot" style="background:var(--green)"></span>自动化 provisioning + OS 打补丁</div>
+        <div class="bl-item"><span class="bl-dot" style="background:var(--green)"></span>持续备份 + <strong>Point-in-Time Restore</strong></div>
+        <div class="bl-item"><span class="bl-dot" style="background:var(--green)"></span>监控 Dashboard</div>
+        <div class="bl-item"><span class="bl-dot" style="background:var(--green)"></span>Read Replicas（读扩展）</div>
+        <div class="bl-item"><span class="bl-dot" style="background:var(--green)"></span>Multi-AZ（灾难恢复）</div>
+        <div class="bl-item"><span class="bl-dot" style="background:var(--green)"></span>垂直 + 水平扩展</div>
+        <div class="bl-item"><span class="bl-dot" style="background:var(--green)"></span>存储由 EBS 支撑</div>
       </div>
+    </div>
+  </div>
+  ${trapdiv('red','必考','BUT — 不能 SSH 登录 RDS 实例','RDS 是完全托管服务，AWS 管理底层 OS。你无法 SSH 进入实例。需要 OS 级访问 → 用 RDS Custom（Oracle/SQL Server 专用）。')}
+</div>
+
+<div class="s-card">
+  <h3>📈 RDS Storage Auto Scaling</h3>
+  <p style="color:var(--ink2);font-size:15px;line-height:1.8;margin-bottom:12px">当 RDS 检测到存储空间不足时，<strong>自动扩容</strong>，避免手动干预。适合<em>工作负载不可预测</em>的应用场景。</p>
+  <div style="background:var(--aws-bg);border:1.5px solid var(--aws-border);border-radius:8px;padding:14px;margin-bottom:12px">
+    <div style="font-size:13px;font-weight:700;color:var(--aws);margin-bottom:10px">⚙️ 自动扩容触发条件（三个同时满足）</div>
+    <div class="flow">
+      <div class="flow-step">
+        <div><div class="flow-n" style="font-size:10px">①</div></div>
+        <div class="flow-body">剩余空间 <strong>&lt; 已分配存储的 10%</strong></div>
+      </div>
+      <div class="flow-step">
+        <div><div class="flow-n" style="font-size:10px">②</div></div>
+        <div class="flow-body">低存储状态持续 <strong>至少 5 分钟</strong></div>
+      </div>
+      <div class="flow-step">
+        <div><div class="flow-n" style="font-size:10px">③</div></div>
+        <div class="flow-body">距离上次扩容 <strong>已过 6 小时</strong></div>
+      </div>
+    </div>
+  </div>
+  <div style="background:var(--surface2);border-radius:8px;padding:12px;font-size:14px;color:var(--ink2)">
+    💡 必须设置 <strong>Maximum Storage Threshold</strong>（最大存储上限），防止无限扩容。支持所有 RDS 数据库引擎。
+  </div>
+</div>
+
+<div class="s-card">
+  <h3>🔁 Read Replica — 读扩展</h3>
+  ${trapdiv('red','极高频','Read Replica 只支持 SELECT，不支持写操作','Read Replica 只能执行 SELECT（读取）。INSERT / UPDATE / DELETE 必须走主实例。这是考试高频陷阱。')}
+
+  <!-- Diagram: Read Replica Architecture (matches slide) -->
+  <div style="background:var(--surface2);border-radius:10px;padding:16px;margin:14px 0">
+    <div style="font-size:12px;font-weight:700;color:var(--ink3);margin-bottom:12px;text-transform:uppercase;letter-spacing:.8px">架构图 — Read Replicas for Scalability</div>
+    <!-- Application bar -->
+    <div style="background:#E8A020;color:#fff;font-weight:700;text-align:center;border-radius:6px;padding:8px;margin-bottom:16px;font-size:14px">Application</div>
+    <!-- DB row -->
+    <div style="display:flex;align-items:flex-start;justify-content:center;gap:0">
+      <!-- Left Replica -->
+      <div style="display:flex;flex-direction:column;align-items:center;flex:1">
+        <div style="font-size:11px;color:var(--green);font-weight:700;margin-bottom:4px">reads ↑</div>
+        <div style="width:52px;height:52px;background:#1D5FBF;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:900;color:#fff;border:3px solid #1243A0">R</div>
+        <div style="font-size:10px;color:var(--ink3);text-align:center;margin-top:6px;line-height:1.4">RDS DB<br>Read Replica</div>
+      </div>
+      <!-- Arrow from left replica to main -->
+      <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;padding-top:18px;flex:1">
+        <div style="font-size:10px;color:var(--ink3);margin-bottom:2px">ASYNC</div>
+        <div style="color:var(--aws);font-size:18px">←</div>
+        <div style="font-size:10px;color:var(--ink3)">replication</div>
+      </div>
+      <!-- Main -->
+      <div style="display:flex;flex-direction:column;align-items:center;flex:1">
+        <div style="font-size:11px;color:var(--ink3);font-weight:700;margin-bottom:4px">writes ↓ / reads ↑</div>
+        <div style="width:56px;height:56px;background:#1D5FBF;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:900;color:#fff;border:3px solid #1243A0">M</div>
+        <div style="font-size:10px;color:var(--ink3);text-align:center;margin-top:6px;line-height:1.4">RDS DB<br>instance</div>
+      </div>
+      <!-- Arrow from main to right replica -->
+      <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;padding-top:18px;flex:1">
+        <div style="font-size:10px;color:var(--ink3);margin-bottom:2px">ASYNC</div>
+        <div style="color:var(--aws);font-size:18px">→</div>
+        <div style="font-size:10px;color:var(--ink3)">replication</div>
+      </div>
+      <!-- Right Replica -->
+      <div style="display:flex;flex-direction:column;align-items:center;flex:1">
+        <div style="font-size:11px;color:var(--green);font-weight:700;margin-bottom:4px">reads ↑</div>
+        <div style="width:52px;height:52px;background:#1D5FBF;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:900;color:#fff;border:3px solid #1243A0">R</div>
+        <div style="font-size:10px;color:var(--ink3);text-align:center;margin-top:6px;line-height:1.4">RDS DB<br>Read Replica</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Use Case Diagram (matches slide) -->
+  <div style="background:var(--surface2);border-radius:10px;padding:16px;margin-bottom:14px">
+    <div style="font-size:12px;font-weight:700;color:var(--ink3);margin-bottom:12px;text-transform:uppercase;letter-spacing:.8px">使用场景 — 报表查询不影响生产</div>
+    <div style="display:flex;justify-content:space-around;margin-bottom:12px">
+      <div style="background:#E8A020;color:#fff;font-weight:700;text-align:center;border-radius:6px;padding:7px 14px;font-size:13px">Production<br>Application</div>
+      <div style="background:#555;color:#fff;font-weight:700;text-align:center;border-radius:6px;padding:7px 14px;font-size:13px">Reporting<br>Application</div>
+    </div>
+    <div style="display:flex;align-items:center;justify-content:center;gap:8px">
+      <div style="display:flex;flex-direction:column;align-items:center">
+        <div style="font-size:11px;color:var(--ink3);margin-bottom:4px">writes↓ reads↑</div>
+        <div style="width:52px;height:52px;background:#1D5FBF;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:900;color:#fff;border:3px solid #1243A0">M</div>
+        <div style="font-size:10px;color:var(--ink3);text-align:center;margin-top:4px">RDS DB instance</div>
+      </div>
+      <div style="text-align:center">
+        <div style="font-size:10px;color:var(--ink3)">ASYNC replication</div>
+        <div style="color:var(--aws);font-size:20px">→</div>
+      </div>
+      <div style="display:flex;flex-direction:column;align-items:center">
+        <div style="font-size:11px;color:var(--green);font-weight:700;margin-bottom:4px">reads ↑ only</div>
+        <div style="width:52px;height:52px;background:#1D5FBF;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:900;color:#fff;border:3px solid #1243A0">R</div>
+        <div style="font-size:10px;color:var(--ink3);text-align:center;margin-top:4px">Read Replica</div>
+      </div>
+    </div>
+    <div style="margin-top:10px;font-size:13px;color:var(--ink2);background:var(--surface);border-radius:6px;padding:8px">
+      ✅ SELECT only（报表） · ❌ INSERT/UPDATE/DELETE 只走 <strong>M</strong>
+    </div>
+  </div>
+
+  <!-- Network Cost Diagram (matches slide) -->
+  <div style="background:var(--surface2);border-radius:10px;padding:16px;margin-bottom:14px">
+    <div style="font-size:12px;font-weight:700;color:var(--ink3);margin-bottom:12px;text-transform:uppercase;letter-spacing:.8px">网络费用 — Network Cost</div>
+    <div class="g2">
+      <div style="border:2px dashed var(--green-border);border-radius:8px;padding:10px;text-align:center">
+        <div style="font-size:11px;color:var(--green);font-weight:700;margin-bottom:8px">Same Region / Different AZ</div>
+        <div style="font-size:10px;color:var(--green);margin-bottom:8px">us-east-1a → us-east-1b</div>
+        <div style="display:flex;align-items:center;justify-content:center;gap:6px">
+          <div style="width:34px;height:34px;background:#1D5FBF;border-radius:5px;display:flex;align-items:center;justify-content:center;font-weight:900;color:#fff;font-size:14px">M</div>
+          <div style="color:var(--aws)">→</div>
+          <div style="width:34px;height:34px;background:#1D5FBF;border-radius:5px;display:flex;align-items:center;justify-content:center;font-weight:900;color:#fff;font-size:14px">R</div>
+        </div>
+        <div style="margin-top:8px;font-size:13px;font-weight:700;color:var(--green)">✅ Free</div>
+      </div>
+      <div style="border:2px dashed var(--red-border);border-radius:8px;padding:10px;text-align:center">
+        <div style="font-size:11px;color:var(--red);font-weight:700;margin-bottom:8px">Cross Region</div>
+        <div style="font-size:10px;color:var(--red);margin-bottom:8px">us-east-1 → eu-west-1</div>
+        <div style="display:flex;align-items:center;justify-content:center;gap:6px">
+          <div style="width:34px;height:34px;background:#1D5FBF;border-radius:5px;display:flex;align-items:center;justify-content:center;font-weight:900;color:#fff;font-size:14px">M</div>
+          <div style="color:var(--aws)">→</div>
+          <div style="width:34px;height:34px;background:#1D5FBF;border-radius:5px;display:flex;align-items:center;justify-content:center;font-weight:900;color:#fff;font-size:14px">R</div>
+        </div>
+        <div style="margin-top:8px;font-size:13px;font-weight:700;color:var(--red)">❌ $$$</div>
+      </div>
+    </div>
+  </div>
+
+  <div style="background:var(--aws-bg);border:1.5px solid var(--aws-border);border-radius:8px;padding:12px;font-size:13px">
+    <div style="font-weight:700;color:var(--aws);margin-bottom:6px">📋 Read Replica 特性总结</div>
+    <div class="bl">
+      <div class="bl-item"><span class="bl-dot"></span>最多 <strong>15 个</strong> Read Replica</div>
+      <div class="bl-item"><span class="bl-dot"></span>可在同 AZ、跨 AZ、跨 Region</div>
+      <div class="bl-item"><span class="bl-dot"></span><strong>ASYNC 异步复制</strong> → 最终一致性</div>
+      <div class="bl-item"><span class="bl-dot"></span>可 Promote 成独立主数据库</div>
+      <div class="bl-item"><span class="bl-dot"></span>应用必须<strong>更新 Connection String</strong> 才能使用</div>
     </div>
   </div>
 </div>
 
 <div class="s-card">
-  <h3>🔁 Read Replica vs Multi-AZ — 最高频考点</h3>
-  ${trapdiv('red','极高频','Multi-AZ Standby 不对外提供读服务','这是最常见的陷阱！Standby 实例只作备用，客户端无法连接它查询。想分担读流量 → Read Replica。')}
-  <div style="overflow-x:auto;margin-top:12px">
-  <table class="tbl">
-    <tr><th>对比维度</th><th>Read Replica</th><th>Multi-AZ</th></tr>
-    <tr><td>主要目的</td><td class="good">读扩展（分担读流量）</td><td class="good">高可用（HA / 故障转移）</td></tr>
-    <tr><td>复制方式</td><td>异步复制（Async）</td><td>同步复制（Sync）</td></tr>
-    <tr><td>副本可读？</td><td class="good">✅ 可以直接查询</td><td class="bad">❌ Standby 不可读</td></tr>
-    <tr><td>故障转移</td><td class="bad">❌ 不自动</td><td class="good">✅ 自动（60–120 秒）</td></tr>
-    <tr><td>副本数量</td><td>最多 5 个</td><td>1 个 Standby</td></tr>
-    <tr><td>跨 Region</td><td class="good">✅ 支持</td><td class="bad">❌ 同 Region</td></tr>
-    <tr><td>网络费用</td><td>跨 AZ 有费用；同 AZ 免费</td><td>无额外网络费用</td></tr>
-    <tr><td>典型场景</td><td>报表查询、读多写少</td><td>生产数据库、高可用要求</td></tr>
-  </table>
+  <h3>🛡️ RDS Multi-AZ — 高可用（Disaster Recovery）</h3>
+  ${trapdiv('red','极高频','Multi-AZ Standby 不可读，不用于扩展','Standby 仅作故障转移备用，不对外服务。想分担读流量 → Read Replica。Multi-AZ ≠ 性能扩展！')}
+
+  <!-- Multi-AZ Architecture Diagram (matches slide) -->
+  <div style="background:var(--surface2);border-radius:10px;padding:16px;margin:14px 0">
+    <div style="font-size:12px;font-weight:700;color:var(--ink3);margin-bottom:12px;text-transform:uppercase;letter-spacing:.8px">架构图 — Multi-AZ Disaster Recovery</div>
+    <!-- Application -->
+    <div style="background:#E8A020;color:#fff;font-weight:700;text-align:center;border-radius:6px;padding:8px;margin-bottom:8px;font-size:14px">Application</div>
+    <!-- writes/reads label -->
+    <div style="display:flex;justify-content:center;gap:40px;margin-bottom:8px;font-size:12px">
+      <span style="color:#1D5FBF;font-weight:600">writes ↓</span>
+      <span style="color:var(--green);font-weight:600">reads ↑</span>
+    </div>
+    <!-- DNS band -->
+    <div style="background:#333;color:#fff;text-align:center;border-radius:6px;padding:6px;margin-bottom:14px;font-size:12px;font-weight:600">One DNS name — automatic failover</div>
+    <!-- DB row -->
+    <div style="display:flex;align-items:center;justify-content:center;gap:16px">
+      <div style="display:flex;flex-direction:column;align-items:center">
+        <div style="width:56px;height:56px;background:#3B6FBF;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:900;color:#fff;border:3px solid #1243A0;opacity:.75">S</div>
+        <div style="font-size:10px;color:var(--ink3);text-align:center;margin-top:6px;line-height:1.4">RDS DB instance<br><strong>standby (AZ B)</strong></div>
+      </div>
+      <div style="text-align:center">
+        <div style="color:var(--aws);font-size:18px">←</div>
+        <div style="font-size:10px;color:var(--ink3);white-space:nowrap">SYNC<br>replication</div>
+      </div>
+      <div style="display:flex;flex-direction:column;align-items:center">
+        <div style="width:56px;height:56px;background:#1D5FBF;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:900;color:#fff;border:3px solid #1243A0">M</div>
+        <div style="font-size:10px;color:var(--ink3);text-align:center;margin-top:6px;line-height:1.4">RDS Master DB<br><strong>instance (AZ A)</strong></div>
+      </div>
+    </div>
+    <div style="margin-top:12px;font-size:12px;color:var(--ink3);text-align:center">
+      ⚡ 故障时 DNS 自动切换 → Standby 变 Primary（约 60–120 秒）
+    </div>
   </div>
 
-  <div style="margin-top:16px">
-  <div style="font-size:13px;font-weight:700;color:var(--ink);margin-bottom:10px">📊 架构流程图</div>
-  <div class="flow">
-    <div class="flow-step">
-      <div><div class="flow-n">1</div></div>
-      <div class="flow-body"><strong>应用层（EC2）</strong> — 写入请求全部发往 <strong>主实例（Primary）</strong></div>
+  <!-- Single-AZ to Multi-AZ Diagram (matches slide) -->
+  <div style="background:var(--surface2);border-radius:10px;padding:16px;margin-bottom:14px">
+    <div style="font-size:12px;font-weight:700;color:var(--ink3);margin-bottom:12px;text-transform:uppercase;letter-spacing:.8px">Zero Downtime — Single-AZ → Multi-AZ</div>
+    <div style="display:flex;align-items:flex-start;justify-content:center;gap:10px;flex-wrap:wrap">
+      <!-- M -->
+      <div style="display:flex;flex-direction:column;align-items:center">
+        <div style="font-size:11px;color:var(--ink3);margin-bottom:4px">RDS DB instance</div>
+        <div style="width:52px;height:52px;background:#1D5FBF;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:900;color:#fff;border:3px solid #1243A0">M</div>
+      </div>
+      <!-- Arrows down + right -->
+      <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;padding-top:20px">
+        <div style="color:var(--aws);font-size:14px">→ SYNC →</div>
+      </div>
+      <!-- S -->
+      <div style="display:flex;flex-direction:column;align-items:center">
+        <div style="font-size:11px;color:var(--ink3);margin-bottom:4px">Standby DB</div>
+        <div style="width:52px;height:52px;background:#3B6FBF;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:900;color:#fff;border:3px solid #1243A0;opacity:.8">S</div>
+      </div>
     </div>
-    <div class="flow-step">
-      <div><div class="flow-n">2</div></div>
-      <div class="flow-body"><strong>Multi-AZ Standby</strong>（AZ-B）：同步复制，<em>等待主确认</em>，不对外服务 → <strong>仅备用</strong></div>
-    </div>
-    <div class="flow-step">
-      <div><div class="flow-n">3</div></div>
-      <div class="flow-body"><strong>Read Replica × N</strong>：异步复制，暴露独立 Endpoint → 应用的<em>报表/只读查询</em>直连 Read Replica</div>
-    </div>
-    <div class="flow-step">
-      <div><div class="flow-n">4</div></div>
-      <div class="flow-body"><strong>主实例故障</strong> → Multi-AZ：DNS 自动切换到 Standby（60–120s）。Read Replica 可手动 Promote 成主实例（需人工操作）</div>
+    <!-- Snapshot flow -->
+    <div style="margin-top:12px;font-size:12px;color:var(--ink3);text-align:center">M → 拍快照 (snapshot) → 新 AZ 恢复 → 建立 SYNC 同步</div>
+    <div style="display:flex;gap:6px;margin-top:10px;flex-wrap:wrap">
+      <div style="background:var(--green-bg);border:1px solid var(--green-border);border-radius:6px;padding:6px 10px;font-size:12px;color:var(--green);font-weight:600">✅ Zero Downtime</div>
+      <div style="background:var(--aws-bg);border:1px solid var(--aws-border);border-radius:6px;padding:6px 10px;font-size:12px;color:var(--aws);font-weight:600">只需点 Modify</div>
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:6px 10px;font-size:12px;color:var(--ink2)">无需停止 DB</div>
     </div>
   </div>
+
+  <!-- Compare table -->
+  <div style="overflow-x:auto">
+  <table class="tbl">
+    <tr><th>对比维度</th><th>Read Replica</th><th>Multi-AZ</th></tr>
+    <tr><td>主要目的</td><td class="good">读扩展（分担读流量）</td><td class="good">高可用（HA）</td></tr>
+    <tr><td>复制方式</td><td><strong>ASYNC</strong>（异步）</td><td><strong>SYNC</strong>（同步）</td></tr>
+    <tr><td>副本可读？</td><td class="good">✅ SELECT only</td><td class="bad">❌ Standby 不可读</td></tr>
+    <tr><td>故障转移</td><td class="bad">❌ 手动 Promote</td><td class="good">✅ 自动（60–120s）</td></tr>
+    <tr><td>数量上限</td><td>最多 15 个</td><td>1 个 Standby</td></tr>
+    <tr><td>跨 Region</td><td class="good">✅ 支持</td><td class="bad">❌ 同 Region 内</td></tr>
+    <tr><td>用于扩展？</td><td class="good">✅ 是</td><td class="bad">❌ 否（Not for scaling）</td></tr>
+  </table>
+  </div>
+  <div style="margin-top:10px;font-size:13px;color:var(--ink3);background:var(--surface2);border-radius:6px;padding:10px">
+    💡 Read Replica 本身也可以配置 Multi-AZ（读扩展 + 该 Replica 自身高可用，双重保障）。
   </div>
 </div>
 
@@ -2350,13 +2564,13 @@ function pgRDS(){return`${back()}
       <div style="font-size:12px;font-weight:700;color:var(--ink);margin-bottom:8px">静态加密</div>
       <div class="bl">
         <div class="bl-item"><span class="bl-dot"></span>KMS 加密（创建时开启）</div>
-        <div class="bl-item"><span class="bl-dot"></span>加密后 Snapshot、Read Replica 也自动加密</div>
+        <div class="bl-item"><span class="bl-dot"></span>加密后 Snapshot / Read Replica 也自动加密</div>
       </div>
     </div>
     <div style="background:var(--green-bg);border:1.5px solid var(--green-border);border-radius:8px;padding:12px">
       <div style="font-size:12px;font-weight:700;color:var(--green);margin-bottom:8px">IAM DB Authentication ⭐</div>
       <div class="bl">
-        <div class="bl-item"><span class="bl-dot" style="background:var(--green)"></span>EC2 用 IAM Role 获取临时 Token（15 分钟有效）</div>
+        <div class="bl-item"><span class="bl-dot" style="background:var(--green)"></span>EC2 用 IAM Role 获取临时 Token（<strong>15 分钟</strong>有效）</div>
         <div class="bl-item"><span class="bl-dot" style="background:var(--green)"></span><strong>无需存储数据库密码</strong></div>
         <div class="bl-item"><span class="bl-dot" style="background:var(--green)"></span>支持 MySQL / PostgreSQL</div>
         <div class="bl-item"><span class="bl-dot" style="background:var(--green)"></span>配合 SSL 确保传输加密</div>
@@ -2366,7 +2580,7 @@ function pgRDS(){return`${back()}
       <div style="font-size:12px;font-weight:700;color:var(--ink);margin-bottom:8px">网络访问控制</div>
       <div class="bl">
         <div class="bl-item"><span class="bl-dot"></span>部署在 VPC 私有子网</div>
-        <div class="bl-item"><span class="bl-dot"></span>Security Group 控制入站端口（MySQL: 3306，PostgreSQL: 5432）</div>
+        <div class="bl-item"><span class="bl-dot"></span>Security Group 控制入站（MySQL: 3306，PostgreSQL: 5432）</div>
       </div>
     </div>
   </div>
@@ -2375,89 +2589,87 @@ function pgRDS(){return`${back()}
 <div class="s-card">
   <h3>🔌 RDS Proxy — Lambda 场景必考</h3>
   <div style="font-size:15px;color:var(--ink2);line-height:1.8;margin-bottom:12px">
-    <strong>问题场景：</strong>Lambda 是无状态的，每次调用都新建数据库连接。高并发时数千个 Lambda 同时运行 → RDS 连接数被耗尽。
+    <strong>问题：</strong>Lambda 无状态，每次调用新建 DB 连接。高并发时数千 Lambda → RDS 连接数耗尽。
   </div>
   <div class="flow">
     <div class="flow-step">
-      <div><div class="flow-n" style="background:var(--purple-bg,#F2EEFF);border-color:var(--purple,#7C3AED);color:var(--purple,#7C3AED)">λ</div></div>
-      <div class="flow-body"><strong>数千个 Lambda 并发</strong> → 每个都尝试连接数据库</div>
+      <div><div class="flow-n" style="background:#F2EEFF;border-color:#7C3AED;color:#7C3AED">λ</div></div>
+      <div class="flow-body"><strong>数千个 Lambda 并发</strong> → 各自尝试连接 DB</div>
     </div>
     <div class="flow-step">
       <div><div class="flow-n" style="background:var(--green-bg);border-color:var(--green-border);color:var(--green)">P</div></div>
-      <div class="flow-body"><strong>RDS Proxy（连接池）</strong> → 将数千连接合并为少量长连接 → 大幅减少 RDS 实际连接数</div>
+      <div class="flow-body"><strong>RDS Proxy（连接池）</strong> → 合并为少量长连接</div>
     </div>
     <div class="flow-step">
       <div><div class="flow-n">DB</div></div>
-      <div class="flow-body"><strong>RDS 实例</strong> → 只看到来自 Proxy 的少量连接，不会过载</div>
+      <div class="flow-body"><strong>RDS</strong> → 只看到少量连接，不过载</div>
     </div>
   </div>
   <div class="g2-sm" style="margin-top:12px">
     <div style="background:var(--green-bg);border:1.5px solid var(--green-border);border-radius:8px;padding:10px;font-size:13px">
-      <div style="font-weight:700;color:var(--green);margin-bottom:6px">✅ RDS Proxy 优势</div>
+      <div style="font-weight:700;color:var(--green);margin-bottom:6px">✅ 优势</div>
       <div>• 防止连接耗尽</div>
-      <div>• 故障转移时间缩短 <strong>66%</strong></div>
+      <div>• 故障转移缩短 <strong>66%</strong></div>
       <div>• 支持 IAM Auth + Secrets Manager</div>
-      <div>• Serverless，全托管</div>
+      <div>• 只在 VPC 内访问（无公网端点）</div>
     </div>
     <div style="background:var(--aws-bg);border:1.5px solid var(--aws-border);border-radius:8px;padding:10px;font-size:13px">
-      <div style="font-weight:700;color:var(--aws);margin-bottom:6px">🎯 适用场景关键词</div>
+      <div style="font-weight:700;color:var(--aws);margin-bottom:6px">🎯 关键词</div>
       <div>• Lambda + RDS</div>
       <div>• 连接数耗尽</div>
       <div>• Serverless 访问数据库</div>
-      <div>• 需要提升故障转移速度</div>
+      <div>• 提升故障转移速度</div>
     </div>
   </div>
-  ${trapdiv('amber','高频','RDS Proxy 只能在 VPC 内访问','RDS Proxy 没有公网访问端点，只能在 VPC 私有网络内使用。Lambda 也应部署在 VPC 内。')}
 </div>
 
 <div class="s-card">
-  <h3>⚡ Amazon Aurora — AWS 自研云原生数据库</h3>
-  <div style="font-size:15px;color:var(--ink2);line-height:1.8;margin-bottom:14px">Aurora 与标准 RDS 兼容，但针对云环境进行了架构级优化：</div>
+  <h3>⚡ Amazon Aurora</h3>
   <div class="g3" style="margin-bottom:16px">
     <div style="background:var(--aws-bg);border:1.5px solid var(--aws-border);border-radius:8px;padding:12px;text-align:center">
-      <div style="font-size:24px;margin-bottom:4px">⚡</div>
+      <div style="font-size:22px;margin-bottom:4px">⚡</div>
       <div style="font-size:13px;font-weight:700;color:var(--aws)">5x 快于 MySQL</div>
       <div style="font-size:12px;color:var(--ink3);margin-top:4px">3x 快于 PostgreSQL</div>
     </div>
     <div style="background:var(--green-bg);border:1.5px solid var(--green-border);border-radius:8px;padding:12px;text-align:center">
-      <div style="font-size:24px;margin-bottom:4px">🔒</div>
+      <div style="font-size:22px;margin-bottom:4px">🔒</div>
       <div style="font-size:13px;font-weight:700;color:var(--green)">6 副本 × 3 AZ</div>
       <div style="font-size:12px;color:var(--ink3);margin-top:4px">写4/6确认，读3/6确认</div>
     </div>
     <div style="background:var(--blue-bg);border:1.5px solid var(--blue-border);border-radius:8px;padding:12px;text-align:center">
-      <div style="font-size:24px;margin-bottom:4px">📦</div>
+      <div style="font-size:22px;margin-bottom:4px">📦</div>
       <div style="font-size:13px;font-weight:700;color:var(--blue)">10GB → 128TB</div>
       <div style="font-size:12px;color:var(--ink3);margin-top:4px">存储自动扩展</div>
     </div>
   </div>
   <div style="overflow-x:auto">
   <table class="tbl">
-    <tr><th>Aurora vs RDS</th><th>Aurora</th><th>标准 RDS</th></tr>
-    <tr><td>Read Replica 上限</td><td class="good"><strong>15 个</strong></td><td>5 个</td></tr>
+    <tr><th>Aurora vs 标准 RDS</th><th>Aurora</th><th>标准 RDS</th></tr>
+    <tr><td>Read Replica 上限</td><td class="good">15 个</td><td>15 个</td></tr>
     <tr><td>存储副本数</td><td class="good">6 份（3 AZ）</td><td>2 份（Multi-AZ）</td></tr>
     <tr><td>存储扩展</td><td class="good">自动（最大 128TB）</td><td>手动调整</td></tr>
+    <tr><td>性能</td><td class="good">5x MySQL / 3x PostgreSQL</td><td>标准</td></tr>
     <tr><td>费用</td><td class="bad">约贵 20%</td><td>较便宜</td></tr>
-    <tr><td>兼容性</td><td>MySQL / PostgreSQL</td><td>多种引擎</td></tr>
   </table>
   </div>
-  <div style="margin-top:14px;background:var(--surface2);border-radius:8px;padding:12px;font-size:14px">
-    <div style="font-weight:700;margin-bottom:8px">🔌 Aurora Endpoints（端点）</div>
+  <div style="margin-top:12px;background:var(--surface2);border-radius:8px;padding:12px;font-size:14px">
+    <div style="font-weight:700;margin-bottom:8px">🔌 Aurora Endpoints</div>
     <div class="bl">
-      <div class="bl-item"><span class="bl-dot" style="background:var(--aws)"></span><strong>Writer Endpoint</strong>：永远指向当前主实例（故障转移后自动更新），用于所有写操作</div>
-      <div class="bl-item"><span class="bl-dot" style="background:var(--green)"></span><strong>Reader Endpoint</strong>：自动负载均衡到所有 Read Replica，用于读操作</div>
-      <div class="bl-item"><span class="bl-dot" style="background:var(--blue)"></span><strong>Custom Endpoint</strong>：指向部分实例（如高性能实例组），用于分析查询</div>
+      <div class="bl-item"><span class="bl-dot" style="background:var(--aws)"></span><strong>Writer Endpoint</strong>：永远指向主实例，用于写操作</div>
+      <div class="bl-item"><span class="bl-dot" style="background:var(--green)"></span><strong>Reader Endpoint</strong>：自动负载均衡到所有 Read Replica</div>
+      <div class="bl-item"><span class="bl-dot" style="background:var(--blue)"></span><strong>Custom Endpoint</strong>：指向部分高性能实例，用于分析查询</div>
     </div>
   </div>
-  ${trapdiv('amber','中频','Aurora 比标准 RDS 贵约 20%','如果题目强调"成本最优"且对高可用要求不极致，标准 RDS Multi-AZ 可能是更好答案。Aurora 更适合"高性能/高可用/无缝扩展"场景。')}
 </div>
 
 <div class="s-card">
-  <h3>⚠️ 高频考试陷阱总结</h3>
-  ${trapdiv('red','极高频','Read Replica vs Multi-AZ 混淆','读扩展/报表查询 → Read Replica。高可用/故障转移 → Multi-AZ。Standby 永远不可读！')}
-  ${trapdiv('red','高频','Lambda + RDS → 必须用 RDS Proxy','Lambda 并发高，直连 RDS 会耗尽连接数。看到 Lambda + 数据库 → 首选 RDS Proxy。')}
-  ${trapdiv('amber','高频','IAM DB Auth 使用临时 Token，15 分钟有效','不是永久凭证，每次需要重新生成。适合 EC2 无密码连接 RDS 的场景。')}
-  ${trapdiv('amber','中频','Aurora Read Replica 最多 15 个（RDS 只有 5 个）','题目如果说"需要大量只读副本"→ Aurora 更合适。')}
-  ${trapdiv('amber','中频','RDS 备份：自动备份（1–35天）vs 手动快照（永久保留）','题目问"保留超过 35 天"→ 必须用手动快照（Manual Snapshot），不能用自动备份。')}
+  <h3>⚠️ 高频考试陷阱</h3>
+  ${trapdiv('red','极高频','Read Replica vs Multi-AZ 混淆','读扩展/报表查询 → Read Replica（ASYNC，可读）。高可用故障转移 → Multi-AZ（SYNC，Standby 不可读）。')}
+  ${trapdiv('red','高频','Read Replica 只能 SELECT','INSERT / UPDATE / DELETE 不能在 Read Replica 执行，必须走主实例。')}
+  ${trapdiv('red','高频','Lambda + RDS → RDS Proxy','Lambda 高并发直连 RDS 会耗尽连接数。看到 Lambda + 数据库 → 首选 RDS Proxy。')}
+  ${trapdiv('amber','高频','Single-AZ → Multi-AZ 是零停机操作','只需点 Modify，内部自动快照 → 恢复 Standby → 建立同步，期间不需要停机。')}
+  ${trapdiv('amber','高频','Read Replica 同 Region 跨 AZ 复制网络费：免费','跨 Region 才收费。同一 Region 内不管跨多少 AZ，复制网络费免费。')}
+  ${trapdiv('amber','中频','RDS 备份：自动备份（1–35天）vs 手动快照（永久）','超过 35 天保留 → 必须用 Manual Snapshot。')}
 </div>`}
 
 /* ═══════════════ ELASTICACHE PAGE ═══════════════ */
