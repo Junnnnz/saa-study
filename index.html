@@ -1129,7 +1129,7 @@ text:'Amazon Aurora 相比标准 RDS MySQL/PostgreSQL，最主要的<em>性能�
 en:'Compared to standard RDS MySQL/PostgreSQL, what are Aurora\'s main <em>performance and availability advantages</em>?',
 ch:['Aurora 比 RDS 便宜 20%，且不支持 Multi-AZ','Aurora 存储跨 3 个 AZ 6 份副本，性能比 MySQL 快 5x、比 PostgreSQL 快 3x','Aurora 只支持单 AZ 部署，但读写速度更快','Aurora 是 NoSQL 数据库，专为低延迟设计'],
 ench:['Aurora is 20% cheaper than RDS and does not support Multi-AZ','Aurora stores 6 copies across 3 AZs, 5x faster than MySQL, 3x faster than PostgreSQL','Aurora only supports single-AZ but with faster read/write','Aurora is a NoSQL DB designed for low latency'],
-ans:1,exp:'<strong>Amazon Aurora 核心优势：</strong><br><br>📦 <strong>存储层：</strong><br>• 数据自动跨 <strong>3 个 AZ</strong> 存储 <strong>6 份副本</strong>（2份/AZ）<br>• 4/6 写入成功 = 写入确认；3/6 读取成功 = 读取确认<br>• 自动修复损坏的数据块（Self-Healing）<br><br>⚡ <strong>性能：</strong><br>• 比标准 MySQL <strong>快 5 倍</strong>，比 PostgreSQL <strong>快 3 倍</strong><br>• 存储自动扩展，10GB 起步，最大 <strong>128TB</strong><br><br>🔌 <strong>端点：</strong><br>• Writer Endpoint（主写）<br>• Reader Endpoint（自动负载均衡到所有 Read Replica）<br>• 最多 <strong>15 个</strong> Read Replica（标准 RDS 最多 5 个）',ww:'Aurora 比 RDS 贵约 20%，不是更便宜（A 错）。Aurora 原生支持 Multi-AZ（C 错）。Aurora 是关系型数据库，不是 NoSQL（D 错）。',rule:'Aurora = MySQL/PostgreSQL 兼容 + 6副本3AZ + 5x/3x 性能 + 最多15个 Read Replica + 自动扩展至128TB。'},
+ans:1,exp:'<strong>Amazon Aurora 核心优势：</strong><br><br>📦 <strong>存储层：</strong><br>• 数据自动跨 <strong>3 个 AZ</strong> 存储 <strong>6 份副本</strong>（2份/AZ）<br>• 4/6 写入成功 = 写入确认；3/6 读取成功 = 读取确认<br>• 自动修复损坏的数据块（Self-Healing）<br><br>⚡ <strong>性能：</strong><br>• 比标准 MySQL <strong>快 5 倍</strong>，比 PostgreSQL <strong>快 3 倍</strong><br>• 存储自动扩展，10GB 起步，最大 <strong>256TB</strong><br><br>🔌 <strong>端点：</strong><br>• Writer Endpoint（主写）<br>• Reader Endpoint（自动负载均衡到所有 Read Replica）<br>• 最多 <strong>15 个</strong> Read Replica（标准 RDS 最多 5 个）',ww:'Aurora 比 RDS 贵约 20%，不是更便宜（A 错）。Aurora 原生支持 Multi-AZ（C 错）。Aurora 是关系型数据库，不是 NoSQL（D 错）。',rule:'Aurora = MySQL/PostgreSQL 兼容 + 6副本3AZ + 5x/3x 性能 + 最多15个 Read Replica + 自动扩展至256TB。'},
 
 {id:'rds_06',topic:'RDS',diff:'high',
 text:'一个投票系统在直播期间，EC2 实例向 RDS 高速写入投票数据，<em>数据库无法跟上写入速度</em>。如何解决？',
@@ -1186,7 +1186,28 @@ text:'公司要将 Single-AZ RDS 升级为 Multi-AZ，<em>不能有停机时间<
 en:'A company wants to upgrade Single-AZ RDS to Multi-AZ <em>with no downtime</em>. What is the correct approach?',
 ch:['停止数据库 → 备份 → 创建 Multi-AZ 新实例 → 恢复数据','直接在 Console 点击 Modify → 勾选 Multi-AZ → 确认，无需停机','使用 DMS 将数据迁移到新的 Multi-AZ 实例','只能在创建数据库时选择 Multi-AZ，事后无法修改'],
 ench:['Stop DB → backup → create new Multi-AZ instance → restore','Click Modify in Console → enable Multi-AZ → confirm, no downtime needed','Use DMS to migrate data to new Multi-AZ instance','Multi-AZ can only be set at creation time, cannot be changed later'],
-ans:1,exp:'<strong>Single-AZ → Multi-AZ 是零停机（Zero Downtime）操作：</strong><br><br>操作：Console → 选择 DB → Modify → 勾选 Multi-AZ → 应用<br><br>AWS 内部自动完成：<br>① 对主实例<strong>拍快照（Snapshot）</strong><br>② 在新 AZ 从快照<strong>恢复 Standby DB</strong><br>③ 建立两者之间的 <strong>SYNC 同步复制</strong><br><br>应用的 DNS Endpoint 不变，<strong>完全无感知，无停机</strong>。',ww:'不需要停机（A 错）。DMS 用于异构数据库迁移，不适合此场景（C 错）。Multi-AZ 可以在事后随时开启（D 错）。',rule:'Single-AZ → Multi-AZ：零停机，点 Modify 即可。内部快照 → 新 AZ 恢复 → SYNC 同步。'}
+ans:1,exp:'<strong>Single-AZ → Multi-AZ 是零停机（Zero Downtime）操作：</strong><br><br>操作：Console → 选择 DB → Modify → 勾选 Multi-AZ → 应用<br><br>AWS 内部自动完成：<br>① 对主实例<strong>拍快照（Snapshot）</strong><br>② 在新 AZ 从快照<strong>恢复 Standby DB</strong><br>③ 建立两者之间的 <strong>SYNC 同步复制</strong><br><br>应用的 DNS Endpoint 不变，<strong>完全无感知，无停机</strong>。',ww:'不需要停机（A 错）。DMS 用于异构数据库迁移，不适合此场景（C 错）。Multi-AZ 可以在事后随时开启（D 错）。',rule:'Single-AZ → Multi-AZ：零停机，点 Modify 即可。内部快照 → 新 AZ 恢复 → SYNC 同步。'},
+
+{id:'ec_05',topic:'ElastiCache',diff:'high',
+text:'需要为游戏应用实现<em>实时排行榜</em>，要求排名实时更新，数据具有唯一性和顺序性。最合适的方案是？',
+en:'Need a <em>real-time gaming leaderboard</em> that updates rankings instantly with uniqueness and ordering. Best solution?',
+ch:['ElastiCache Redis — 使用 Sorted Sets 实现实时排行榜','ElastiCache Memcached — 使用 String 存储分数','RDS MySQL — 每次查询时 ORDER BY 排序','DynamoDB — 用 GSI 实现排序'],
+ench:['ElastiCache Redis — use Sorted Sets for real-time leaderboard','ElastiCache Memcached — use String to store scores','RDS MySQL — ORDER BY on every query','DynamoDB — use GSI for sorting'],
+ans:0,exp:'<strong>Redis Sorted Sets</strong> 是实时排行榜的标准方案：<br><br>• 每个元素都有 score（分数），自动按 score 排序<br>• 保证<strong>唯一性</strong>（同一元素不重复）<br>• 新元素插入时，实时排序插入正确位置<br>• ZRANGE、ZRANK 命令直接查询排名<br><br>RDS ORDER BY 代价高，不适合高频实时更新。Memcached 不支持复杂数据结构。',ww:'Memcached 只支持 String，不支持排序（B 错）。RDS ORDER BY 每次查询代价高（C 错）。DynamoDB GSI 可排序，但不如 Redis Sorted Set 高效（D 较弱）。',rule:'实时排行榜 → Redis Sorted Sets（实时排序 + 唯一性）。'},
+
+{id:'ec_06',topic:'ElastiCache',diff:'mid',
+text:'公司使用 ElastiCache Redis，需要在 Security Group 之上增加<em>额外的连接认证</em>保护 Redis 集群。应使用什么？',
+en:'Company uses ElastiCache Redis and wants to add <em>extra connection authentication</em> on top of Security Groups. What to use?',
+ch:['IAM Database Authentication Token','Redis AUTH（创建集群时设置 password/token）','在 Security Group 入站规则中再加 IP 白名单','SASL-based authentication'],
+ench:['IAM Database Authentication Token','Redis AUTH (set password/token when creating cluster)','Add more IP whitelist rules to Security Group','SASL-based authentication'],
+ans:1,exp:'<strong>Redis AUTH</strong> 是在 Security Group 之上的额外安全层：<br><br>• 创建 Redis 集群时设置 password/token<br>• 客户端连接时必须提供密码才能执行命令<br>• 结合 <strong>SSL/TLS 传输加密</strong><br>• IAM Auth 用于 AWS API 级别安全，不是 Redis 连接密码<br>• SASL 是 Memcached 的认证方案',ww:'IAM Auth 是 AWS API 级别，非 Redis 连接密码（A 错）。Security Group 是网络层（C 错）。SASL 是 Memcached 方案（D 错）。',rule:'Redis 额外认证 → Redis AUTH（集群密码+SSL）。Memcached 认证 → SASL。'},
+
+{id:'rds_11',topic:'RDS',diff:'mid',
+text:'公司需要将<em>本地 MySQL 数据库迁移到 AWS Aurora MySQL</em>。正确的迁移步骤是？',
+en:'Company needs to <em>migrate an on-premises MySQL database to AWS Aurora MySQL</em>. What is the correct migration approach?',
+ch:['备份本地 MySQL → 上传 S3 → 从 S3 恢复到新 RDS MySQL 实例','用 Percona XtraBackup 备份 → 上传 S3 → 从 S3 恢复到新 Aurora MySQL Cluster','直接创建 Aurora，手动导入数据','创建 RDS Read Replica，然后 Promote 为 Aurora'],
+ench:['Backup MySQL → upload to S3 → restore to new RDS MySQL','Use Percona XtraBackup → upload to S3 → restore to new Aurora MySQL Cluster','Create Aurora directly and manually import data','Create RDS Read Replica then Promote to Aurora'],
+ans:1,exp:'<strong>本地 MySQL → Aurora MySQL 的正确路径：</strong><br><br>① 用 <strong>Percona XtraBackup</strong> 备份本地 MySQL 数据库<br>② 将备份文件上传到 <strong>Amazon S3</strong><br>③ 从 S3 恢复备份文件到新的 <strong>Aurora MySQL Cluster</strong><br><br>注意区分：<br>• 本地 MySQL → <strong>RDS MySQL</strong>：普通备份文件 → S3 → RDS<br>• 本地 MySQL → <strong>Aurora MySQL</strong>：<strong>Percona XtraBackup</strong> → S3 → Aurora',ww:'选 A 是迁移到 RDS MySQL 的步骤，不是 Aurora（A 错）。手动导入太慢（C 错）。Read Replica Promote 是 RDS 内部操作，不用于本地迁移（D 错）。',rule:'本地 MySQL → Aurora：Percona XtraBackup → S3 → Aurora Cluster。本地 MySQL → RDS：普通备份 → S3 → RDS。'}
 ];
 
 /* ═══════════════ QUIZ STATE ═══════════════ */
@@ -2295,384 +2316,473 @@ function pgAMI(){return`${back()}
 function pgRDS(){return`${back()}
 <div class="pg-title">Amazon RDS & Aurora</div>
 <div class="pg-tags">
-  <span class="tag tag-high">⭐ 高频考点</span>
+  <span class="tag tag-high">⭐ 极高频考点</span>
   <span class="tag tag-mid">Section 9</span>
   <span class="tag tag-low">关系型数据库</span>
 </div>
 
 <div class="s-card">
-  <h3>🗄️ RDS 是什么？</h3>
-  <p style="color:var(--ink2);font-size:15px;line-height:1.8">RDS（Relational Database Service）是 AWS 的<strong>托管关系型数据库服务</strong>，使用 SQL 作为查询语言。AWS 负责 OS 打补丁、数据库升级、备份、监控——你只需管理数据和应用。</p>
+  <h3>🗄️ RDS 概览</h3>
+  <p style="color:var(--ink2);font-size:15px;line-height:1.8">RDS 是 AWS 的<strong>托管关系型数据库服务</strong>，使用 SQL 查询语言。支持：PostgreSQL · MySQL · MariaDB · Oracle · MS SQL Server · IBM DB2 · <strong>Aurora</strong>（AWS 自研）</p>
   <div class="g2" style="margin-top:12px">
-    <div style="background:var(--aws-bg);border:1.5px solid var(--aws-border);border-radius:8px;padding:12px">
-      <div style="font-size:12px;font-weight:700;color:var(--aws);margin-bottom:8px">✅ 支持的数据库引擎</div>
-      <div class="bl">
-        <div class="bl-item"><span class="bl-dot"></span>PostgreSQL</div>
-        <div class="bl-item"><span class="bl-dot"></span>MySQL</div>
-        <div class="bl-item"><span class="bl-dot"></span>MariaDB</div>
-        <div class="bl-item"><span class="bl-dot"></span>Oracle</div>
-        <div class="bl-item"><span class="bl-dot"></span>Microsoft SQL Server</div>
-        <div class="bl-item"><span class="bl-dot"></span>IBM DB2</div>
-        <div class="bl-item"><span class="bl-dot"></span>Aurora（AWS 自研）</div>
-      </div>
-    </div>
     <div style="background:var(--green-bg);border:1.5px solid var(--green-border);border-radius:8px;padding:12px">
-      <div style="font-size:12px;font-weight:700;color:var(--green);margin-bottom:8px">✅ RDS 托管优势（vs 自己在 EC2 装 DB）</div>
+      <div style="font-size:12px;font-weight:700;color:var(--green);margin-bottom:8px">✅ RDS 托管优势</div>
       <div class="bl">
         <div class="bl-item"><span class="bl-dot" style="background:var(--green)"></span>自动化 provisioning + OS 打补丁</div>
-        <div class="bl-item"><span class="bl-dot" style="background:var(--green)"></span>持续备份 + <strong>Point-in-Time Restore</strong></div>
-        <div class="bl-item"><span class="bl-dot" style="background:var(--green)"></span>监控 Dashboard</div>
-        <div class="bl-item"><span class="bl-dot" style="background:var(--green)"></span>Read Replicas（读扩展）</div>
-        <div class="bl-item"><span class="bl-dot" style="background:var(--green)"></span>Multi-AZ（灾难恢复）</div>
+        <div class="bl-item"><span class="bl-dot" style="background:var(--green)"></span>持续备份 + Point-in-Time Restore</div>
+        <div class="bl-item"><span class="bl-dot" style="background:var(--green)"></span>Read Replicas 读扩展</div>
+        <div class="bl-item"><span class="bl-dot" style="background:var(--green)"></span>Multi-AZ 灾难恢复</div>
         <div class="bl-item"><span class="bl-dot" style="background:var(--green)"></span>垂直 + 水平扩展</div>
         <div class="bl-item"><span class="bl-dot" style="background:var(--green)"></span>存储由 EBS 支撑</div>
       </div>
     </div>
+    <div style="background:var(--red-bg);border:1.5px solid var(--red-border);border-radius:8px;padding:12px">
+      <div style="font-size:12px;font-weight:700;color:var(--red);margin-bottom:8px">❌ 无法 SSH 登录实例</div>
+      <div style="font-size:13px;color:var(--ink2);line-height:1.8">RDS 底层 OS 由 AWS 完全管理。<br><br>需要 OS 级访问 → 用 <strong>RDS Custom</strong>（Oracle / SQL Server 专用）</div>
+    </div>
   </div>
-  ${trapdiv('red','必考','BUT — 不能 SSH 登录 RDS 实例','RDS 是完全托管服务，AWS 管理底层 OS。你无法 SSH 进入实例。需要 OS 级访问 → 用 RDS Custom（Oracle/SQL Server 专用）。')}
+</div>
+
+<div class="s-card">
+  <h3>🔧 RDS Custom</h3>
+  <div style="font-size:14px;color:var(--ink2);line-height:1.8;margin-bottom:12px">专为 <strong>Oracle</strong> 和 <strong>MS SQL Server</strong> — 在托管 RDS 基础上提供底层访问权。</div>
+  <div class="g2">
+    <div style="background:var(--aws-bg);border:1.5px solid var(--aws-border);border-radius:8px;padding:12px">
+      <div style="font-size:12px;font-weight:700;color:var(--aws);margin-bottom:8px">RDS Custom 能做</div>
+      <div class="bl">
+        <div class="bl-item"><span class="bl-dot"></span>配置 OS 和 DB 设置</div>
+        <div class="bl-item"><span class="bl-dot"></span>安装自定义补丁</div>
+        <div class="bl-item"><span class="bl-dot"></span>启用 Native Features</div>
+        <div class="bl-item"><span class="bl-dot"></span>通过 SSH 或 SSM Session Manager 访问 EC2</div>
+      </div>
+    </div>
+    <div style="background:var(--surface2);border-radius:8px;padding:12px">
+      <div style="font-size:12px;font-weight:700;color:var(--ink);margin-bottom:8px">⚠️ 注意</div>
+      <div class="bl">
+        <div class="bl-item"><span class="bl-dot" style="background:var(--amber)"></span>自定义前必须<strong>关闭 Automation Mode</strong></div>
+        <div class="bl-item"><span class="bl-dot" style="background:var(--amber)"></span>操作前建议先拍 DB Snapshot</div>
+      </div>
+      <div style="margin-top:10px;padding:8px;background:var(--surface);border-radius:6px;font-size:12px">
+        RDS = DB + OS 全由 AWS 管<br>
+        RDS Custom = 你有完整 Admin 权限
+      </div>
+    </div>
+  </div>
 </div>
 
 <div class="s-card">
   <h3>📈 RDS Storage Auto Scaling</h3>
-  <p style="color:var(--ink2);font-size:15px;line-height:1.8;margin-bottom:12px">当 RDS 检测到存储空间不足时，<strong>自动扩容</strong>，避免手动干预。适合<em>工作负载不可预测</em>的应用场景。</p>
-  <div style="background:var(--aws-bg);border:1.5px solid var(--aws-border);border-radius:8px;padding:14px;margin-bottom:12px">
-    <div style="font-size:13px;font-weight:700;color:var(--aws);margin-bottom:10px">⚙️ 自动扩容触发条件（三个同时满足）</div>
+  <div style="background:var(--aws-bg);border:1.5px solid var(--aws-border);border-radius:8px;padding:14px">
+    <div style="font-size:13px;font-weight:700;color:var(--aws);margin-bottom:10px">⚙️ 触发扩容的三个条件（同时满足）</div>
     <div class="flow">
-      <div class="flow-step">
-        <div><div class="flow-n" style="font-size:10px">①</div></div>
-        <div class="flow-body">剩余空间 <strong>&lt; 已分配存储的 10%</strong></div>
-      </div>
-      <div class="flow-step">
-        <div><div class="flow-n" style="font-size:10px">②</div></div>
-        <div class="flow-body">低存储状态持续 <strong>至少 5 分钟</strong></div>
-      </div>
-      <div class="flow-step">
-        <div><div class="flow-n" style="font-size:10px">③</div></div>
-        <div class="flow-body">距离上次扩容 <strong>已过 6 小时</strong></div>
-      </div>
+      <div class="flow-step"><div><div class="flow-n" style="font-size:10px">①</div></div><div class="flow-body">剩余空间 <strong>&lt; 已分配的 10%</strong></div></div>
+      <div class="flow-step"><div><div class="flow-n" style="font-size:10px">②</div></div><div class="flow-body">低存储持续 <strong>至少 5 分钟</strong></div></div>
+      <div class="flow-step"><div><div class="flow-n" style="font-size:10px">③</div></div><div class="flow-body">距上次扩容 <strong>已过 6 小时</strong></div></div>
     </div>
-  </div>
-  <div style="background:var(--surface2);border-radius:8px;padding:12px;font-size:14px;color:var(--ink2)">
-    💡 必须设置 <strong>Maximum Storage Threshold</strong>（最大存储上限），防止无限扩容。支持所有 RDS 数据库引擎。
+    <div style="margin-top:8px;font-size:13px;color:var(--ink2)">必须设置 <strong>Maximum Storage Threshold</strong>。适合工作负载不可预测的场景。</div>
   </div>
 </div>
 
 <div class="s-card">
   <h3>🔁 Read Replica — 读扩展</h3>
-  ${trapdiv('red','极高频','Read Replica 只支持 SELECT，不支持写操作','Read Replica 只能执行 SELECT（读取）。INSERT / UPDATE / DELETE 必须走主实例。这是考试高频陷阱。')}
-
-  <!-- Diagram: Read Replica Architecture (matches slide) -->
+  ${trapdiv("red","极高频","Read Replica 只支持 SELECT","INSERT / UPDATE / DELETE 必须走主实例。这是最高频考试陷阱！")}
   <div style="background:var(--surface2);border-radius:10px;padding:16px;margin:14px 0">
-    <div style="font-size:12px;font-weight:700;color:var(--ink3);margin-bottom:12px;text-transform:uppercase;letter-spacing:.8px">架构图 — Read Replicas for Scalability</div>
-    <!-- Application bar -->
+    <div style="font-size:12px;font-weight:700;color:var(--ink3);margin-bottom:12px;text-transform:uppercase;letter-spacing:.8px">架构图 — Read Replicas for Read Scalability</div>
     <div style="background:#E8A020;color:#fff;font-weight:700;text-align:center;border-radius:6px;padding:8px;margin-bottom:16px;font-size:14px">Application</div>
-    <!-- DB row -->
     <div style="display:flex;align-items:flex-start;justify-content:center;gap:0">
-      <!-- Left Replica -->
       <div style="display:flex;flex-direction:column;align-items:center;flex:1">
         <div style="font-size:11px;color:var(--green);font-weight:700;margin-bottom:4px">reads ↑</div>
-        <div style="width:52px;height:52px;background:#1D5FBF;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:900;color:#fff;border:3px solid #1243A0">R</div>
-        <div style="font-size:10px;color:var(--ink3);text-align:center;margin-top:6px;line-height:1.4">RDS DB<br>Read Replica</div>
+        <div style="width:48px;height:48px;background:#1D5FBF;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:900;color:#fff;border:3px solid #1243A0">R</div>
+        <div style="font-size:10px;color:var(--ink3);text-align:center;margin-top:4px;line-height:1.4">Read<br>Replica</div>
       </div>
-      <!-- Arrow from left replica to main -->
-      <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;padding-top:18px;flex:1">
-        <div style="font-size:10px;color:var(--ink3);margin-bottom:2px">ASYNC</div>
-        <div style="color:var(--aws);font-size:18px">←</div>
-        <div style="font-size:10px;color:var(--ink3)">replication</div>
-      </div>
-      <!-- Main -->
+      <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;padding-top:16px;flex:1;font-size:10px;color:var(--ink3)">ASYNC ←</div>
       <div style="display:flex;flex-direction:column;align-items:center;flex:1">
-        <div style="font-size:11px;color:var(--ink3);font-weight:700;margin-bottom:4px">writes ↓ / reads ↑</div>
-        <div style="width:56px;height:56px;background:#1D5FBF;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:900;color:#fff;border:3px solid #1243A0">M</div>
-        <div style="font-size:10px;color:var(--ink3);text-align:center;margin-top:6px;line-height:1.4">RDS DB<br>instance</div>
-      </div>
-      <!-- Arrow from main to right replica -->
-      <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;padding-top:18px;flex:1">
-        <div style="font-size:10px;color:var(--ink3);margin-bottom:2px">ASYNC</div>
-        <div style="color:var(--aws);font-size:18px">→</div>
-        <div style="font-size:10px;color:var(--ink3)">replication</div>
-      </div>
-      <!-- Right Replica -->
-      <div style="display:flex;flex-direction:column;align-items:center;flex:1">
-        <div style="font-size:11px;color:var(--green);font-weight:700;margin-bottom:4px">reads ↑</div>
-        <div style="width:52px;height:52px;background:#1D5FBF;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:900;color:#fff;border:3px solid #1243A0">R</div>
-        <div style="font-size:10px;color:var(--ink3);text-align:center;margin-top:6px;line-height:1.4">RDS DB<br>Read Replica</div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Use Case Diagram (matches slide) -->
-  <div style="background:var(--surface2);border-radius:10px;padding:16px;margin-bottom:14px">
-    <div style="font-size:12px;font-weight:700;color:var(--ink3);margin-bottom:12px;text-transform:uppercase;letter-spacing:.8px">使用场景 — 报表查询不影响生产</div>
-    <div style="display:flex;justify-content:space-around;margin-bottom:12px">
-      <div style="background:#E8A020;color:#fff;font-weight:700;text-align:center;border-radius:6px;padding:7px 14px;font-size:13px">Production<br>Application</div>
-      <div style="background:#555;color:#fff;font-weight:700;text-align:center;border-radius:6px;padding:7px 14px;font-size:13px">Reporting<br>Application</div>
-    </div>
-    <div style="display:flex;align-items:center;justify-content:center;gap:8px">
-      <div style="display:flex;flex-direction:column;align-items:center">
-        <div style="font-size:11px;color:var(--ink3);margin-bottom:4px">writes↓ reads↑</div>
+        <div style="font-size:11px;color:var(--ink3);font-weight:700;margin-bottom:4px">writes↓ reads↑</div>
         <div style="width:52px;height:52px;background:#1D5FBF;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:900;color:#fff;border:3px solid #1243A0">M</div>
-        <div style="font-size:10px;color:var(--ink3);text-align:center;margin-top:4px">RDS DB instance</div>
+        <div style="font-size:10px;color:var(--ink3);text-align:center;margin-top:4px;line-height:1.4">RDS DB<br>instance</div>
       </div>
-      <div style="text-align:center">
-        <div style="font-size:10px;color:var(--ink3)">ASYNC replication</div>
-        <div style="color:var(--aws);font-size:20px">→</div>
-      </div>
-      <div style="display:flex;flex-direction:column;align-items:center">
-        <div style="font-size:11px;color:var(--green);font-weight:700;margin-bottom:4px">reads ↑ only</div>
-        <div style="width:52px;height:52px;background:#1D5FBF;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:900;color:#fff;border:3px solid #1243A0">R</div>
-        <div style="font-size:10px;color:var(--ink3);text-align:center;margin-top:4px">Read Replica</div>
-      </div>
-    </div>
-    <div style="margin-top:10px;font-size:13px;color:var(--ink2);background:var(--surface);border-radius:6px;padding:8px">
-      ✅ SELECT only（报表） · ❌ INSERT/UPDATE/DELETE 只走 <strong>M</strong>
-    </div>
-  </div>
-
-  <!-- Network Cost Diagram (matches slide) -->
-  <div style="background:var(--surface2);border-radius:10px;padding:16px;margin-bottom:14px">
-    <div style="font-size:12px;font-weight:700;color:var(--ink3);margin-bottom:12px;text-transform:uppercase;letter-spacing:.8px">网络费用 — Network Cost</div>
-    <div class="g2">
-      <div style="border:2px dashed var(--green-border);border-radius:8px;padding:10px;text-align:center">
-        <div style="font-size:11px;color:var(--green);font-weight:700;margin-bottom:8px">Same Region / Different AZ</div>
-        <div style="font-size:10px;color:var(--green);margin-bottom:8px">us-east-1a → us-east-1b</div>
-        <div style="display:flex;align-items:center;justify-content:center;gap:6px">
-          <div style="width:34px;height:34px;background:#1D5FBF;border-radius:5px;display:flex;align-items:center;justify-content:center;font-weight:900;color:#fff;font-size:14px">M</div>
-          <div style="color:var(--aws)">→</div>
-          <div style="width:34px;height:34px;background:#1D5FBF;border-radius:5px;display:flex;align-items:center;justify-content:center;font-weight:900;color:#fff;font-size:14px">R</div>
-        </div>
-        <div style="margin-top:8px;font-size:13px;font-weight:700;color:var(--green)">✅ Free</div>
-      </div>
-      <div style="border:2px dashed var(--red-border);border-radius:8px;padding:10px;text-align:center">
-        <div style="font-size:11px;color:var(--red);font-weight:700;margin-bottom:8px">Cross Region</div>
-        <div style="font-size:10px;color:var(--red);margin-bottom:8px">us-east-1 → eu-west-1</div>
-        <div style="display:flex;align-items:center;justify-content:center;gap:6px">
-          <div style="width:34px;height:34px;background:#1D5FBF;border-radius:5px;display:flex;align-items:center;justify-content:center;font-weight:900;color:#fff;font-size:14px">M</div>
-          <div style="color:var(--aws)">→</div>
-          <div style="width:34px;height:34px;background:#1D5FBF;border-radius:5px;display:flex;align-items:center;justify-content:center;font-weight:900;color:#fff;font-size:14px">R</div>
-        </div>
-        <div style="margin-top:8px;font-size:13px;font-weight:700;color:var(--red)">❌ $$$</div>
+      <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;padding-top:16px;flex:1;font-size:10px;color:var(--ink3)">→ ASYNC</div>
+      <div style="display:flex;flex-direction:column;align-items:center;flex:1">
+        <div style="font-size:11px;color:var(--green);font-weight:700;margin-bottom:4px">reads ↑</div>
+        <div style="width:48px;height:48px;background:#1D5FBF;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:900;color:#fff;border:3px solid #1243A0">R</div>
+        <div style="font-size:10px;color:var(--ink3);text-align:center;margin-top:4px;line-height:1.4">Read<br>Replica</div>
       </div>
     </div>
   </div>
-
-  <div style="background:var(--aws-bg);border:1.5px solid var(--aws-border);border-radius:8px;padding:12px;font-size:13px">
-    <div style="font-weight:700;color:var(--aws);margin-bottom:6px">📋 Read Replica 特性总结</div>
-    <div class="bl">
-      <div class="bl-item"><span class="bl-dot"></span>最多 <strong>15 个</strong> Read Replica</div>
-      <div class="bl-item"><span class="bl-dot"></span>可在同 AZ、跨 AZ、跨 Region</div>
-      <div class="bl-item"><span class="bl-dot"></span><strong>ASYNC 异步复制</strong> → 最终一致性</div>
-      <div class="bl-item"><span class="bl-dot"></span>可 Promote 成独立主数据库</div>
-      <div class="bl-item"><span class="bl-dot"></span>应用必须<strong>更新 Connection String</strong> 才能使用</div>
+  <div class="g2" style="margin-bottom:14px">
+    <div style="background:var(--aws-bg);border:1.5px solid var(--aws-border);border-radius:8px;padding:12px;font-size:13px">
+      <div style="font-weight:700;color:var(--aws);margin-bottom:6px">📋 特性</div>
+      <div>• 最多 <strong>15 个</strong> Read Replica</div>
+      <div>• 同 AZ / 跨 AZ / 跨 Region</div>
+      <div>• <strong>ASYNC</strong> 异步 → 最终一致性</div>
+      <div>• 可 Promote 成独立数据库</div>
+      <div>• 需更新 Connection String</div>
+    </div>
+    <div style="background:var(--surface2);border-radius:8px;padding:12px;font-size:13px">
+      <div style="font-weight:700;color:var(--ink);margin-bottom:8px">💰 网络费用</div>
+      <div style="background:var(--green-bg);border-radius:6px;padding:6px;margin-bottom:6px">
+        <span style="color:var(--green);font-weight:700">✅ 同 Region → Free</span><br>
+        <span style="font-size:11px;color:var(--ink3)">us-east-1a → us-east-1b</span>
+      </div>
+      <div style="background:var(--red-bg);border-radius:6px;padding:6px">
+        <span style="color:var(--red);font-weight:700">❌ 跨 Region → $$$</span><br>
+        <span style="font-size:11px;color:var(--ink3)">us-east-1 → eu-west-1</span>
+      </div>
     </div>
   </div>
 </div>
 
 <div class="s-card">
-  <h3>🛡️ RDS Multi-AZ — 高可用（Disaster Recovery）</h3>
-  ${trapdiv('red','极高频','Multi-AZ Standby 不可读，不用于扩展','Standby 仅作故障转移备用，不对外服务。想分担读流量 → Read Replica。Multi-AZ ≠ 性能扩展！')}
-
-  <!-- Multi-AZ Architecture Diagram (matches slide) -->
+  <h3>🛡️ Multi-AZ — 高可用（DR）</h3>
+  ${trapdiv("red","极高频","Standby 不可读，不用于扩展","Standby 仅备用。读扩展 → Read Replica。Not used for scaling！")}
   <div style="background:var(--surface2);border-radius:10px;padding:16px;margin:14px 0">
     <div style="font-size:12px;font-weight:700;color:var(--ink3);margin-bottom:12px;text-transform:uppercase;letter-spacing:.8px">架构图 — Multi-AZ Disaster Recovery</div>
-    <!-- Application -->
     <div style="background:#E8A020;color:#fff;font-weight:700;text-align:center;border-radius:6px;padding:8px;margin-bottom:8px;font-size:14px">Application</div>
-    <!-- writes/reads label -->
-    <div style="display:flex;justify-content:center;gap:40px;margin-bottom:8px;font-size:12px">
-      <span style="color:#1D5FBF;font-weight:600">writes ↓</span>
-      <span style="color:var(--green);font-weight:600">reads ↑</span>
-    </div>
-    <!-- DNS band -->
     <div style="background:#333;color:#fff;text-align:center;border-radius:6px;padding:6px;margin-bottom:14px;font-size:12px;font-weight:600">One DNS name — automatic failover</div>
-    <!-- DB row -->
-    <div style="display:flex;align-items:center;justify-content:center;gap:16px">
+    <div style="display:flex;align-items:center;justify-content:center;gap:20px">
       <div style="display:flex;flex-direction:column;align-items:center">
-        <div style="width:56px;height:56px;background:#3B6FBF;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:900;color:#fff;border:3px solid #1243A0;opacity:.75">S</div>
-        <div style="font-size:10px;color:var(--ink3);text-align:center;margin-top:6px;line-height:1.4">RDS DB instance<br><strong>standby (AZ B)</strong></div>
+        <div style="width:52px;height:52px;background:#3B6FBF;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:900;color:#fff;border:3px solid #1243A0;opacity:.75">S</div>
+        <div style="font-size:10px;color:var(--ink3);text-align:center;margin-top:6px;line-height:1.4">Standby<br><strong>AZ B</strong></div>
       </div>
-      <div style="text-align:center">
-        <div style="color:var(--aws);font-size:18px">←</div>
-        <div style="font-size:10px;color:var(--ink3);white-space:nowrap">SYNC<br>replication</div>
-      </div>
+      <div style="text-align:center"><div style="color:var(--aws);font-size:18px">← SYNC</div></div>
       <div style="display:flex;flex-direction:column;align-items:center">
-        <div style="width:56px;height:56px;background:#1D5FBF;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:900;color:#fff;border:3px solid #1243A0">M</div>
-        <div style="font-size:10px;color:var(--ink3);text-align:center;margin-top:6px;line-height:1.4">RDS Master DB<br><strong>instance (AZ A)</strong></div>
+        <div style="width:52px;height:52px;background:#1D5FBF;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:900;color:#fff;border:3px solid #1243A0">M</div>
+        <div style="font-size:10px;color:var(--ink3);text-align:center;margin-top:6px;line-height:1.4">Master<br><strong>AZ A</strong></div>
       </div>
     </div>
-    <div style="margin-top:12px;font-size:12px;color:var(--ink3);text-align:center">
-      ⚡ 故障时 DNS 自动切换 → Standby 变 Primary（约 60–120 秒）
+    <div style="margin-top:10px;font-size:12px;color:var(--ink3);text-align:center">故障时 DNS 自动切换（约 60–120 秒）</div>
+  </div>
+  <div style="background:var(--surface2);border-radius:8px;padding:12px;margin-bottom:12px">
+    <div style="font-size:12px;font-weight:700;margin-bottom:8px">🔄 Single-AZ → Multi-AZ（Zero Downtime）</div>
+    <div class="flow">
+      <div class="flow-step"><div><div class="flow-n" style="font-size:10px">①</div></div><div class="flow-body" style="font-size:13px">拍快照（Snapshot）</div></div>
+      <div class="flow-step"><div><div class="flow-n" style="font-size:10px">②</div></div><div class="flow-body" style="font-size:13px">新 AZ 从快照恢复 Standby</div></div>
+      <div class="flow-step"><div><div class="flow-n" style="font-size:10px">③</div></div><div class="flow-body" style="font-size:13px">建立 SYNC 同步复制</div></div>
+    </div>
+    <div style="display:flex;gap:6px;margin-top:8px;flex-wrap:wrap">
+      <span style="background:var(--green-bg);border:1px solid var(--green-border);border-radius:5px;padding:3px 8px;font-size:11px;color:var(--green);font-weight:600">Zero Downtime</span>
+      <span style="background:var(--aws-bg);border:1px solid var(--aws-border);border-radius:5px;padding:3px 8px;font-size:11px;color:var(--aws)">只需点 Modify</span>
     </div>
   </div>
-
-  <!-- Single-AZ to Multi-AZ Diagram (matches slide) -->
-  <div style="background:var(--surface2);border-radius:10px;padding:16px;margin-bottom:14px">
-    <div style="font-size:12px;font-weight:700;color:var(--ink3);margin-bottom:12px;text-transform:uppercase;letter-spacing:.8px">Zero Downtime — Single-AZ → Multi-AZ</div>
-    <div style="display:flex;align-items:flex-start;justify-content:center;gap:10px;flex-wrap:wrap">
-      <!-- M -->
-      <div style="display:flex;flex-direction:column;align-items:center">
-        <div style="font-size:11px;color:var(--ink3);margin-bottom:4px">RDS DB instance</div>
-        <div style="width:52px;height:52px;background:#1D5FBF;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:900;color:#fff;border:3px solid #1243A0">M</div>
-      </div>
-      <!-- Arrows down + right -->
-      <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;padding-top:20px">
-        <div style="color:var(--aws);font-size:14px">→ SYNC →</div>
-      </div>
-      <!-- S -->
-      <div style="display:flex;flex-direction:column;align-items:center">
-        <div style="font-size:11px;color:var(--ink3);margin-bottom:4px">Standby DB</div>
-        <div style="width:52px;height:52px;background:#3B6FBF;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:900;color:#fff;border:3px solid #1243A0;opacity:.8">S</div>
-      </div>
-    </div>
-    <!-- Snapshot flow -->
-    <div style="margin-top:12px;font-size:12px;color:var(--ink3);text-align:center">M → 拍快照 (snapshot) → 新 AZ 恢复 → 建立 SYNC 同步</div>
-    <div style="display:flex;gap:6px;margin-top:10px;flex-wrap:wrap">
-      <div style="background:var(--green-bg);border:1px solid var(--green-border);border-radius:6px;padding:6px 10px;font-size:12px;color:var(--green);font-weight:600">✅ Zero Downtime</div>
-      <div style="background:var(--aws-bg);border:1px solid var(--aws-border);border-radius:6px;padding:6px 10px;font-size:12px;color:var(--aws);font-weight:600">只需点 Modify</div>
-      <div style="background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:6px 10px;font-size:12px;color:var(--ink2)">无需停止 DB</div>
-    </div>
-  </div>
-
-  <!-- Compare table -->
   <div style="overflow-x:auto">
   <table class="tbl">
-    <tr><th>对比维度</th><th>Read Replica</th><th>Multi-AZ</th></tr>
-    <tr><td>主要目的</td><td class="good">读扩展（分担读流量）</td><td class="good">高可用（HA）</td></tr>
-    <tr><td>复制方式</td><td><strong>ASYNC</strong>（异步）</td><td><strong>SYNC</strong>（同步）</td></tr>
-    <tr><td>副本可读？</td><td class="good">✅ SELECT only</td><td class="bad">❌ Standby 不可读</td></tr>
-    <tr><td>故障转移</td><td class="bad">❌ 手动 Promote</td><td class="good">✅ 自动（60–120s）</td></tr>
-    <tr><td>数量上限</td><td>最多 15 个</td><td>1 个 Standby</td></tr>
-    <tr><td>跨 Region</td><td class="good">✅ 支持</td><td class="bad">❌ 同 Region 内</td></tr>
-    <tr><td>用于扩展？</td><td class="good">✅ 是</td><td class="bad">❌ 否（Not for scaling）</td></tr>
+    <tr><th>对比</th><th>Read Replica</th><th>Multi-AZ</th></tr>
+    <tr><td>目的</td><td class="good">读扩展</td><td class="good">高可用（HA）</td></tr>
+    <tr><td>复制</td><td><strong>ASYNC</strong></td><td><strong>SYNC</strong></td></tr>
+    <tr><td>可读？</td><td class="good">✅ SELECT only</td><td class="bad">❌ 不可读</td></tr>
+    <tr><td>故障转移</td><td class="bad">❌ 手动</td><td class="good">✅ 自动</td></tr>
+    <tr><td>数量</td><td>最多 15 个</td><td>1 个 Standby</td></tr>
+    <tr><td>跨 Region</td><td class="good">✅</td><td class="bad">❌</td></tr>
+    <tr><td>用于扩展</td><td class="good">✅</td><td class="bad">❌</td></tr>
   </table>
-  </div>
-  <div style="margin-top:10px;font-size:13px;color:var(--ink3);background:var(--surface2);border-radius:6px;padding:10px">
-    💡 Read Replica 本身也可以配置 Multi-AZ（读扩展 + 该 Replica 自身高可用，双重保障）。
   </div>
 </div>
 
 <div class="s-card">
-  <h3>🔒 RDS Security</h3>
-  <div class="g2" style="margin-top:8px">
-    <div style="background:var(--surface2);border-radius:8px;padding:12px">
-      <div style="font-size:12px;font-weight:700;color:var(--ink);margin-bottom:8px">传输加密</div>
+  <h3>💾 RDS Backups</h3>
+  <div class="g2">
+    <div style="background:var(--aws-bg);border:1.5px solid var(--aws-border);border-radius:8px;padding:12px">
+      <div style="font-size:12px;font-weight:700;color:var(--aws);margin-bottom:8px">🔄 Automated Backups</div>
       <div class="bl">
-        <div class="bl-item"><span class="bl-dot"></span>支持 SSL/TLS 加密连接</div>
-        <div class="bl-item"><span class="bl-dot"></span>可强制要求客户端必须用 SSL</div>
-      </div>
-    </div>
-    <div style="background:var(--surface2);border-radius:8px;padding:12px">
-      <div style="font-size:12px;font-weight:700;color:var(--ink);margin-bottom:8px">静态加密</div>
-      <div class="bl">
-        <div class="bl-item"><span class="bl-dot"></span>KMS 加密（创建时开启）</div>
-        <div class="bl-item"><span class="bl-dot"></span>加密后 Snapshot / Read Replica 也自动加密</div>
+        <div class="bl-item"><span class="bl-dot"></span>每日全量备份（备份窗口期间）</div>
+        <div class="bl-item"><span class="bl-dot"></span>每 <strong>5 分钟</strong>备份事务日志</div>
+        <div class="bl-item"><span class="bl-dot"></span>可恢复到任意时间点（最近 5 分钟内）</div>
+        <div class="bl-item"><span class="bl-dot"></span>保留 <strong>1 ~ 35 天</strong>（设 0 = 禁用）</div>
       </div>
     </div>
     <div style="background:var(--green-bg);border:1.5px solid var(--green-border);border-radius:8px;padding:12px">
-      <div style="font-size:12px;font-weight:700;color:var(--green);margin-bottom:8px">IAM DB Authentication ⭐</div>
+      <div style="font-size:12px;font-weight:700;color:var(--green);margin-bottom:8px">📸 Manual DB Snapshots</div>
       <div class="bl">
-        <div class="bl-item"><span class="bl-dot" style="background:var(--green)"></span>EC2 用 IAM Role 获取临时 Token（<strong>15 分钟</strong>有效）</div>
-        <div class="bl-item"><span class="bl-dot" style="background:var(--green)"></span><strong>无需存储数据库密码</strong></div>
-        <div class="bl-item"><span class="bl-dot" style="background:var(--green)"></span>支持 MySQL / PostgreSQL</div>
-        <div class="bl-item"><span class="bl-dot" style="background:var(--green)"></span>配合 SSL 确保传输加密</div>
+        <div class="bl-item"><span class="bl-dot" style="background:var(--green)"></span>用户手动触发</div>
+        <div class="bl-item"><span class="bl-dot" style="background:var(--green)"></span>保留时间<strong>无限制</strong></div>
+        <div class="bl-item"><span class="bl-dot" style="background:var(--green)"></span>超过 35 天 → 必须用 Manual Snapshot</div>
+      </div>
+    </div>
+  </div>
+  ${trapdiv("amber","高频","停止 RDS 仍然收存储费","停止实例后存储继续计费！长期不用 → 拍 Snapshot → 删实例 → 需要时从快照重建。")}
+</div>
+
+<div class="s-card">
+  <h3>🔁 RDS & Aurora Restore Options</h3>
+  <div style="font-size:14px;color:var(--ink2);margin-bottom:12px;padding:8px;background:var(--aws-bg);border-radius:6px">⚠️ 恢复备份或快照 → 始终创建<strong>新数据库</strong>，不会覆盖原有实例</div>
+  <div class="g2">
+    <div style="background:var(--surface2);border-radius:8px;padding:12px;font-size:13px">
+      <div style="font-weight:700;color:var(--ink);margin-bottom:8px">MySQL RDS 从 S3 恢复</div>
+      <div class="flow">
+        <div class="flow-step"><div><div class="flow-n" style="font-size:10px">1</div></div><div class="flow-body" style="font-size:12px">备份 on-premises DB</div></div>
+        <div class="flow-step"><div><div class="flow-n" style="font-size:10px">2</div></div><div class="flow-body" style="font-size:12px">上传到 S3</div></div>
+        <div class="flow-step"><div><div class="flow-n" style="font-size:10px">3</div></div><div class="flow-body" style="font-size:12px">恢复到新 RDS MySQL 实例</div></div>
+      </div>
+    </div>
+    <div style="background:var(--surface2);border-radius:8px;padding:12px;font-size:13px">
+      <div style="font-weight:700;color:var(--ink);margin-bottom:8px">MySQL Aurora 从 S3 恢复</div>
+      <div class="flow">
+        <div class="flow-step"><div><div class="flow-n" style="font-size:10px">1</div></div><div class="flow-body" style="font-size:12px">用 <strong>Percona XtraBackup</strong> 备份</div></div>
+        <div class="flow-step"><div><div class="flow-n" style="font-size:10px">2</div></div><div class="flow-body" style="font-size:12px">上传到 S3</div></div>
+        <div class="flow-step"><div><div class="flow-n" style="font-size:10px">3</div></div><div class="flow-body" style="font-size:12px">恢复到新 Aurora MySQL Cluster</div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="s-card">
+  <h3>🔒 RDS & Aurora Security</h3>
+  <div class="g2">
+    <div style="background:var(--surface2);border-radius:8px;padding:12px">
+      <div style="font-size:12px;font-weight:700;color:var(--ink);margin-bottom:8px">静态加密（At-rest）</div>
+      <div class="bl">
+        <div class="bl-item"><span class="bl-dot"></span>KMS 加密，<strong>创建时</strong>定义</div>
+        <div class="bl-item"><span class="bl-dot"></span>主实例不加密 → Read Replica 也无法加密</div>
+        <div class="bl-item"><span class="bl-dot"></span>未加密 DB 要加密 → 快照 → 以加密方式恢复</div>
       </div>
     </div>
     <div style="background:var(--surface2);border-radius:8px;padding:12px">
-      <div style="font-size:12px;font-weight:700;color:var(--ink);margin-bottom:8px">网络访问控制</div>
+      <div style="font-size:12px;font-weight:700;color:var(--ink);margin-bottom:8px">传输加密 + 其他</div>
       <div class="bl">
-        <div class="bl-item"><span class="bl-dot"></span>部署在 VPC 私有子网</div>
-        <div class="bl-item"><span class="bl-dot"></span>Security Group 控制入站（MySQL: 3306，PostgreSQL: 5432）</div>
+        <div class="bl-item"><span class="bl-dot"></span>TLS 默认就绪（In-flight）</div>
+        <div class="bl-item"><span class="bl-dot"></span>Security Groups 控制网络访问</div>
+        <div class="bl-item"><span class="bl-dot"></span>无 SSH（RDS Custom 除外）</div>
+        <div class="bl-item"><span class="bl-dot"></span>Audit Logs → CloudWatch Logs</div>
       </div>
+    </div>
+  </div>
+  <div style="background:var(--green-bg);border:1.5px solid var(--green-border);border-radius:8px;padding:12px;margin-top:10px">
+    <div style="font-size:12px;font-weight:700;color:var(--green);margin-bottom:8px">IAM Authentication ⭐</div>
+    <div class="bl">
+      <div class="bl-item"><span class="bl-dot" style="background:var(--green)"></span>IAM Role 连接 DB，替代用户名/密码</div>
+      <div class="bl-item"><span class="bl-dot" style="background:var(--green)"></span>临时 Token，<strong>15 分钟</strong>有效</div>
+      <div class="bl-item"><span class="bl-dot" style="background:var(--green)"></span>支持 MySQL / PostgreSQL</div>
     </div>
   </div>
 </div>
 
 <div class="s-card">
   <h3>🔌 RDS Proxy — Lambda 场景必考</h3>
-  <div style="font-size:15px;color:var(--ink2);line-height:1.8;margin-bottom:12px">
-    <strong>问题：</strong>Lambda 无状态，每次调用新建 DB 连接。高并发时数千 Lambda → RDS 连接数耗尽。
+  <div style="background:var(--surface2);border-radius:10px;padding:16px;margin-bottom:14px">
+    <div style="font-size:12px;font-weight:700;color:var(--ink3);margin-bottom:12px;text-transform:uppercase;letter-spacing:.8px">架构图 — Lambda + RDS Proxy in VPC</div>
+    <div style="border:2px solid var(--green-border);border-radius:8px;padding:12px;background:var(--green-bg)">
+      <div style="font-size:11px;color:var(--green);font-weight:700;margin-bottom:8px">☁️ VPC</div>
+      <div style="background:var(--surface);border-radius:6px;padding:8px;margin-bottom:8px">
+        <div style="font-size:11px;color:var(--ink3);margin-bottom:6px;font-weight:600">Lambda functions</div>
+        <div style="display:flex;gap:5px;flex-wrap:wrap">
+          <div style="width:28px;height:28px;background:#F2EEFF;border:1.5px solid #7C3AED;border-radius:5px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#7C3AED">λ</div>
+          <div style="width:28px;height:28px;background:#F2EEFF;border:1.5px solid #7C3AED;border-radius:5px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#7C3AED">λ</div>
+          <div style="width:28px;height:28px;background:#F2EEFF;border:1.5px solid #7C3AED;border-radius:5px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#7C3AED">λ</div>
+          <div style="width:28px;height:28px;background:#F2EEFF;border:1.5px solid #7C3AED;border-radius:5px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#7C3AED">λ</div>
+          <div style="font-size:12px;color:var(--ink3);align-self:center">...</div>
+        </div>
+      </div>
+      <div style="font-size:11px;color:var(--ink3);text-align:center;margin-bottom:6px">↓ IAM Authentication ↓</div>
+      <div style="border:1.5px dashed var(--border2);border-radius:6px;padding:8px;background:var(--surface)">
+        <div style="font-size:11px;color:var(--ink3);margin-bottom:6px">🔒 Private subnet</div>
+        <div style="display:flex;align-items:center;justify-content:center;gap:8px">
+          <div style="background:#1D5FBF;color:#fff;border-radius:5px;padding:5px 10px;font-size:11px;font-weight:700">RDS Proxy</div>
+          <div style="color:var(--aws)">→</div>
+          <div style="background:#1D5FBF;color:#fff;border-radius:5px;padding:5px 10px;font-size:11px;font-weight:700">RDS DB</div>
+        </div>
+      </div>
+    </div>
   </div>
-  <div class="flow">
-    <div class="flow-step">
-      <div><div class="flow-n" style="background:#F2EEFF;border-color:#7C3AED;color:#7C3AED">λ</div></div>
-      <div class="flow-body"><strong>数千个 Lambda 并发</strong> → 各自尝试连接 DB</div>
-    </div>
-    <div class="flow-step">
-      <div><div class="flow-n" style="background:var(--green-bg);border-color:var(--green-border);color:var(--green)">P</div></div>
-      <div class="flow-body"><strong>RDS Proxy（连接池）</strong> → 合并为少量长连接</div>
-    </div>
-    <div class="flow-step">
-      <div><div class="flow-n">DB</div></div>
-      <div class="flow-body"><strong>RDS</strong> → 只看到少量连接，不过载</div>
-    </div>
-  </div>
-  <div class="g2-sm" style="margin-top:12px">
+  <div class="g2-sm">
     <div style="background:var(--green-bg);border:1.5px solid var(--green-border);border-radius:8px;padding:10px;font-size:13px">
       <div style="font-weight:700;color:var(--green);margin-bottom:6px">✅ 优势</div>
-      <div>• 防止连接耗尽</div>
-      <div>• 故障转移缩短 <strong>66%</strong></div>
-      <div>• 支持 IAM Auth + Secrets Manager</div>
-      <div>• 只在 VPC 内访问（无公网端点）</div>
+      <div>• 连接池，防耗尽</div>
+      <div>• Failover 缩短 <strong>66%</strong></div>
+      <div>• Serverless + Multi-AZ</div>
+      <div>• IAM Auth + Secrets Manager</div>
+      <div>• 支持 MySQL/PostgreSQL/<br>MariaDB/MS SQL + Aurora</div>
     </div>
     <div style="background:var(--aws-bg);border:1.5px solid var(--aws-border);border-radius:8px;padding:10px;font-size:13px">
       <div style="font-weight:700;color:var(--aws);margin-bottom:6px">🎯 关键词</div>
       <div>• Lambda + RDS</div>
       <div>• 连接数耗尽</div>
-      <div>• Serverless 访问数据库</div>
+      <div>• Serverless 访问 DB</div>
       <div>• 提升故障转移速度</div>
+      <div>• <strong>只在 VPC 内</strong>（无公网）</div>
     </div>
   </div>
 </div>
 
 <div class="s-card">
   <h3>⚡ Amazon Aurora</h3>
-  <div class="g3" style="margin-bottom:16px">
-    <div style="background:var(--aws-bg);border:1.5px solid var(--aws-border);border-radius:8px;padding:12px;text-align:center">
-      <div style="font-size:22px;margin-bottom:4px">⚡</div>
-      <div style="font-size:13px;font-weight:700;color:var(--aws)">5x 快于 MySQL</div>
-      <div style="font-size:12px;color:var(--ink3);margin-top:4px">3x 快于 PostgreSQL</div>
+  <div class="g3" style="margin-bottom:14px">
+    <div style="background:var(--aws-bg);border:1.5px solid var(--aws-border);border-radius:8px;padding:10px;text-align:center">
+      <div style="font-size:18px;margin-bottom:3px">⚡</div>
+      <div style="font-size:12px;font-weight:700;color:var(--aws)">5x MySQL</div>
+      <div style="font-size:11px;color:var(--ink3)">3x PostgreSQL</div>
     </div>
-    <div style="background:var(--green-bg);border:1.5px solid var(--green-border);border-radius:8px;padding:12px;text-align:center">
-      <div style="font-size:22px;margin-bottom:4px">🔒</div>
-      <div style="font-size:13px;font-weight:700;color:var(--green)">6 副本 × 3 AZ</div>
-      <div style="font-size:12px;color:var(--ink3);margin-top:4px">写4/6确认，读3/6确认</div>
+    <div style="background:var(--green-bg);border:1.5px solid var(--green-border);border-radius:8px;padding:10px;text-align:center">
+      <div style="font-size:18px;margin-bottom:3px">🔒</div>
+      <div style="font-size:12px;font-weight:700;color:var(--green)">6副本 × 3 AZ</div>
+      <div style="font-size:11px;color:var(--ink3)">写4/6，读3/6</div>
     </div>
-    <div style="background:var(--blue-bg);border:1.5px solid var(--blue-border);border-radius:8px;padding:12px;text-align:center">
-      <div style="font-size:22px;margin-bottom:4px">📦</div>
-      <div style="font-size:13px;font-weight:700;color:var(--blue)">10GB → 128TB</div>
-      <div style="font-size:12px;color:var(--ink3);margin-top:4px">存储自动扩展</div>
+    <div style="background:var(--blue-bg);border:1.5px solid var(--blue-border);border-radius:8px;padding:10px;text-align:center">
+      <div style="font-size:18px;margin-bottom:3px">📦</div>
+      <div style="font-size:12px;font-weight:700;color:var(--blue)">10GB → 256TB</div>
+      <div style="font-size:11px;color:var(--ink3)">自动扩展</div>
     </div>
   </div>
-  <div style="overflow-x:auto">
-  <table class="tbl">
-    <tr><th>Aurora vs 标准 RDS</th><th>Aurora</th><th>标准 RDS</th></tr>
-    <tr><td>Read Replica 上限</td><td class="good">15 个</td><td>15 个</td></tr>
-    <tr><td>存储副本数</td><td class="good">6 份（3 AZ）</td><td>2 份（Multi-AZ）</td></tr>
-    <tr><td>存储扩展</td><td class="good">自动（最大 128TB）</td><td>手动调整</td></tr>
-    <tr><td>性能</td><td class="good">5x MySQL / 3x PostgreSQL</td><td>标准</td></tr>
-    <tr><td>费用</td><td class="bad">约贵 20%</td><td>较便宜</td></tr>
-  </table>
+  <div style="font-size:13px;color:var(--ink2);line-height:1.8;margin-bottom:14px;background:var(--surface2);border-radius:6px;padding:10px">
+    AWS 专有技术，兼容 PostgreSQL / MySQL 驱动。Failover &lt;<strong>30 秒</strong>（HA Native）。Replica lag &lt;<strong>10ms</strong>。比 RDS 贵约 <strong>20%</strong>。
   </div>
-  <div style="margin-top:12px;background:var(--surface2);border-radius:8px;padding:12px;font-size:14px">
-    <div style="font-weight:700;margin-bottom:8px">🔌 Aurora Endpoints</div>
-    <div class="bl">
-      <div class="bl-item"><span class="bl-dot" style="background:var(--aws)"></span><strong>Writer Endpoint</strong>：永远指向主实例，用于写操作</div>
-      <div class="bl-item"><span class="bl-dot" style="background:var(--green)"></span><strong>Reader Endpoint</strong>：自动负载均衡到所有 Read Replica</div>
-      <div class="bl-item"><span class="bl-dot" style="background:var(--blue)"></span><strong>Custom Endpoint</strong>：指向部分高性能实例，用于分析查询</div>
+
+  <!-- Aurora HA Diagram (matches slide: 6 copies 3 AZ) -->
+  <div style="background:var(--surface2);border-radius:10px;padding:14px;margin-bottom:14px">
+    <div style="font-size:12px;font-weight:700;color:var(--ink3);margin-bottom:10px;text-transform:uppercase;letter-spacing:.8px">Aurora HA — 6副本跨3 AZ</div>
+    <div style="display:flex;gap:4px;justify-content:center;margin-bottom:10px">
+      <div style="flex:1;text-align:center;border:1px dashed var(--border2);border-radius:6px;padding:8px">
+        <div style="font-size:11px;color:var(--aws);font-weight:600;margin-bottom:6px">AZ 1</div>
+        <div style="display:flex;gap:3px;justify-content:center">
+          <div style="width:30px;height:30px;background:#1D5FBF;border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:900;color:#fff">M</div>
+          <div style="width:30px;height:30px;background:#1D5FBF;border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:900;color:#fff;opacity:.8">R</div>
+        </div>
+        <div style="font-size:9px;color:var(--ink3);margin-top:3px">W↓  R↑</div>
+      </div>
+      <div style="flex:1;text-align:center;border:1px dashed var(--border2);border-radius:6px;padding:8px">
+        <div style="font-size:11px;color:var(--ink3);font-weight:600;margin-bottom:6px">AZ 2</div>
+        <div style="display:flex;gap:3px;justify-content:center">
+          <div style="width:30px;height:30px;background:#1D5FBF;border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:900;color:#fff;opacity:.8">R</div>
+          <div style="width:30px;height:30px;background:#1D5FBF;border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:900;color:#fff;opacity:.8">R</div>
+        </div>
+        <div style="font-size:9px;color:var(--ink3);margin-top:3px">R↑  R↑</div>
+      </div>
+      <div style="flex:1;text-align:center;border:1px dashed var(--border2);border-radius:6px;padding:8px">
+        <div style="font-size:11px;color:var(--ink3);font-weight:600;margin-bottom:6px">AZ 3</div>
+        <div style="display:flex;gap:3px;justify-content:center">
+          <div style="width:30px;height:30px;background:#1D5FBF;border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:900;color:#fff;opacity:.8">R</div>
+          <div style="width:30px;height:30px;background:#1D5FBF;border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:900;color:#fff;opacity:.8">R</div>
+        </div>
+        <div style="font-size:9px;color:var(--ink3);margin-top:3px">R↑  R↑</div>
+      </div>
+    </div>
+    <div style="background:#333;color:#fff;border-radius:5px;padding:6px;text-align:center;font-size:11px">Shared Storage Volume — Replication + Self Healing + Auto Expanding</div>
+    <div style="display:flex;gap:5px;margin-top:8px;flex-wrap:wrap;justify-content:center">
+      <span style="background:var(--green-bg);border:1px solid var(--green-border);border-radius:4px;padding:2px 7px;font-size:11px;color:var(--green)">写入需 4/6</span>
+      <span style="background:var(--blue-bg);border:1px solid var(--blue-border);border-radius:4px;padding:2px 7px;font-size:11px;color:var(--blue)">读取需 3/6</span>
+      <span style="background:var(--surface);border:1px solid var(--border);border-radius:4px;padding:2px 7px;font-size:11px;color:var(--ink2)">Self-Healing</span>
+    </div>
+  </div>
+
+  <!-- Aurora DB Cluster Diagram (matches slide 4) -->
+  <div style="background:var(--surface2);border-radius:10px;padding:14px;margin-bottom:14px">
+    <div style="font-size:12px;font-weight:700;color:var(--ink3);margin-bottom:10px;text-transform:uppercase;letter-spacing:.8px">Aurora DB Cluster — Endpoints</div>
+    <div style="display:flex;gap:6px;margin-bottom:10px">
+      <div style="background:#2D8A4E;color:#fff;border-radius:5px;padding:7px 10px;font-size:11px;font-weight:700;flex:1;text-align:center">Writer Endpoint<br><span style="font-weight:400;font-size:10px">→ Master</span></div>
+      <div style="background:#E8A020;color:#fff;border-radius:5px;padding:7px 10px;font-size:11px;font-weight:700;flex:2;text-align:center">Reader Endpoint<br><span style="font-weight:400;font-size:10px">Connection Load Balancing</span></div>
+    </div>
+    <div style="display:flex;align-items:center;gap:3px;margin-bottom:6px">
+      <div style="width:38px;height:38px;background:#1D5FBF;border-radius:5px;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:900;color:#fff;border:2px solid #1243A0">M</div>
+      <div style="display:flex;gap:3px;flex:1;justify-content:space-around">
+        <div style="width:34px;height:34px;background:#1D5FBF;border-radius:5px;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:900;color:#fff;opacity:.85">R</div>
+        <div style="width:34px;height:34px;background:#1D5FBF;border-radius:5px;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:900;color:#fff;opacity:.85">R</div>
+        <div style="width:34px;height:34px;background:#1D5FBF;border-radius:5px;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:900;color:#fff;opacity:.85">R</div>
+        <div style="width:34px;height:34px;background:#1D5FBF;border-radius:5px;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:900;color:#fff;opacity:.85">R</div>
+        <div style="width:34px;height:34px;background:#1D5FBF;border-radius:5px;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:900;color:#fff;opacity:.85">R</div>
+      </div>
+    </div>
+    <div style="background:#333;color:#fff;border-radius:5px;padding:5px;text-align:center;font-size:11px">← Auto Scaling → Shared Storage: 10G to 256 TB →</div>
+  </div>
+
+  <!-- Features + Replicas Auto Scaling + Custom Endpoint -->
+  <div class="g2" style="margin-bottom:14px">
+    <div style="background:var(--surface2);border-radius:8px;padding:12px">
+      <div style="font-size:12px;font-weight:700;margin-bottom:8px">✨ Aurora 特性</div>
+      <div class="bl" style="font-size:12px">
+        <div class="bl-item"><span class="bl-dot" style="background:var(--green)"></span>Automatic failover (&lt;30s)</div>
+        <div class="bl-item"><span class="bl-dot" style="background:var(--green)"></span>Backup and Recovery</div>
+        <div class="bl-item"><span class="bl-dot" style="background:var(--green)"></span>Push-button scaling</div>
+        <div class="bl-item"><span class="bl-dot" style="background:var(--green)"></span>Zero Downtime Patching</div>
+        <div class="bl-item"><span class="bl-dot" style="background:var(--green)"></span><strong>Backtrack</strong>：无需备份回滚到任意时间点</div>
+      </div>
+    </div>
+    <div style="background:var(--surface2);border-radius:8px;padding:12px">
+      <div style="font-size:12px;font-weight:700;margin-bottom:8px">🔌 Endpoints 总结</div>
+      <div class="bl" style="font-size:12px">
+        <div class="bl-item"><span class="bl-dot" style="background:#2D8A4E"></span><strong>Writer</strong>：永远指向 Master</div>
+        <div class="bl-item"><span class="bl-dot" style="background:#E8A020"></span><strong>Reader</strong>：负载均衡到所有 Replica</div>
+        <div class="bl-item"><span class="bl-dot" style="background:#7C3AED"></span><strong>Custom</strong>：指向高性能实例子集（分析查询）。定义后 Reader Endpoint 通常不再用</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Serverless + Global -->
+  <div class="g2" style="margin-bottom:14px">
+    <div style="background:var(--aws-bg);border:1.5px solid var(--aws-border);border-radius:8px;padding:12px;font-size:13px">
+      <div style="font-weight:700;color:var(--aws);margin-bottom:6px">☁️ Aurora Serverless</div>
+      <div>• 按实际用量自动伸缩</div>
+      <div>• 按秒计费，无需容量规划</div>
+      <div>• 适合：<strong>不频繁/间歇性/不可预测</strong>负载</div>
+      <div>• Proxy Fleet 管理实例</div>
+    </div>
+    <div style="background:var(--blue-bg);border:1.5px solid var(--blue-border);border-radius:8px;padding:12px;font-size:13px">
+      <div style="font-weight:700;color:var(--blue);margin-bottom:6px">🌍 Global Aurora（推荐）</div>
+      <div>• 1 主 Region（读写）</div>
+      <div>• 最多 <strong>10</strong> 个副本 Region（只读）</div>
+      <div>• 每个副本 Region 最多 <strong>16</strong> 个 Replica</div>
+      <div>• 跨 Region 复制 &lt;<strong>1 秒</strong></div>
+      <div>• DR Promote RTO &lt;<strong>1 分钟</strong></div>
+    </div>
+  </div>
+
+  <!-- Aurora Cloning -->
+  <div style="background:var(--surface2);border-radius:8px;padding:12px;margin-bottom:14px">
+    <div style="font-size:12px;font-weight:700;margin-bottom:8px">🧬 Aurora Database Cloning</div>
+    <div style="display:flex;align-items:center;justify-content:center;gap:12px;margin-bottom:8px">
+      <div style="background:#1D5FBF;color:#fff;border-radius:5px;padding:5px 10px;font-size:11px;font-weight:700">Production Aurora</div>
+      <div style="font-size:12px;color:var(--aws)">→ clone →</div>
+      <div style="background:#1D5FBF;color:#fff;border-radius:5px;padding:5px 10px;font-size:11px;font-weight:700;opacity:.8">Staging Aurora</div>
+    </div>
+    <div class="bl" style="font-size:12px">
+      <div class="bl-item"><span class="bl-dot" style="background:var(--green)"></span><strong>Copy-on-write</strong> 协议，比快照更快</div>
+      <div class="bl-item"><span class="bl-dot" style="background:var(--green)"></span>初始共享数据卷，写入时才分离</div>
+      <div class="bl-item"><span class="bl-dot" style="background:var(--green)"></span>不影响生产数据库</div>
     </div>
   </div>
 </div>
 
 <div class="s-card">
   <h3>⚠️ 高频考试陷阱</h3>
-  ${trapdiv('red','极高频','Read Replica vs Multi-AZ 混淆','读扩展/报表查询 → Read Replica（ASYNC，可读）。高可用故障转移 → Multi-AZ（SYNC，Standby 不可读）。')}
-  ${trapdiv('red','高频','Read Replica 只能 SELECT','INSERT / UPDATE / DELETE 不能在 Read Replica 执行，必须走主实例。')}
-  ${trapdiv('red','高频','Lambda + RDS → RDS Proxy','Lambda 高并发直连 RDS 会耗尽连接数。看到 Lambda + 数据库 → 首选 RDS Proxy。')}
-  ${trapdiv('amber','高频','Single-AZ → Multi-AZ 是零停机操作','只需点 Modify，内部自动快照 → 恢复 Standby → 建立同步，期间不需要停机。')}
-  ${trapdiv('amber','高频','Read Replica 同 Region 跨 AZ 复制网络费：免费','跨 Region 才收费。同一 Region 内不管跨多少 AZ，复制网络费免费。')}
-  ${trapdiv('amber','中频','RDS 备份：自动备份（1–35天）vs 手动快照（永久）','超过 35 天保留 → 必须用 Manual Snapshot。')}
+  ${trapdiv("red","极高频","Read Replica vs Multi-AZ","读扩展 → Read Replica（ASYNC，可读）。高可用 → Multi-AZ（SYNC，Standby 不可读）。")}
+  ${trapdiv("red","高频","Read Replica 只能 SELECT","INSERT/UPDATE/DELETE 只走主实例。")}
+  ${trapdiv("red","高频","Lambda + RDS → RDS Proxy","Lambda 高并发直连 RDS 会耗尽连接数。")}
+  ${trapdiv("amber","高频","Aurora 存储最大 256TB","每次以 10GB 增量扩展，最大 256TB（不是 128TB）。")}
+  ${trapdiv("amber","高频","Aurora Backups 不能禁用","RDS 可设 0 禁用，Aurora 不能禁用（最少 1 天）。")}
+  ${trapdiv("amber","中频","未加密 DB 要加密 → 快照恢复法","不能直接加密。拍快照 → 以加密方式恢复为新实例。")}
+  ${trapdiv("amber","中频","停止 RDS 仍收存储费","长期不用 → Snapshot → 删实例 → 从快照重建。")}
+</div>
+
+<div class="s-card">
+  <h3>🔌 常用端口快速参考</h3>
+  <div style="font-size:12px;color:var(--ink3);margin-bottom:10px">考试不要求记忆端口号，但要能区分"重要端口"和"数据库端口"。</div>
+  <div class="g2">
+    <div style="background:var(--aws-bg);border:1.5px solid var(--aws-border);border-radius:8px;padding:12px">
+      <div style="font-size:12px;font-weight:700;color:var(--aws);margin-bottom:8px">🌐 重要端口（Important）</div>
+      <div style="overflow-x:auto">
+      <table class="tbl" style="font-size:13px">
+        <tr><td><strong>FTP</strong></td><td>21</td></tr>
+        <tr><td><strong>SSH / SFTP</strong></td><td>22</td></tr>
+        <tr><td><strong>HTTP</strong></td><td>80</td></tr>
+        <tr><td><strong>HTTPS</strong></td><td>443</td></tr>
+        <tr><td><strong>RDP</strong>（Windows）</td><td>3389</td></tr>
+      </table>
+      </div>
+    </div>
+    <div style="background:var(--surface2);border-radius:8px;padding:12px">
+      <div style="font-size:12px;font-weight:700;color:var(--ink);margin-bottom:8px">🗄️ 数据库端口（RDS）</div>
+      <div style="overflow-x:auto">
+      <table class="tbl" style="font-size:13px">
+        <tr><td><strong>PostgreSQL</strong></td><td>5432</td></tr>
+        <tr><td><strong>MySQL / MariaDB</strong></td><td>3306</td></tr>
+        <tr><td><strong>Oracle RDS</strong></td><td>1521</td></tr>
+        <tr><td><strong>MSSQL Server</strong></td><td>1433</td></tr>
+        <tr><td><strong>Aurora (PostgreSQL)</strong></td><td>5432</td></tr>
+        <tr><td><strong>Aurora (MySQL)</strong></td><td>3306</td></tr>
+      </table>
+      </div>
+    </div>
+  </div>
 </div>`}
 
-/* ═══════════════ ELASTICACHE PAGE ═══════════════ */
 function pgElastiCache(){return`${back()}
 <div class="pg-title">Amazon ElastiCache</div>
 <div class="pg-tags">
@@ -2683,130 +2793,210 @@ function pgElastiCache(){return`${back()}
 
 <div class="s-card">
   <h3>💡 ElastiCache 是什么？</h3>
-  <p style="color:var(--ink2);font-size:15px;line-height:1.8">ElastiCache 是 AWS 的<strong>托管内存缓存服务</strong>，基于 Redis 或 Memcached。核心价值：将热点数据放在内存中，响应速度比读取数据库快 <strong>100–1000 倍</strong>，同时大幅降低数据库负载。</p>
-  <div class="flow" style="margin-top:14px">
-    <div class="flow-step">
-      <div><div class="flow-n">1</div></div>
-      <div class="flow-body"><strong>应用请求数据</strong> → 先查 ElastiCache</div>
-    </div>
-    <div class="flow-step">
-      <div><div class="flow-n">✅</div></div>
-      <div class="flow-body"><strong>Cache Hit（命中）</strong> → 直接从内存返回，极低延迟，<em>数据库不参与</em></div>
-    </div>
-    <div class="flow-step">
-      <div><div class="flow-n">❌</div></div>
-      <div class="flow-body"><strong>Cache Miss（未命中）</strong> → 查 RDS → 将结果写入 ElastiCache → 返回给用户（Lazy Loading 模式）</div>
-    </div>
-  </div>
+  <p style="color:var(--ink2);font-size:15px;line-height:1.8">就像 RDS 是托管关系型数据库，ElastiCache 是 AWS 的<strong>托管内存缓存</strong>，基于 Redis 或 Memcached。核心价值：高性能 + 低延迟，减少数据库负载，让应用<strong>无状态化</strong>。</p>
+  ${trapdiv("amber","重要","使用 ElastiCache 需要大量修改应用代码","不能直接插入 — 应用逻辑必须改写，处理 Cache Hit/Miss、失效策略等。")}
 </div>
 
 <div class="s-card">
   <h3>🆚 Redis vs Memcached — 必考对比</h3>
-  ${trapdiv('red','极高频','分不清 Redis 和 Memcached 适用场景','Session、排行榜、复杂结构、持久化 → Redis。纯字符串缓存、需要多线程 → Memcached。')}
-  <div style="overflow-x:auto;margin-top:12px">
+  ${trapdiv("red","极高频","Session/排行榜/持久化/高可用 → Redis","Memcached 无持久化、无复制、无高可用。只做简单字符串缓存 → Memcached。")}
+  <!-- Redis vs Memcached Diagram (matches slide 1) -->
+  <div style="background:var(--surface2);border-radius:10px;padding:14px;margin:14px 0">
+    <div style="font-size:12px;font-weight:700;color:var(--ink3);margin-bottom:12px;text-transform:uppercase;letter-spacing:.8px">架构图 — Redis vs Memcached</div>
+    <div class="g2">
+      <!-- Redis side -->
+      <div style="border:2px solid #1D5FBF;border-radius:8px;padding:12px">
+        <div style="font-size:12px;font-weight:700;color:#1D5FBF;text-align:center;margin-bottom:10px">REDIS</div>
+        <div style="display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:10px">
+          <div style="width:38px;height:38px;background:#1D5FBF;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:900;color:#fff">R</div>
+          <div style="font-size:11px;color:var(--ink3)">Replication →</div>
+          <div style="width:38px;height:38px;background:#1D5FBF;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:900;color:#fff;opacity:.8">R</div>
+        </div>
+        <div class="bl" style="font-size:12px">
+          <div class="bl-item"><span class="bl-dot" style="background:var(--green)"></span>Multi-AZ + Auto-Failover</div>
+          <div class="bl-item"><span class="bl-dot" style="background:var(--green)"></span>Read Replicas（读扩展 + 高可用）</div>
+          <div class="bl-item"><span class="bl-dot" style="background:var(--green)"></span>AOF 持久化（Data Durability）</div>
+          <div class="bl-item"><span class="bl-dot" style="background:var(--green)"></span>Backup & Restore</div>
+          <div class="bl-item"><span class="bl-dot" style="background:var(--green)"></span>Sets + <strong>Sorted Sets</strong></div>
+        </div>
+      </div>
+      <!-- Memcached side -->
+      <div style="border:2px solid var(--border2);border-radius:8px;padding:12px">
+        <div style="font-size:12px;font-weight:700;color:var(--ink);text-align:center;margin-bottom:10px">MEMCACHED</div>
+        <div style="display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:10px">
+          <div style="width:38px;height:38px;background:#555;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:900;color:#fff">M</div>
+          <div style="font-size:11px;color:var(--ink3)">+ sharding</div>
+          <div style="width:38px;height:38px;background:#555;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:900;color:#fff">M</div>
+        </div>
+        <div class="bl" style="font-size:12px">
+          <div class="bl-item"><span class="bl-dot" style="background:var(--red)"></span>Multi-node 分片（sharding）</div>
+          <div class="bl-item"><span class="bl-dot" style="background:var(--red)"></span>❌ 无高可用（无复制）</div>
+          <div class="bl-item"><span class="bl-dot" style="background:var(--red)"></span>❌ Non-persistent（非持久化）</div>
+          <div class="bl-item"><span class="bl-dot" style="background:var(--green)"></span>Backup & Restore（Serverless）</div>
+          <div class="bl-item"><span class="bl-dot" style="background:var(--green)"></span>Multi-threaded 多线程</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div style="overflow-x:auto">
   <table class="tbl">
     <tr><th>特性</th><th>Redis ✅</th><th>Memcached</th></tr>
-    <tr><td>数据结构</td><td class="good">String/List/Set/Hash/SortedSet/Bitmap</td><td class="bad">仅 String</td></tr>
-    <tr><td>持久化</td><td class="good">✅ AOF / RDB 快照</td><td class="bad">❌ 断电全丢</td></tr>
-    <tr><td>主从复制</td><td class="good">✅ 支持</td><td class="bad">❌ 不支持</td></tr>
-    <tr><td>Multi-AZ 故障转移</td><td class="good">✅ 自动</td><td class="bad">❌ 不支持</td></tr>
-    <tr><td>Pub/Sub 消息</td><td class="good">✅ 支持</td><td class="bad">❌ 不支持</td></tr>
-    <tr><td>Global Datastore</td><td class="good">✅ 跨 Region</td><td class="bad">❌ 不支持</td></tr>
-    <tr><td>线程模型</td><td>单线程</td><td class="good">多线程（简单场景更快）</td></tr>
-    <tr><td>水平扩展</td><td class="good">✅ Cluster Mode</td><td class="good">✅ 多节点分片</td></tr>
-    <tr><td>典型场景</td><td>Session / 排行榜 / 计数器 / 实时分析</td><td>简单 Key-Value 缓存</td></tr>
+    <tr><td>持久化</td><td class="good">✅ AOF / RDB</td><td class="bad">❌ 断电全丢</td></tr>
+    <tr><td>主从复制</td><td class="good">✅</td><td class="bad">❌</td></tr>
+    <tr><td>Multi-AZ HA</td><td class="good">✅ Auto-Failover</td><td class="bad">❌</td></tr>
+    <tr><td>数据结构</td><td class="good">String/List/Set/Hash/<strong>Sorted Set</strong></td><td class="bad">仅 String</td></tr>
+    <tr><td>Global Datastore</td><td class="good">✅ 跨 Region</td><td class="bad">❌</td></tr>
+    <tr><td>线程</td><td>单线程</td><td class="good">多线程</td></tr>
+    <tr><td>水平扩展</td><td class="good">Cluster Mode</td><td class="good">Multi-node sharding</td></tr>
   </table>
   </div>
+</div>
 
-  <div class="g2" style="margin-top:14px">
+<div class="s-card">
+  <h3>🔒 ElastiCache Cache Security</h3>
+  <!-- Security Diagram (matches slide 2) -->
+  <div style="background:var(--surface2);border-radius:10px;padding:14px;margin-bottom:14px">
+    <div style="font-size:12px;font-weight:700;color:var(--ink3);margin-bottom:12px;text-transform:uppercase;letter-spacing:.8px">架构图 — Cache Security</div>
+    <div style="display:flex;align-items:center;justify-content:center;gap:12px">
+      <div style="border:2px solid var(--red);border-radius:8px;padding:10px;text-align:center">
+        <div style="font-size:10px;color:var(--red);font-weight:700;margin-bottom:4px">EC2 Security group</div>
+        <div style="background:#E8A020;color:#fff;border-radius:5px;padding:5px 10px;font-size:13px;font-weight:700">EC2</div>
+        <div style="font-size:10px;color:var(--ink3);margin-top:4px">Client</div>
+      </div>
+      <div style="text-align:center">
+        <div style="color:var(--ink3);font-size:11px">↕</div>
+        <div style="font-size:10px;color:var(--ink3);white-space:nowrap">SSL encryption<br>Redis AUTH</div>
+      </div>
+      <div style="border:2px solid var(--red);border-radius:8px;padding:10px;text-align:center">
+        <div style="font-size:10px;color:var(--red);font-weight:700;margin-bottom:4px">Redis Security group</div>
+        <div style="width:40px;height:40px;background:#1D5FBF;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:900;color:#fff;margin:0 auto">R</div>
+      </div>
+    </div>
+  </div>
+  <div class="g2">
     <div style="background:var(--green-bg);border:1.5px solid var(--green-border);border-radius:8px;padding:12px">
-      <div style="font-size:12px;font-weight:700;color:var(--green);margin-bottom:8px">选 Redis 的关键词</div>
-      <div class="bl">
-        <div class="bl-item"><span class="bl-dot" style="background:var(--green)"></span>Session 管理（需要对象/Hash）</div>
-        <div class="bl-item"><span class="bl-dot" style="background:var(--green)"></span>排行榜（Sorted Set）</div>
-        <div class="bl-item"><span class="bl-dot" style="background:var(--green)"></span>需要持久化</div>
-        <div class="bl-item"><span class="bl-dot" style="background:var(--green)"></span>Pub/Sub 消息</div>
-        <div class="bl-item"><span class="bl-dot" style="background:var(--green)"></span>需要 Multi-AZ 高可用</div>
-        <div class="bl-item"><span class="bl-dot" style="background:var(--green)"></span>跨 Region 复制（Global Datastore）</div>
+      <div style="font-size:12px;font-weight:700;color:var(--green);margin-bottom:8px">Redis 安全</div>
+      <div class="bl" style="font-size:13px">
+        <div class="bl-item"><span class="bl-dot" style="background:var(--green)"></span><strong>IAM Authentication</strong> for Redis</div>
+        <div class="bl-item"><span class="bl-dot" style="background:var(--green)"></span>IAM policies = AWS API 级别安全</div>
+        <div class="bl-item"><span class="bl-dot" style="background:var(--green)"></span><strong>Redis AUTH</strong>：创建集群时设 password/token（Security Group 之上的额外安全层）</div>
+        <div class="bl-item"><span class="bl-dot" style="background:var(--green)"></span>支持 <strong>SSL 传输加密</strong>（in-flight）</div>
       </div>
     </div>
     <div style="background:var(--surface2);border-radius:8px;padding:12px">
-      <div style="font-size:12px;font-weight:700;color:var(--ink);margin-bottom:8px">选 Memcached 的关键词</div>
-      <div class="bl">
-        <div class="bl-item"><span class="bl-dot"></span>纯粹的简单缓存</div>
-        <div class="bl-item"><span class="bl-dot"></span>Key-Value 均为字符串</div>
-        <div class="bl-item"><span class="bl-dot"></span>多线程，单节点性能更高</div>
-        <div class="bl-item"><span class="bl-dot"></span>不在乎数据丢失</div>
-        <div class="bl-item"><span class="bl-dot"></span>简单水平分片扩展</div>
+      <div style="font-size:12px;font-weight:700;color:var(--ink);margin-bottom:8px">Memcached 安全</div>
+      <div class="bl" style="font-size:13px">
+        <div class="bl-item"><span class="bl-dot"></span>支持 <strong>SASL-based authentication</strong>（高级）</div>
+      </div>
+      <div style="margin-top:10px;padding:8px;background:var(--surface);border-radius:6px;font-size:12px;color:var(--ink3)">
+        Memcached 安全性比 Redis 弱，没有 IAM Auth 和 SSL。
       </div>
     </div>
   </div>
 </div>
 
 <div class="s-card">
-  <h3>🏗️ 常见架构模式</h3>
-  <div style="font-size:13px;font-weight:700;color:var(--ink);margin-bottom:10px">① DB Cache（数据库缓存）— 最常见</div>
-  <div class="flow">
-    <div class="flow-step">
-      <div><div class="flow-n">Q</div></div>
-      <div class="flow-body">应用查询 → 先问 <strong>ElastiCache</strong></div>
-    </div>
-    <div class="flow-step">
-      <div><div class="flow-n">H</div></div>
-      <div class="flow-body"><strong>Hit</strong>：直接返回缓存结果（微秒级延迟）</div>
-    </div>
-    <div class="flow-step">
-      <div><div class="flow-n">M</div></div>
-      <div class="flow-body"><strong>Miss</strong>：查 RDS → 写入 ElastiCache → 返回（<em>Lazy Loading</em>）</div>
+  <h3>🏗️ Patterns for ElastiCache</h3>
+  <!-- Lazy Loading Illustrated Diagram (matches slide 3) -->
+  <div style="background:var(--surface2);border-radius:10px;padding:16px;margin-bottom:14px">
+    <div style="font-size:12px;font-weight:700;color:var(--ink3);margin-bottom:14px;text-transform:uppercase;letter-spacing:.8px">Lazy Loading illustrated</div>
+    <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+      <div style="background:#E8A020;color:#fff;font-weight:700;border-radius:8px;padding:14px 16px;font-size:13px;text-align:center;min-width:76px">application</div>
+      <div style="display:flex;flex-direction:column;gap:10px;flex:1;min-width:100px">
+        <div style="display:flex;align-items:center;gap:6px">
+          <div style="background:var(--green);height:3px;flex:1;border-radius:2px"></div>
+          <div style="font-size:11px;color:var(--green);font-weight:600;white-space:nowrap">Cache hit ↔</div>
+          <div style="background:var(--green);height:3px;flex:1;border-radius:2px"></div>
+        </div>
+        <div style="display:flex;align-items:center;gap:6px">
+          <div style="background:var(--amber);height:3px;flex:1;border-radius:2px"></div>
+          <div style="font-size:11px;color:var(--amber);font-weight:600;white-space:nowrap">Cache miss →</div>
+          <div style="background:var(--amber);height:3px;flex:1;border-radius:2px"></div>
+        </div>
+        <div style="display:flex;align-items:center;gap:6px">
+          <div style="background:var(--amber);height:3px;flex:1;border-radius:2px"></div>
+          <div style="font-size:11px;color:var(--amber);font-weight:600;white-space:nowrap">← Write to cache</div>
+          <div style="background:var(--amber);height:3px;flex:1;border-radius:2px"></div>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <div style="background:#1D5FBF;color:#fff;border-radius:6px;padding:8px 10px;font-size:12px;font-weight:700;text-align:center">Amazon<br>ElastiCache</div>
+        <div style="font-size:11px;color:var(--ink3);text-align:center">Read from DB ↕</div>
+        <div style="background:#1D5FBF;color:#fff;border-radius:6px;padding:8px 10px;font-size:12px;font-weight:700;text-align:center">Amazon<br>RDS</div>
+      </div>
     </div>
   </div>
-
-  <div style="font-size:13px;font-weight:700;color:var(--ink);margin:16px 0 10px">② User Session Store（Session 共享）</div>
-  <div style="background:var(--surface2);border-radius:8px;padding:12px;font-size:14px;color:var(--ink2);line-height:1.8">
-    多台 EC2 后面有 ALB（负载均衡）。用户登录后，Session 写入 <strong>ElastiCache Redis</strong>。<br>
-    无论请求被路由到哪台 EC2，都能从 Redis 读到相同的 Session → <strong>无状态架构</strong><br>
-    关键词：<em>sticky session 的替代方案 / 无状态 / 水平扩展</em>
+  <div class="g2" style="margin-bottom:12px">
+    <div style="background:var(--aws-bg);border:1.5px solid var(--aws-border);border-radius:8px;padding:12px">
+      <div style="font-size:12px;font-weight:700;color:var(--aws);margin-bottom:6px">① Lazy Loading（懒加载）</div>
+      <div style="font-size:13px;color:var(--ink2);line-height:1.7">Cache Miss 时才写缓存。数据可能 <strong>stale（过时）</strong>，适合读多写少场景。</div>
+    </div>
+    <div style="background:var(--surface2);border-radius:8px;padding:12px">
+      <div style="font-size:12px;font-weight:700;color:var(--ink);margin-bottom:6px">② Write Through（同步写）</div>
+      <div style="font-size:13px;color:var(--ink2);line-height:1.7">写 DB 时同步更新缓存，<strong>无过期数据</strong>，但每次写都要更新缓存。</div>
+    </div>
   </div>
+  <div style="background:var(--surface2);border-radius:8px;padding:12px">
+    <div style="font-size:12px;font-weight:700;color:var(--ink);margin-bottom:6px">③ Session Store（TTL 特性）</div>
+    <div style="font-size:13px;color:var(--ink2)">用 TTL 存储临时 Session 数据，到期自动过期。</div>
+  </div>
+  <div style="margin-top:12px;background:var(--surface2);border-radius:6px;padding:10px;font-size:12px;color:var(--ink3);font-style:italic">
+    💬 "There are only two hard things in Computer Science: cache invalidation and naming things"
+  </div>
+</div>
 
-  <div style="font-size:13px;font-weight:700;color:var(--ink);margin:16px 0 10px">③ 缓存策略对比</div>
-  <div style="overflow-x:auto">
-  <table class="tbl">
-    <tr><th>策略</th><th>Lazy Loading（懒加载）</th><th>Write Through（同步写）</th></tr>
-    <tr><td>写入时机</td><td>Cache Miss 时才写缓存</td><td>写 DB 时同步写缓存</td></tr>
-    <tr><td>数据新鲜度</td><td class="bad">可能读到过期数据（Stale）</td><td class="good">缓存始终是最新的</td></tr>
-    <tr><td>冷启动</td><td class="bad">刚启动时大量 Cache Miss</td><td class="good">缓存提前预热</td></tr>
-    <tr><td>写性能</td><td class="good">写 DB 不受影响</td><td class="bad">每次写都要更新缓存</td></tr>
-    <tr><td>适合场景</td><td>读多写少、可容忍短暂数据过时</td><td>数据一致性要求高</td></tr>
-  </table>
+<div class="s-card">
+  <h3>🏆 Redis Use Case — Gaming Leaderboards</h3>
+  <!-- Leaderboard Diagram (matches slide 4) -->
+  <div style="background:var(--surface2);border-radius:10px;padding:14px;margin-bottom:14px">
+    <div style="font-size:12px;font-weight:700;color:var(--ink3);margin-bottom:12px;text-transform:uppercase;letter-spacing:.8px">架构图 — Real-time Leaderboard</div>
+    <div style="display:flex;align-items:center;justify-content:center;gap:12px;flex-wrap:wrap">
+      <div style="text-align:center">
+        <div style="font-size:20px;margin-bottom:4px">👥</div>
+        <div style="font-size:11px;color:var(--ink3)">Clients</div>
+      </div>
+      <div style="color:var(--aws);font-size:18px">→</div>
+      <div style="border:2px dashed var(--border2);border-radius:8px;padding:10px;display:flex;flex-direction:column;gap:6px">
+        <div style="background:#1D5FBF;color:#fff;border-radius:5px;padding:5px 10px;font-size:11px;font-weight:700;text-align:center">ElastiCache<br>for Redis</div>
+        <div style="background:#1D5FBF;color:#fff;border-radius:5px;padding:5px 10px;font-size:11px;font-weight:700;text-align:center;opacity:.85">ElastiCache<br>for Redis</div>
+        <div style="background:#1D5FBF;color:#fff;border-radius:5px;padding:5px 10px;font-size:11px;font-weight:700;text-align:center;opacity:.7">ElastiCache<br>for Redis</div>
+      </div>
+      <div style="color:var(--aws);font-size:18px">→</div>
+      <div style="text-align:left">
+        <div style="background:var(--surface);border:1.5px solid var(--border);border-radius:6px;padding:8px 12px;font-size:13px">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px"><span>👤</span><span style="font-weight:600">1</span><div style="height:2px;background:var(--border2);width:40px;border-radius:1px"></div></div>
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px"><span>👤</span><span style="font-weight:600">2</span><div style="height:2px;background:var(--border2);width:35px;border-radius:1px"></div></div>
+          <div style="display:flex;align-items:center;gap:8px"><span>👤</span><span style="font-weight:600">3</span><div style="height:2px;background:var(--border2);width:30px;border-radius:1px"></div></div>
+        </div>
+        <div style="font-size:11px;color:var(--ink3);text-align:center;margin-top:4px">Real-time Leaderboard</div>
+      </div>
+    </div>
+  </div>
+  <div class="bl">
+    <div class="bl-item"><span class="bl-dot" style="background:var(--aws)"></span>游戏排行榜需要实时计算 + 排序，计算复杂度高</div>
+    <div class="bl-item"><span class="bl-dot" style="background:var(--aws)"></span>Redis <strong>Sorted Sets</strong> 保证唯一性 + 元素排序</div>
+    <div class="bl-item"><span class="bl-dot" style="background:var(--aws)"></span>每次新增元素，实时排序后插入正确位置</div>
+    <div class="bl-item"><span class="bl-dot" style="background:var(--aws)"></span>考试关键词：<em>排行榜 / Leaderboard / Real-time ranking → Redis Sorted Set</em></div>
   </div>
 </div>
 
 <div class="s-card">
   <h3>🌍 ElastiCache Global Datastore（跨 Region）</h3>
-  <div style="font-size:15px;color:var(--ink2);line-height:1.8;margin-bottom:12px">仅 <strong>Redis</strong> 支持。用于跨 Region 灾难恢复和低延迟全球读取。</div>
+  <div style="font-size:14px;color:var(--ink2);margin-bottom:12px">仅 <strong>Redis</strong> 支持。</div>
   <div class="flow">
-    <div class="flow-step">
-      <div><div class="flow-n">P</div></div>
-      <div class="flow-body"><strong>Primary Region</strong>（us-east-1）：主集群，处理写操作</div>
-    </div>
-    <div class="flow-step">
-      <div><div class="flow-n">R</div></div>
-      <div class="flow-body"><strong>Replica Region</strong>（ap-northeast-1）：副本集群，处理本地读取，约 <strong>1 秒</strong>延迟复制</div>
-    </div>
-    <div class="flow-step">
-      <div><div class="flow-n">🆘</div></div>
-      <div class="flow-body"><strong>灾难恢复</strong>：将副本 Region 集群 <strong>Promote 为 Primary</strong> → 新的写入端点生效</div>
-    </div>
+    <div class="flow-step"><div><div class="flow-n">P</div></div><div class="flow-body"><strong>Primary Region</strong>：主集群，处理写操作</div></div>
+    <div class="flow-step"><div><div class="flow-n">R</div></div><div class="flow-body"><strong>Replica Region</strong>：副本，本地读，复制延迟约 <strong>1 秒</strong></div></div>
+    <div class="flow-step"><div><div class="flow-n">🆘</div></div><div class="flow-body">灾难恢复：<strong>Promote 副本 Region</strong> 为 Primary</div></div>
   </div>
-  ${trapdiv('amber','高频','Global Datastore 是 Redis 专属功能','Memcached 不支持跨 Region 复制。题目出现"跨 Region ElastiCache"→ 答案必须是 Redis。')}
+  ${trapdiv("amber","高频","Global Datastore 是 Redis 专属","Memcached 不支持跨 Region 复制。")}
 </div>
 
 <div class="s-card">
   <h3>⚠️ 高频考试陷阱</h3>
-  ${trapdiv('red','极高频','Session 管理 → Redis（不是 Memcached）','Session 对象需要 Hash 数据结构，只有 Redis 支持。Memcached 只支持 String。')}
-  ${trapdiv('red','高频','ElastiCache 不能持久化 → 只有 Redis 可以','题目问"缓存数据需要持久化/不能丢"→ 必须选 Redis，Memcached 断电全丢。')}
-  ${trapdiv('amber','高频','降低 DB 负载 → ElastiCache（不是 Read Replica）','Read Replica 也能分担读，但 ElastiCache 速度更快（内存 vs 磁盘）。强调"极低延迟缓存"→ ElastiCache。')}
-  ${trapdiv('amber','中频','ElastiCache 不支持 SQL 查询','ElastiCache 是 Key-Value 缓存，不是数据库。需要 SQL 查询 → RDS/Aurora。')}
+  ${trapdiv("red","极高频","Session / 排行榜 / 持久化 → Redis","Memcached 无持久化、无复制、无高可用。复杂场景 → 一律 Redis。")}
+  ${trapdiv("red","高频","ElastiCache 需要重写应用代码","Heavy application code changes，不是透明插入。")}
+  ${trapdiv("amber","高频","Redis AUTH vs IAM Auth","IAM Auth = AWS API 级别。Redis AUTH = Redis 集群密码，是 Security Group 之上的额外层。")}
+  ${trapdiv("amber","中频","降低 DB 负载 → ElastiCache（速度快于 Read Replica）","ElastiCache 内存操作，极低延迟。")}
 </div>`}
 
 /* ═══════════════ RECORDS PAGE ═══════════════ */
