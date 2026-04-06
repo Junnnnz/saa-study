@@ -1440,6 +1440,43 @@ ch:['Public Hosted Zone（公共托管区）','Private Hosted Zone（私有托�
 ench:['Public Hosted Zone','Private Hosted Zone bound to a VPC','Create separate Route 53 accounts per service','Use Elastic IPs instead of domain names'],
 ans:1,exp:'<strong>Private Hosted Zone</strong> 是正确方案：<br><br>• 存储只在 VPC 内部可解析的 DNS 记录<br>• 域名（如 payment.internal）<strong>只能从绑定的 VPC 内部查询</strong><br>• 公网无法解析这些域名，天然隔离<br>• 收费标准：$0.50/月/Hosted Zone（同 Public）<br><br>Public Hosted Zone 的记录对互联网开放，不符合要求（A 错）',ww:'Public Hosted Zone 在公网可见（A 错）。Route 53 是 Account 级别服务，无需多账号（C 错）。Elastic IP 无法替代域名功能（D 错）。',rule:'VPC 内部服务间 DNS 通信 → Private Hosted Zone（绑定 VPC，公网不可见）。'},
 
+
+{id:'r53_09',topic:'Route 53',diff:'mid',
+text:'公司在 us-east-1 和 eu-west-1 各部署了一套应用。希望平时 us-east-1 承接所有流量，但 us-east-1 <em>故障时自动切到 eu-west-1</em>。应使用哪种路由策略？',
+en:'A company runs applications in us-east-1 and eu-west-1. All traffic should go to us-east-1 normally, but <em>automatically failover to eu-west-1 when us-east-1 is unhealthy</em>. Which routing policy should be used?',
+ch:['Weighted（权重 100/0）','Latency-based','Failover','Geolocation'],
+ench:['Weighted (100/0)','Latency-based','Failover','Geolocation'],
+ans:2,exp:'<strong>Failover</strong> 是 Active-Passive 主备切换的专用策略：<br><br>• Primary 记录挂载 <strong>Health Check</strong>（必须）<br>• Primary 健康 → 所有流量走 us-east-1<br>• Primary 不健康 → Route 53 自动切换到 Secondary（eu-west-1）<br>• Secondary 记录不需要 Health Check（也可以加）<br><br>Weighted 100/0 虽然平时也能全走主，但无法在故障时自动切换（A 错）。<br>Latency 会根据实测延迟路由，不保证主备逻辑（B 错）。<br>Geolocation 按用户位置，不按健康状态（D 错）。',ww:'Weighted 100/0 没有 Health Check 驱动的自动故障转移（A 错）。Latency 按延迟不按健康（B 错）。Geolocation 按地理位置（D 错）。',rule:'主备切换 / 灾难恢复 → Failover（Active-Passive）+ Health Check 必须配置在 Primary 记录上。'},
+
+{id:'r53_10',topic:'Route 53',diff:'high',
+text:'公司同时在多个 AWS Region 运行 Web 服务器，希望 Route 53 <em>返回多个 IP，只返回健康的端点</em>，客户端随机选一个。这不是负载均衡，只是简单的健康过滤。应使用哪种路由策略？',
+en:'A company runs web servers in multiple AWS Regions. They want Route 53 to <em>return multiple IPs and only return healthy endpoints</em>. The client randomly picks one. This is not load balancing, just health filtering. Which routing policy?',
+ch:['Simple（多值模式）','Weighted','Multi-Value Answer','ALB + Geolocation'],
+ench:['Simple (multi-value mode)','Weighted','Multi-Value Answer','ALB + Geolocation'],
+ans:2,exp:'<strong>Multi-Value Answer</strong> 符合所有要求：<br><br>• 返回多个记录（最多 8 条）<br>• 可绑定 Health Check，<strong>只返回健康的端点</strong><br>• 客户端从健康列表中随机选一个<br>• 不是真正的负载均衡器，是 DNS 层的多值响应<br><br>Simple 多值模式：可返回多个 IP，但<strong>不支持 Health Check</strong>，无法过滤不健康端点（A 错）。<br>Weighted：按权重分配，不是返回全部让客户端选（B 错）。',ww:'Simple 多值不支持 Health Check（A 错）。Weighted 是按比例路由，不是返回多值（B 错）。ALB 是流量层负载均衡，不是 DNS 多值（D 错）。',rule:'多个健康 IP 供客户端随机选 → Multi-Value。注意：Multi-Value 不能替代 ELB 做真正的负载均衡。'},
+
+{id:'r53_11',topic:'Route 53',diff:'high',
+text:'公司需要根据<em>用户来源 IP 段（CIDR）</em>，将不同 ISP 的用户路由到不同的服务器端点，以降低网络传输成本。应使用哪种路由策略？',
+en:'A company needs to route users from different ISPs to specific server endpoints based on their <em>source IP CIDR ranges</em>, in order to reduce network transfer costs. Which routing policy should be used?',
+ch:['Geolocation','IP-based Routing','Latency-based','Geoproximity'],
+ench:['Geolocation','IP-based Routing','Latency-based','Geoproximity'],
+ans:1,exp:'<strong>IP-based Routing</strong> 是正确答案：<br><br>• 你预先定义 CIDR 集合（IP 段）和对应的端点映射<br>• Route 53 根据客户端的<strong>实际 IP 地址</strong>来决定路由<br>• 典型场景：特定 ISP 用户 → 与该 ISP 有 Peering 的服务器，减少跨网费用<br>• 也可用于性能优化（某些 IP 段访问特定 Region 更快）<br><br>Geolocation 按国家/大洲，粒度较粗，无法精确到 CIDR（A 错）。<br>Latency 按实测延迟，不能按 IP 段精确控制（C 错）。',ww:'Geolocation 粒度是国家级，不能按 IP 段（A 错）。Latency 不能控制 IP 来源（C 错）。Geoproximity 按资源位置（D 错）。',rule:'按客户端 IP 段（CIDR）路由 → IP-based Routing。场景：ISP 流量分流、降低网络成本。'},
+
+{id:'r53_12',topic:'Route 53',diff:'mid',
+text:'公司机房（On-Premises）的 DNS 服务器需要解析 AWS 私有托管区中的域名（如 <span class="code-inline">app.internal.aws</span>）。应该配置哪种 Route 53 Resolver Endpoint？',
+en:'An on-premises DNS server needs to resolve domain names in an AWS Private Hosted Zone (e.g., <span class="code-inline">app.internal.aws</span>). Which type of Route 53 Resolver Endpoint should be configured?',
+ch:['Outbound Endpoint','Inbound Endpoint','Public Hosted Zone','Route 53 Traffic Flow'],
+ench:['Outbound Endpoint','Inbound Endpoint','Public Hosted Zone','Route 53 Traffic Flow'],
+ans:1,exp:'<strong>Inbound Endpoint</strong> 正确：<br><br>流量方向：<strong>机房 → AWS</strong><br><br>• 机房 DNS 服务器想查询 AWS 内部域名<br>• 查询经由 VPN/Direct Connect 进入 VPC<br>• 命中 <strong>Inbound Endpoint</strong> → 转发给 Route 53 Resolver<br>• Route 53 查询 Private Hosted Zone → 返回结果<br><br>Outbound 是 AWS 内部查询转发到机房 DNS（方向相反，A 错）。<br>Public Hosted Zone 对外公开，不适合内部解析（C 错）。',ww:'Outbound 是 AWS 查机房，方向相反（A 错）。Public Hosted Zone 公网可见不合适（C 错）。Traffic Flow 是路由策略工具（D 错）。',rule:'机房查 AWS 域名 → Inbound Endpoint（外进来）。AWS 查机房域名 → Outbound Endpoint（从内出去）。'},
+
+{id:'r53_13',topic:'Route 53',diff:'mid',
+text:'团队使用 Geolocation 路由，为欧洲、亚洲用户分别创建了路由记录，但<em>没有创建 Default 记录</em>。一位来自南美洲的用户访问域名，会发生什么？',
+en:'A team uses Geolocation routing with records for Europe and Asia, but <em>forgot to create a Default record</em>. A user from South America accesses the domain. What happens?',
+ch:['用户被随机路由到欧洲或亚洲','Route 53 返回延迟最低的端点','DNS 查询无法解析，用户无法访问','用户被路由到最近的 Region'],
+ench:['User is randomly routed to Europe or Asia','Route 53 returns the lowest-latency endpoint','DNS query cannot be resolved and the user cannot access the site','User is routed to the nearest Region'],
+ans:2,exp:'<strong>DNS 解析失败</strong>：<br><br>Geolocation 路由是严格的位置匹配：<br>• 用户位置匹配某条记录 → 返回对应 IP<br>• 用户位置<strong>不匹配任何记录且无 Default</strong> → Route 53 返回 <strong>NXDOMAIN（域名不存在）</strong><br>• 用户看到的就是访问失败，无法打开网站<br><br>这是最常见的 Geolocation 配置错误！<br>最佳实践：<strong>始终创建一条 Default 记录</strong>作为兜底。',ww:'Geolocation 没有随机回退逻辑（A 错）。Geolocation 不考虑延迟（B 错）。没有自动选最近 Region 的逻辑（D 错）。',rule:'Geolocation 必须创建 Default 记录！没有 Default + 无匹配 → NXDOMAIN（解析失败）。'}
+
+,
 {id:'udemy_rds_25',topic:'RDS',diff:'high',
 text:'100 台 EC2 连接到 RDS。<em>每次 DB 维护时，所有应用都需要很长时间重新连接</em>，原因是应用逻辑较差。如何改善？',
 en:'You have 100 EC2 instances connected to your RDS database. Upon maintenance, all applications take a lot of time to reconnect to RDS due to poor application logic. How do you improve this?',
@@ -3518,6 +3555,152 @@ function pgRoute53(){return`${back()}
   ${trapdiv("red","高频","HTTP Health Checks 只能监控公共资源","私有 VPC 内的资源必须通过 CloudWatch Alarm 间接健康检查。Health Checkers 在 VPC 外部，无法访问私有 IP。")}
 </div>
 
+
+<div class="s-card">
+  <h3>🔀 路由策略详解（每种都要会选）</h3>
+
+  <!-- Failover -->
+  <div style="border-left:3px solid var(--aws);padding-left:14px;margin-bottom:18px">
+    <div style="font-weight:700;color:var(--aws);font-size:14px;margin-bottom:6px">① Failover — 主备自动切换</div>
+    <p style="font-size:13px;color:var(--ink2);line-height:1.8;margin-bottom:10px">
+      想象一下：主店营业，备用店平时关着。主店一旦出问题，顾客自动被引导去备用店。<br>
+      Route 53 就是门口的导引员，Health Check 就是它检查主店是否还开着。
+    </p>
+    <div style="background:var(--surface2);border-radius:8px;padding:12px;font-size:13px">
+      <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;justify-content:center">
+        <div style="text-align:center">
+          <div style="font-size:20px">💻</div>
+          <div style="font-size:11px;color:var(--ink3)">Client</div>
+        </div>
+        <div style="color:var(--ink3)">→</div>
+        <div style="background:#7C3AED;color:#fff;border-radius:6px;padding:6px 10px;font-size:12px;font-weight:700;text-align:center">Route 53<br><span style="font-size:10px;font-weight:400">❤️ Health Check</span></div>
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <div style="display:flex;align-items:center;gap:6px">
+            <div style="color:var(--ink3);font-size:11px">→ 正常时</div>
+            <div style="background:var(--green-bg);border:1px solid var(--green-border);border-radius:5px;padding:4px 8px;font-size:11px;font-weight:700;color:var(--green)">Primary EC2</div>
+          </div>
+          <div style="display:flex;align-items:center;gap:6px">
+            <div style="color:var(--ink3);font-size:11px">→ 故障时</div>
+            <div style="background:var(--amber-bg);border:1px solid var(--amber-border);border-radius:5px;padding:4px 8px;font-size:11px;font-weight:700;color:var(--amber)">Secondary (DR)</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div style="margin-top:8px;font-size:12px;color:var(--ink3)">关键词：<strong>主备 / Active-Passive / 灾难恢复 / primary 故障 → 自动切换</strong></div>
+  </div>
+
+  <!-- Geolocation -->
+  <div style="border-left:3px solid var(--blue);padding-left:14px;margin-bottom:18px">
+    <div style="font-weight:700;color:var(--blue);font-size:14px;margin-bottom:6px">② Geolocation — 按用户所在国家路由</div>
+    <p style="font-size:13px;color:var(--ink2);line-height:1.8;margin-bottom:8px">
+      就像视频网站的「地区限制」：日本用户看日本内容，欧洲用户看欧洲内容。<br>
+      可按 <strong>大洲 / 国家 / 美国各州</strong> 来设置，重叠时取最精确的那条。
+    </p>
+    <div style="background:var(--blue-bg);border-radius:8px;padding:10px;font-size:12px;color:var(--ink2)">
+      <div style="font-weight:700;margin-bottom:4px">⚠️ 必须设置 Default 记录！</div>
+      如果用户来自没有匹配规则的地方（比如南极洲），没有 Default 记录就会 DNS 解析失败。
+    </div>
+    <div style="margin-top:6px;font-size:12px;color:var(--ink3)">关键词：<strong>本地化内容 / 版权限制 / 合规要求 / 用户在哪个国家</strong></div>
+  </div>
+
+  <!-- Geoproximity -->
+  <div style="border-left:3px solid var(--green);padding-left:14px;margin-bottom:18px">
+    <div style="font-weight:700;color:var(--green);font-size:14px;margin-bottom:6px">③ Geoproximity — 按资源位置 + Bias 偏移</div>
+    <p style="font-size:13px;color:var(--ink2);line-height:1.8;margin-bottom:8px">
+      想象美国被一条竖线分成左右两半，左边走 us-west-1，右边走 us-east-1。<br>
+      <strong>Bias</strong> 就是把这条竖线往左/右推：给 us-east-1 设 Bias=50，竖线就往西移，更多用户走 us-east-1。
+    </p>
+    <div style="background:var(--surface2);border-radius:8px;padding:10px;margin-bottom:6px">
+      <div style="font-size:12px;font-weight:700;color:var(--ink3);margin-bottom:8px">Bias 效果示意（美国为例）</div>
+      <div class="g2" style="font-size:12px;text-align:center">
+        <div style="border:1.5px solid var(--border);border-radius:6px;padding:8px">
+          <div style="font-weight:700">Bias 均为 0</div>
+          <div style="color:var(--ink3);margin-top:4px">流量 50% / 50%<br>中间线居中</div>
+        </div>
+        <div style="border:1.5px solid var(--green-border);border-radius:6px;padding:8px;background:var(--green-bg)">
+          <div style="font-weight:700">us-east-1 Bias=50</div>
+          <div style="color:var(--green);margin-top:4px">us-east-1 吸引更多流量<br>中间线往西移</div>
+        </div>
+      </div>
+    </div>
+    <div style="font-size:12px;color:var(--ink3)">
+      Bias 正值 (1~99) = 扩大覆盖范围 &nbsp;|&nbsp; Bias 负值 (-1~-99) = 缩小覆盖范围<br>
+      必须使用 <strong>Route 53 Traffic Flow</strong>（高级功能）才能用 Geoproximity
+    </div>
+  </div>
+
+  <!-- Multi-Value -->
+  <div style="border-left:3px solid var(--amber);padding-left:14px;margin-bottom:18px">
+    <div style="font-weight:700;color:var(--amber);font-size:14px;margin-bottom:6px">④ Multi-Value — 返回多个健康 IP，客户端自选</div>
+    <p style="font-size:13px;color:var(--ink2);line-height:1.8;margin-bottom:8px">
+      想象你问导航「附近有哪些加油站？」，它返回 8 个健康的选项，你自己选最近的去。<br>
+      Route 53 最多返回 <strong>8 条健康记录</strong>，客户端随机挑一条用。
+    </p>
+    <div style="background:var(--amber-bg);border:1px solid var(--amber-border);border-radius:8px;padding:10px;font-size:12px;color:var(--ink2)">
+      <strong>⚠️ Multi-Value ≠ ELB（负载均衡器）！</strong><br>
+      Multi-Value 只是 DNS 层面返回多个 IP，不能替代真正的 Load Balancer。<br>
+      ELB 在流量层面做分发，Multi-Value 只是 DNS 查询时给多个地址供客户端选择。
+    </div>
+    <div class="tbl-wrap" style="margin-top:10px">
+    <table class="tbl" style="font-size:12px">
+      <tr><th>名称</th><th>类型</th><th>IP</th><th>Health Check</th></tr>
+      <tr><td>www.example.com</td><td>A</td><td>192.0.2.2</td><td style="color:var(--green)">✅ A</td></tr>
+      <tr><td>www.example.com</td><td>A</td><td>198.51.100.2</td><td style="color:var(--green)">✅ B</td></tr>
+      <tr><td>www.example.com</td><td>A</td><td>203.0.113.2</td><td style="color:var(--red)">❌ C（不返回）</td></tr>
+    </table>
+    </div>
+  </div>
+
+  <!-- IP-based -->
+  <div style="border-left:3px solid var(--ink3);padding-left:14px">
+    <div style="font-weight:700;color:var(--ink);font-size:14px;margin-bottom:6px">⑤ IP-based Routing — 按客户端 IP 路由</div>
+    <p style="font-size:13px;color:var(--ink2);line-height:1.8;margin-bottom:6px">
+      你预先告诉 Route 53：「来自这段 IP 的用户，走这个服务器」。<br>
+      用途：把某个 ISP 的用户引导到专属服务器，降低网络成本或提升性能。
+    </p>
+    <div style="background:var(--surface2);border-radius:6px;padding:8px;font-size:12px;color:var(--ink2)">
+      例：CIDR 203.0.113.0/24 → location-1 → EC2 1.2.3.4<br>
+      例：CIDR 200.5.4.0/24 &nbsp;→ location-2 → EC2 5.6.7.8
+    </div>
+  </div>
+</div>
+
+<div class="s-card">
+  <h3>🔌 Hybrid DNS — 混合云 DNS 解析</h3>
+  <p style="font-size:14px;color:var(--ink2);line-height:1.8;margin-bottom:14px">
+    <strong>使用场景</strong>：公司有自己的机房（On-Premises），同时也在 AWS 上跑服务。两边需要互相用域名访问对方。<br>
+    就像公司内网（机房）和家庭网络（AWS VPC）要共享一个电话簿（DNS）。
+  </p>
+  <div class="g2" style="margin-bottom:14px">
+    <div style="border:2px solid var(--green-border);border-radius:8px;padding:14px;background:var(--green-bg)">
+      <div style="font-size:13px;font-weight:700;color:var(--green);margin-bottom:8px">📥 Inbound Endpoint</div>
+      <div style="font-size:13px;color:var(--ink2);line-height:1.75">
+        <strong>方向：机房 → AWS</strong><br>
+        机房的 DNS 服务器想查 AWS 里的域名（如 app.aws.private）<br><br>
+        流程：机房 DNS → Inbound Endpoint → Route 53 Resolver → 返回 IP<br><br>
+        <span style="color:var(--green)">✅ 让本地机房能解析 AWS 私有域名</span>
+      </div>
+    </div>
+    <div style="border:2px solid var(--blue-border);border-radius:8px;padding:14px;background:var(--blue-bg)">
+      <div style="font-size:13px;font-weight:700;color:var(--blue);margin-bottom:8px">📤 Outbound Endpoint</div>
+      <div style="font-size:13px;color:var(--ink2);line-height:1.75">
+        <strong>方向：AWS → 机房</strong><br>
+        AWS 里的 EC2 想查机房的域名（如 web.onpremise.private）<br><br>
+        流程：EC2 → Route 53 Resolver → Outbound Endpoint → 机房 DNS → 返回 IP<br><br>
+        <span style="color:var(--blue)">✅ 让 AWS 内能解析本地机房域名</span>
+      </div>
+    </div>
+  </div>
+  <div style="background:var(--surface2);border-radius:8px;padding:12px;font-size:13px;color:var(--ink2)">
+    <div style="font-weight:700;margin-bottom:6px">💡 简单记忆口诀</div>
+    <div class="g2" style="font-size:12px">
+      <div><strong>Inbound</strong> = 外面（机房）的查询<strong>进来</strong> AWS 解析<br><span style="color:var(--ink3)">机房 → 问 AWS</span></div>
+      <div><strong>Outbound</strong> = AWS 的查询<strong>出去</strong>给机房解析<br><span style="color:var(--ink3)">AWS → 问机房</span></div>
+    </div>
+  </div>
+  <div style="margin-top:10px;font-size:12px;color:var(--ink3)">连接方式：通过 <strong>Direct Connect</strong> 或 <strong>AWS VPN</strong> 打通机房和 VPC 网络</div>
+</div>
+
 <div class="s-card">
   <h3>⚠️ 高频考试陷阱</h3>
   ${trapdiv("red","极高频","根域名只能用 Alias，不能用 CNAME","example.com → Alias。www.example.com → CNAME 或 Alias 均可。")}
@@ -3526,6 +3709,10 @@ function pgRoute53(){return`${back()}
   ${trapdiv("amber","高频","Latency ≠ 地理位置最近","德国用户可能被路由到 us-east-1（如果那里延迟更低）。Latency 是实测延迟，不是地理距离。")}
   ${trapdiv("amber","高频","DNS 迁移前必须提前降低 TTL","切换时才降 TTL 没用，旧缓存已经存在。需要提前几天降低 TTL，等旧缓存过期。")}
   ${trapdiv("amber","中频","Health Check 只对公共资源直接有效","私有资源需要 CloudWatch Alarm 中转。别忘了在防火墙允许 Route 53 Health Checker IP 段。")}
+  ${trapdiv("red","高频","Multi-Value 不是 ELB 的替代品","Multi-Value 是 DNS 层多值响应，客户端随机选；ELB 是真正的流量负载均衡。两者概念不同。")}
+  ${trapdiv("amber","中频","Geoproximity 必须用 Traffic Flow","普通 Route 53 记录无法使用 Geoproximity，必须开启 Traffic Flow 高级功能。")}
+  ${trapdiv("amber","中频","Geolocation 必须有 Default 记录","没有 Default 记录时，未匹配地区的用户会 DNS 解析失败，而不是随机选一个。")}
+  ${trapdiv("amber","低频","Inbound vs Outbound Endpoint 方向","Inbound = 外部（机房）查 AWS；Outbound = AWS 查外部（机房）。方向常被考反。")}
 </div>
 `}
 
