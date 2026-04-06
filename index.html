@@ -362,10 +362,14 @@ button,input{font-family:var(--font)}
     <button class="sb-item" onclick="go('rds',this)"><span class="si-dot" style="background:#C084FC"></span>RDS &amp; Aurora<span id="sp-rds" class="sb-rate"></span></button>
     <button class="sb-item" onclick="go('elasticache',this)"><span class="si-dot" style="background:#F472B6"></span>ElastiCache<span id="sp-elasticache" class="sb-rate"></span></button>
   </div>
+  <div class="sb-section">
+    <div class="sb-label">网络 / DNS</div>
+    <button class="sb-item" onclick="go('route53',this)"><span class="si-dot" style="background:#8B5CF6"></span>Route 53<span id="sp-r53" class="sb-rate"></span></button>
+  </div>
   <div style="padding:12px 16px;margin-top:auto;border-top:1px solid var(--border)">
     <div style="font-size:11px;color:var(--ink3);line-height:1.7">
       <div style="font-weight:700;color:var(--ink2);margin-bottom:4px">📋 下一章预告</div>
-      <div>Route 53 · Classic Architecture · S3</div>
+      <div>Classic Architecture · S3 · CloudFront</div>
     </div>
   </div>
 </nav>
@@ -1207,7 +1211,241 @@ text:'公司需要将<em>本地 MySQL 数据库迁移到 AWS Aurora MySQL</em>�
 en:'Company needs to <em>migrate an on-premises MySQL database to AWS Aurora MySQL</em>. What is the correct migration approach?',
 ch:['备份本地 MySQL → 上传 S3 → 从 S3 恢复到新 RDS MySQL 实例','用 Percona XtraBackup 备份 → 上传 S3 → 从 S3 恢复到新 Aurora MySQL Cluster','直接创建 Aurora，手动导入数据','创建 RDS Read Replica，然后 Promote 为 Aurora'],
 ench:['Backup MySQL → upload to S3 → restore to new RDS MySQL','Use Percona XtraBackup → upload to S3 → restore to new Aurora MySQL Cluster','Create Aurora directly and manually import data','Create RDS Read Replica then Promote to Aurora'],
-ans:1,exp:'<strong>本地 MySQL → Aurora MySQL 的正确路径：</strong><br><br>① 用 <strong>Percona XtraBackup</strong> 备份本地 MySQL 数据库<br>② 将备份文件上传到 <strong>Amazon S3</strong><br>③ 从 S3 恢复备份文件到新的 <strong>Aurora MySQL Cluster</strong><br><br>注意区分：<br>• 本地 MySQL → <strong>RDS MySQL</strong>：普通备份文件 → S3 → RDS<br>• 本地 MySQL → <strong>Aurora MySQL</strong>：<strong>Percona XtraBackup</strong> → S3 → Aurora',ww:'选 A 是迁移到 RDS MySQL 的步骤，不是 Aurora（A 错）。手动导入太慢（C 错）。Read Replica Promote 是 RDS 内部操作，不用于本地迁移（D 错）。',rule:'本地 MySQL → Aurora：Percona XtraBackup → S3 → Aurora Cluster。本地 MySQL → RDS：普通备份 → S3 → RDS。'}
+ans:1,exp:'<strong>本地 MySQL → Aurora MySQL 的正确路径：</strong><br><br>① 用 <strong>Percona XtraBackup</strong> 备份本地 MySQL 数据库<br>② 将备份文件上传到 <strong>Amazon S3</strong><br>③ 从 S3 恢复备份文件到新的 <strong>Aurora MySQL Cluster</strong><br><br>注意区分：<br>• 本地 MySQL → <strong>RDS MySQL</strong>：普通备份文件 → S3 → RDS<br>• 本地 MySQL → <strong>Aurora MySQL</strong>：<strong>Percona XtraBackup</strong> → S3 → Aurora',ww:'选 A 是迁移到 RDS MySQL 的步骤，不是 Aurora（A 错）。手动导入太慢（C 错）。Read Replica Promote 是 RDS 内部操作，不用于本地迁移（D 错）。',rule:'本地 MySQL → Aurora：Percona XtraBackup → S3 → Aurora Cluster。本地 MySQL → RDS：普通备份 → S3 → RDS。'},
+
+/* ── Udemy 官方小测验 RDS & ElastiCache (Q1-Q11) ── */
+{id:'udemy_rds_01',topic:'RDS',diff:'high',
+text:'Amazon RDS 支持以下数据库，<em>除了</em>哪一个？',
+en:'Amazon RDS supports the following databases, EXCEPT:',
+ch:['MongoDB','MySQL','MariaDB','Microsoft SQL Server'],
+ench:['MongoDB','MySQL','MariaDB','Microsoft SQL Server'],
+ans:0,exp:'<strong>RDS 支持的引擎：</strong>MySQL · PostgreSQL · MariaDB · Oracle · Microsoft SQL Server · IBM DB2 · Amazon Aurora。<br><br><strong>MongoDB 不在支持范围内。</strong> MongoDB 是 NoSQL 文档数据库，AWS 对应的托管服务是 <strong>Amazon DocumentDB</strong>（兼容 MongoDB）。',ww:'MySQL（B）、MariaDB（C）、MS SQL Server（D）都是 RDS 支持的引擎。',rule:'RDS 不支持 MongoDB → 用 DocumentDB（MongoDB 兼容）。'},
+
+{id:'udemy_rds_02',topic:'RDS',diff:'high',
+text:'你在规划一个新方案，需要一个 MySQL 数据库，<em>即使某个可用区发生灾难也必须可用</em>。应该使用什么？',
+en:'You are planning for a new solution that requires a MySQL database that must be available even in case of a disaster in one of the Availability Zones. What should you use?',
+ch:['创建 Read Replicas','启用 Encryption（加密）','启用 Multi-AZ'],
+ench:['Create Read Replicas','Enable Encryption','Enable Multi-AZ'],
+ans:2,exp:'<strong>Multi-AZ</strong> 专门用于应对 AZ 级别的灾难恢复：<br><br>• 主实例（AZ-A）SYNC 同步复制到 Standby（AZ-B）<br>• 某个 AZ 宕机时，DNS 自动切换到 Standby，约 60–120 秒<br>• 应用无需改代码（同一个 DNS endpoint）<br><br>如果要防范整个 <strong>AWS Region</strong> 宕机，则需要跨 Region 的备份和复制（如 Aurora Global Database）。<br><br>Read Replica 是用于读扩展，不是 HA 故障转移。加密与可用性无关。',ww:'Read Replica 是读扩展，不是 AZ 故障转移（A 错）。Encryption 与高可用无关（B 错）。',rule:'AZ 级别灾难恢复 → Multi-AZ。整个 Region 灾难恢复 → 跨 Region 复制/Aurora Global。'},
+
+{id:'udemy_rds_03',topic:'RDS',diff:'high',
+text:'RDS 数据库因读请求太多而不堪重负，网站有数百万用户，<em>以读新闻为主</em>，更新不频繁。以下哪个方案<em>不适合</em>解决这个问题？',
+en:'An RDS database struggles to keep up with read requests from a news website with millions of users. Users mostly read news and posts are not updated often. Which solution is NOT adapted?',
+ch:['ElastiCache 集群','RDS Multi-AZ','RDS Read Replicas'],
+ench:['An ElastiCache Cluster','RDS Multi-AZ','RDS Read Replicas'],
+ans:1,exp:'<strong>注意：题目问的是"NOT adapted"（不适合）的方案。</strong><br><br>• ElastiCache：✅ 适合 — 缓存热点新闻数据，极低延迟，大幅减少 RDS 压力<br>• RDS Read Replicas：✅ 适合 — 读流量分流到 Replica，生产 DB 不受影响<br>• <strong>RDS Multi-AZ：❌ 不适合</strong> — Multi-AZ 是高可用方案，Standby 不对外提供读服务，<strong>对读性能没有帮助</strong><br><br>⚠️ 考试技巧：注意 NOT/EXCEPT 这类反向题！',ww:'ElastiCache 和 Read Replica 都能有效分担读负载（A、C 都适合，不是答案）。',rule:'读扩展 → ElastiCache + Read Replica。Multi-AZ = 高可用，不帮助读性能。'},
+
+{id:'udemy_rds_04',topic:'RDS',diff:'high',
+text:'你设置了 Read Replica，但用户反映<em>更新帖子后看不到最新内容</em>。可能的原因是？',
+en:'You have set up read replicas on your RDS database, but users complain that after updating their posts they do not see the updated content right away. What is a possible cause?',
+ch:['你的应用程序有 Bug','Read Replica 使用异步复制，用户只能读到最终一致性（Eventual Consistency）','应该用 Multi-AZ 代替 Read Replica'],
+ench:['There must be a bug in your application','Read Replicas have Asynchronous Replication, users will only read Eventual Consistency','You should have setup Multi-AZ instead'],
+ans:1,exp:'<strong>Read Replica 使用异步复制（ASYNC）</strong>，这意味着：<br><br>• 主实例写入完成后，数据异步同步到 Read Replica<br>• 在同步完成之前，读取 Read Replica 可能看到<strong>旧数据</strong><br>• 这就是"<strong>最终一致性（Eventual Consistency）</strong>"——数据最终会同步，但不是立即<br><br>用户写入 → 主实例 → 应用读取 Read Replica → 数据还未同步 → 看到旧数据。这是 Read Replica 的正常行为，不是 Bug。',ww:'不是应用 Bug，是 ASYNC 复制的特性（A 错）。Multi-AZ 不解决这个问题，Standby 也不可读（C 错）。',rule:'Read Replica = ASYNC = 最终一致性。写完立刻读可能看到旧数据，这是正常现象。'},
+
+{id:'udemy_rds_05',topic:'RDS',diff:'high',
+text:'RDS（非 Aurora）的哪个功能在使用时<em>不需要修改 SQL 连接字符串</em>？',
+en:'Which RDS (NOT Aurora) feature when used does not require you to change the SQL connection string?',
+ch:['Multi-AZ','Read Replicas'],
+ench:['Multi-AZ','Read Replicas'],
+ans:0,exp:'<strong>Multi-AZ 不需要修改连接字符串：</strong><br><br>• Multi-AZ 使用<strong>同一个 DNS Endpoint</strong>，无论主实例在哪个 AZ，应用始终连接同一个地址<br>• 主实例故障时，AWS 自动将 DNS 切换到 Standby，应用<strong>无感知，无需改代码</strong><br><br><strong>Read Replica 需要修改连接字符串：</strong><br>• 每个 Read Replica 有自己独立的 Endpoint<br>• 应用必须<strong>显式更新连接字符串</strong>才能将读请求指向 Replica',ww:'Read Replica 有独立 Endpoint，应用必须更新连接字符串才能使用（B 错）。',rule:'Multi-AZ = 同一 DNS，无需改连接字符串。Read Replica = 独立 Endpoint，必须改连接字符串。'},
+
+{id:'udemy_rds_06',topic:'ElastiCache',diff:'high',
+text:'应用运行在 ASG + ALB 上，用户频繁被要求重新登录。你<em>不想用 Sticky Sessions</em>（怕 EC2 过载）。应该怎么做？',
+en:'Your application runs on EC2 instances managed by an ASG behind an ALB. Users have to constantly log back in and you do not want to enable Sticky Sessions. What should you do?',
+ch:['用自建 Load Balancer 替换 ALB','将 Session 数据存入 RDS','将 Session 数据存入 ElastiCache','将 Session 数据存入共享 EBS 卷'],
+ench:['Use a custom Load Balancer instead of ALB','Store session data in RDS','Store session data in ElastiCache','Store session data in a shared EBS volume'],
+ans:2,exp:'<strong>将 Session 存入 ElastiCache</strong> 是 User Session Store 的标准模式：<br><br>• 用户登录任意 EC2 → Session 写入 <strong>ElastiCache Redis</strong><br>• 无论 ALB 下次路由到哪台 EC2，都能从 ElastiCache 读取 Session<br>• 用户保持登录状态，无需 Sticky Sessions<br>• 应用实现<strong>无状态化（Stateless）</strong>，可自由水平扩展<br><br>Sticky Sessions 会把用户固定到某台 EC2，如果该 EC2 过载或宕机，用户就断线。ElastiCache 解决了这个问题。',ww:'自建 LB 无意义（A 错）。RDS 是数据库，Session 高频读写不适合（B 错）。EBS 不能在多 EC2 间共享（D 错）。',rule:'无 Sticky Sessions + 多 EC2 共享 Session → ElastiCache（User Session Store 模式）。'},
+
+{id:'udemy_rds_07',topic:'RDS',diff:'high',
+text:'分析应用正在对<em>生产 RDS 数据库</em>执行查询，查询随时发生且会拖慢数据库，影响用户体验。怎么改善？',
+en:'An analytics application is currently performing queries against your main production RDS database. These queries run at any time and slow down the RDS database impacting users. What should you do?',
+ch:['设置 Read Replica','设置 Multi-AZ','只在晚上运行分析查询'],
+ench:['Setup a Read Replica','Setup Multi-AZ','Run the analytics queries at night'],
+ans:0,exp:'<strong>设置 Read Replica，让分析查询直接连接 Replica：</strong><br><br>• 创建 Read Replica → 分析应用连接 Replica 的 Endpoint<br>• 所有分析查询在 Replica 上运行，<strong>生产主数据库完全不受影响</strong><br>• Read Replica 通过 ASYNC 异步复制保持数据同步<br><br>这是 Read Replica 最典型的使用场景：<em>报表 / 分析查询 / BI 工具 → 全部走 Read Replica</em>。',ww:'Multi-AZ 的 Standby 不可读，不能运行查询（B 错）。只在晚上运行是临时方案，不能根本解决问题（C 错）。',rule:'分析查询拖慢生产 DB → 创建 Read Replica，分析查询指向 Replica。'},
+
+{id:'udemy_rds_08',topic:'RDS',diff:'high',
+text:'你希望在<em>另一个 AWS Region</em> 有数据库副本，以便主 Region 发生灾难时使用。哪个数据库方案最合适？',
+en:'You would like to ensure you have a replica of your database available in another AWS Region if a disaster happens to your main AWS Region. Which database do you recommend?',
+ch:['RDS Read Replicas','RDS Multi-AZ','Aurora Read Replicas','Aurora Global Database'],
+ench:['RDS Read Replicas','RDS Multi-AZ','Aurora Read Replicas','Aurora Global Database'],
+ans:3,exp:'<strong>Aurora Global Database</strong> 是跨 Region 灾难恢复的最佳方案：<br><br>• 1 个主 Region（读写） + 最多 5 个次要 Region（只读）<br>• 跨 Region 复制延迟 <strong>&lt; 1 秒</strong><br>• 灾难恢复时，将次要 Region Promote 为主 Region，RTO <strong>&lt; 1 分钟</strong><br>• 每个次要 Region 最多 16 个 Read Replica<br><br>RDS Multi-AZ 只在同一 Region 内不同 AZ 之间复制，无法跨 Region。RDS Read Replica 可以跨 Region，但 Aurora Global Database 更简单且性能更好。',ww:'RDS Multi-AZ 只在同 Region 内（B 错）。RDS/Aurora Read Replica 可跨 Region 但不如 Global Database 全面（A、C 较弱）。',rule:'跨 Region 灾难恢复 → Aurora Global Database（&lt;1s 复制，&lt;1分钟 RTO）。'},
+
+{id:'udemy_rds_09',topic:'ElastiCache',diff:'high',
+text:'你想通过允许用户使用<em>其 IAM 身份（用户、角色）</em>访问 ElastiCache Redis 集群来增强安全性。应使用什么？',
+en:'How can you enhance the security of your ElastiCache Redis Cluster by allowing users to access your ElastiCache Redis Cluster using their IAM Identities (e.g., Users, Roles)?',
+ch:['使用 Redis Authentication（Redis AUTH）','使用 IAM Authentication','使用 Security Groups'],
+ench:['Using Redis Authentication','Using IAM Authentication','Use Security Groups'],
+ans:1,exp:'<strong>IAM Authentication for ElastiCache Redis</strong>：<br><br>允许用户使用 IAM 身份（User、Role）访问 Redis 集群，实现细粒度访问控制。这与用户管理可以集成，便于统一管理权限。<br><br><strong>区分 IAM Auth vs Redis AUTH：</strong><br>• <strong>IAM Authentication</strong>：使用 IAM 身份访问 Redis，适合需要精细权限管理的场景<br>• <strong>Redis AUTH</strong>：创建集群时设置 password/token，是 Security Group 之上的额外密码层<br><br>题目关键词：<em>IAM Identities / IAM Users / IAM Roles</em> → 选 IAM Authentication。',ww:'Redis AUTH 是密码认证，不使用 IAM 身份（A 错）。Security Groups 是网络层，不是身份认证（C 错）。',rule:'使用 IAM 身份访问 Redis → IAM Authentication。额外密码层防护 Redis → Redis AUTH（password/token）。'},
+
+{id:'udemy_rds_10',topic:'RDS',diff:'high',
+text:'生产 Node.js 应用使用 RDS MySQL，新的 Java 分析应用需要<em>每小时执行大量分析查询</em>生成 Dashboard。如何以最低成本、最小影响的方式实现？',
+en:'Production Node.js app uses RDS MySQL. A new Java analytics app will perform heavy analytics workload hourly. What is the most cost-effective solution to minimize disruption for the main application?',
+ch:['启用 Multi-AZ 并在 Standby 上运行分析查询','在不同 AZ 创建 Read Replica，在 Replica 上运行分析查询','在不同 AZ 创建 Read Replica，但在源数据库上运行分析查询'],
+ench:['Enable Multi-AZ and run analytics on the standby database','Create a Read Replica in a different AZ and run analytics on the replica database','Create a Read Replica in a different AZ and run analytics on the source database'],
+ans:1,exp:'<strong>正确答案：在不同 AZ 的 Read Replica 上运行分析查询。</strong><br><br>• 创建 Read Replica（不同 AZ，无跨 Region 网络费）<br>• 分析 Java 应用连接 Replica 的 Endpoint 执行查询<br>• 生产 Node.js 应用继续使用主实例，<strong>完全不受分析负载影响</strong><br><br><strong>为什么不是 Multi-AZ + Standby？</strong><br>Multi-AZ 的 Standby 不对外提供读服务，无法直接连接执行查询。这是 SAA 考试最常见的 Multi-AZ 陷阱。',ww:'Multi-AZ Standby 不可读，无法运行分析（A 错）。在源数据库（主实例）上运行分析会影响生产（C 错）。',rule:'分析查询隔离 → Read Replica（不同 AZ，同 Region 免费）。绝对不能用 Multi-AZ Standby 跑查询！'},
+
+{id:'udemy_rds_11',topic:'RDS',diff:'high',
+text:'你需要为 RDS PostgreSQL 创建<em>跨 Region 灾难恢复策略</em>，Region 中断时，DR 数据库必须<em>能快速支持读写</em>，且 DR 数据库本身必须<em>高可用</em>。推荐什么方案？',
+en:'You need a disaster recovery strategy for your RDS PostgreSQL. If regional outage happens, the DR database must be quickly available for both read and write. The DR database must be highly available. What do you recommend?',
+ch:['在同 Region 创建 Read Replica，在主数据库上启用 Multi-AZ','在<em>不同 Region</em> 创建 Read Replica，在 Read Replica 上启用 Multi-AZ','在同 Region 创建 Read Replica，在 Read Replica 上启用 Multi-AZ','在主数据库上启用 Multi-Region 选项'],
+ench:['Create Read Replica in same region + Multi-AZ on main DB','Create Read Replica in different region + Multi-AZ on the Read Replica','Create Read Replica in same region + Multi-AZ on the Read Replica','Enable Multi-Region option on the main database'],
+ans:1,exp:'<strong>跨 Region Read Replica + 在该 Replica 上启用 Multi-AZ</strong>：<br><br>① 在另一个 Region 创建 <strong>Read Replica</strong>（跨 Region 容灾）<br>② 在该跨 Region Read Replica 上启用 <strong>Multi-AZ</strong>（DR 数据库自身高可用）<br>③ 灾难发生时，将跨 Region Replica <strong>Promote 为主数据库</strong>，即可支持读写<br><br>关键点：<br>• Read Replica 可以单独配置 Multi-AZ<br>• Promote 后就成为独立主实例，支持读写<br>• 同 Region 方案无法应对区域级中断（A、C 错）<br>• RDS 没有"Multi-Region option"这个选项（D 错）',ww:'同 Region 无法应对 Region 级灾难（A、C 错）。RDS 没有 Multi-Region 选项（D 错）。',rule:'跨 Region DR + DR 数据库高可用 → 跨 Region Read Replica + 在该 Replica 上启用 Multi-AZ + Promote 时支持读写。'},
+
+{id:'udemy_rds_12',topic:'RDS',diff:'high',
+text:'你将 MySQL 数据库从本地迁移到 RDS。每个开发者都有 IAM User。<em>如何让开发者访问 RDS，而不是为每人单独创建 DB 用户？</em>',
+en:'You have migrated MySQL from on-premises to RDS. Each developer has an IAM user. What is a suitable approach to give developers access to the MySQL RDS DB instance instead of creating a DB user for each one?',
+ch:['IAM User 默认就有 RDS 访问权限','使用 Amazon Cognito','启用 IAM Database Authentication'],
+ench:['By default IAM users have access to your RDS database','Use Amazon Cognito','Enable IAM Database Authentication'],
+ans:2,exp:'<strong>IAM Database Authentication</strong> 允许使用 IAM 身份（User、Role）代替传统数据库用户名/密码连接 RDS：<br><br>• 启用后，开发者用自己的 IAM User 生成临时 Token 连接 RDS<br>• 无需为每人单独创建 DB User<br>• 权限统一在 IAM 中管理<br>• Token 有效期 15 分钟，安全性高<br>• 支持 MySQL 和 PostgreSQL<br><br>IAM User 默认<strong>没有</strong> RDS 访问权限（A 错）。Cognito 用于终端用户身份验证，不适用于开发者访问 DB（B 错）。',ww:'IAM User 默认没有 RDS 数据库访问权限（A 错）。Cognito 是给应用终端用户用的，不是给开发者连 DB 用的（B 错）。',rule:'开发者用 IAM 身份访问 RDS，不创建 DB User → 启用 IAM Database Authentication。'},
+
+{id:'udemy_rds_13',topic:'RDS',diff:'high',
+text:'关于 RDS Read Replica 和 Multi-AZ 的复制方式，哪个描述正确？',
+en:'Which statement is true regarding replication in both RDS Read Replicas and Multi-AZ?',
+ch:['Read Replica 异步复制，Multi-AZ 也是异步复制','Read Replica 异步复制（ASYNC），Multi-AZ 同步复制（SYNC）','Read Replica 同步复制，Multi-AZ 也是同步复制','Read Replica 同步复制，Multi-AZ 是异步复制'],
+ench:['Read Replica uses ASYNC, Multi-AZ uses ASYNC','Read Replica uses ASYNC, Multi-AZ uses SYNC','Read Replica uses SYNC, Multi-AZ uses SYNC','Read Replica uses SYNC, Multi-AZ uses ASYNC'],
+ans:1,exp:'<strong>复制方式是 Read Replica 和 Multi-AZ 最核心的区别：</strong><br><br>📤 <strong>Read Replica = ASYNC（异步）</strong><br>• 主实例写入完成后，异步传播到 Replica<br>• 可能有短暂延迟（最终一致性）<br>• 优点：写入性能不受影响<br><br>🔒 <strong>Multi-AZ = SYNC（同步）</strong><br>• 主实例写入必须同步确认 Standby 也写入成功<br>• 保证数据零丢失（RPO = 0）<br>• 缺点：写入延迟略高（等待 Standby 确认）',ww:'两种方式复制机制完全不同，其他三个选项都混淆了方向。',rule:'Read Replica = ASYNC（异步，最终一致性）。Multi-AZ = SYNC（同步，零数据丢失）。'},
+
+{id:'udemy_rds_14',topic:'RDS',diff:'high',
+text:'如何对一个<em>未加密的 RDS DB 实例</em>进行加密？',
+en:'How do you encrypt an unencrypted RDS DB instance?',
+ch:['直接在 AWS Console 选择 RDS 实例 → Actions → Encrypt using KMS','停止 RDS 实例后，在 AWS Console 直接加密','创建未加密实例的快照 → 复制快照时勾选 Enable encryption → 从加密快照恢复 RDS 实例'],
+ench:['Directly in AWS Console, select RDS, Actions, then Encrypt using KMS','Stop the RDS DB instance, then encrypt from AWS Console','Create a snapshot of the unencrypted DB, copy the snapshot with Enable encryption, then restore RDS from the encrypted snapshot'],
+ans:2,exp:'<strong>RDS 加密只能在创建时开启，不能直接修改运行中的实例。</strong><br><br>已有未加密 RDS 的加密流程：<br>① 对未加密 RDS 创建<strong>快照（Snapshot）</strong><br>② 复制快照时，勾选 <strong>"Enable encryption"</strong>（并选择 KMS 密钥）<br>③ 从加密后的快照<strong>恢复成新的 RDS 实例</strong><br><br>新实例就是加密的。之后可以将应用切换到新实例，删除旧实例。<br><br>AWS Console 没有直接加密现有实例的选项（A、B 错）。',ww:'没有"直接加密现有实例"的功能（A、B 错）。必须通过快照 → 复制（启用加密）→ 恢复的三步流程。',rule:'未加密 RDS 要加密：快照 → 复制快照（Enable encryption）→ 从加密快照恢复新实例。'},
+
+{id:'udemy_rds_15',topic:'RDS',diff:'mid',
+text:'RDS 数据库最多可以有多少个 Read Replica？',
+en:'For your RDS database, you can have up to .......... Read Replicas.',
+ch:['5 个','15 个','7 个'],
+ench:['5','15','7'],
+ans:1,exp:'<strong>RDS Read Replica 上限：15 个</strong>（适用于 MySQL、PostgreSQL、MariaDB）。<br><br>注意：以前的文档/旧课程可能显示 5 个，但 AWS 已将上限提升至 15 个。Aurora 同样支持最多 15 个 Read Replica。<br><br>考试题目如果出现选项 5 vs 15，正确答案是 <strong>15</strong>。',ww:'5 是过时的数字（A 错）。7 从未是正确选项（C 错）。',rule:'RDS Read Replica 最多 15 个。Aurora Read Replica 也是最多 15 个。'},
+
+{id:'udemy_rds_16',topic:'RDS',diff:'high',
+text:'以下哪个 RDS 数据库引擎<em>不支持</em> IAM Database Authentication？',
+en:'Which RDS database technology does NOT support IAM Database Authentication?',
+ch:['Oracle','PostgreSQL','MySQL'],
+ench:['Oracle','PostgreSQL','MySQL'],
+ans:0,exp:'<strong>IAM Database Authentication 支持的引擎：MySQL 和 PostgreSQL。</strong><br><br>• ✅ MySQL：支持<br>• ✅ PostgreSQL：支持<br>• ❌ <strong>Oracle：不支持</strong><br>• ❌ SQL Server：不支持<br>• ❌ MariaDB：不支持（MariaDB 不在 IAM Auth 支持列表）<br><br>考试关键记忆：IAM DB Auth 只支持 <strong>MySQL 和 PostgreSQL</strong>，其他引擎（Oracle、SQL Server、MariaDB）均不支持。',ww:'PostgreSQL 和 MySQL 都支持 IAM DB Auth（B、C 错）。',rule:'IAM DB Authentication 只支持 MySQL 和 PostgreSQL。Oracle / SQL Server / MariaDB 不支持。'},
+
+{id:'udemy_rds_17',topic:'RDS',diff:'high',
+text:'你有一个<em>未加密</em>的 RDS 实例，想创建 Read Replica 并让它们<em>加密</em>。可以做到吗？',
+en:'You have an un-encrypted RDS DB instance and you want to create Read Replicas. Can you configure the RDS Read Replicas to be encrypted?',
+ch:['不可以','可以'],
+ench:['No','Yes'],
+ans:0,exp:'<strong>不可以。</strong> 你无法从未加密的 RDS 主实例创建加密的 Read Replica。<br><br>加密规则：<br>• 主实例未加密 → Read Replica <strong>必须也是未加密的</strong><br>• 主实例已加密 → Read Replica <strong>自动也是加密的</strong><br>• 加密是在存储层面实现的，必须主从一致<br><br>如果想要加密的 Read Replica：<br>① 先将主实例加密（快照 → 加密恢复）<br>② 再创建 Read Replica（会自动加密）',ww:'无法对未加密主实例创建加密 Replica，加密必须源头一致（B 错）。',rule:'未加密主实例 → Read Replica 也必须未加密。已加密主实例 → Read Replica 自动加密。'},
+
+{id:'udemy_rds_18',topic:'RDS',diff:'high',
+text:'开发团队需要一个 Aurora 版本用于按需的重型工作负载，<em>大多数时间应用不会使用</em>，需要<em>最低成本</em>。应该使用什么？',
+en:'Development team needs a scaled-down Aurora application that can handle heavy workload on a need-basis. Most of the time the application will be unused. Minimize costs. What do you suggest?',
+ch:['Aurora Global Database','RDS 数据库','Aurora Serverless','在 EC2 上运行 Aurora 并在晚上关闭'],
+ench:['Use an Aurora Global Database','Use an RDS database','Use Aurora Serverless','Run Aurora on EC2 and write a script to shut down EC2 at night'],
+ans:2,exp:'<strong>Aurora Serverless</strong> 专为间歇性/不可预测工作负载设计：<br><br>• 按实际使用<strong>自动伸缩</strong>（scale up/down）<br>• <strong>按秒计费</strong>，不使用时不收计算费<br>• 无需预先规划容量<br>• 内部通过 <strong>Proxy Fleet</strong> 管理实例生命周期<br>• 适合场景：开发/测试环境、大部分时间空闲、偶发峰值负载<br><br>Aurora Global Database 是跨 Region 方案（A 错）。RDS 数据库始终收费（B 较差）。在 EC2 上手动跑 Aurora 不切实际（D 错）。',ww:'Aurora Global Database 用于跨 Region（A 错）。RDS 按时收费，不用也要付钱（B 较差）。手动脚本关 EC2 太笨（D 错）。',rule:'大多数时间不用 + 最低成本 → Aurora Serverless（按实际用量计费）。'},
+
+{id:'udemy_rds_19',topic:'RDS',diff:'mid',
+text:'一个 Aurora DB Cluster 中最多可以有多少个 Aurora Read Replica？',
+en:'How many Aurora Read Replicas can you have in a single Aurora DB Cluster?',
+ch:['5 个','10 个','15 个'],
+ench:['5','10','15'],
+ans:2,exp:'<strong>Aurora DB Cluster 最多支持 15 个 Read Replica。</strong><br><br>相比标准 RDS（也是最多 15 个），Aurora 的优势在于：<br>• Replica lag <strong>&lt; 10ms</strong>（远快于标准 RDS）<br>• Failover 在 <strong>30 秒内</strong>自动完成（HA Native）<br>• Reader Endpoint 自动负载均衡所有 Read Replica<br>• 支持 Replica Auto Scaling（CPU 高时自动增加 Replica）',ww:'5 是过时数字（A 错）。10 不是正确上限（B 错）。',rule:'Aurora Read Replica 最多 15 个，Replica lag < 10ms，Failover < 30s。'},
+
+{id:'udemy_rds_20',topic:'RDS',diff:'mid',
+text:'Amazon Aurora 支持哪两种数据库？',
+en:'Amazon Aurora supports both .......... databases.',
+ch:['MySQL 和 MariaDB','MySQL 和 PostgreSQL','Oracle 和 MariaDB','Oracle 和 MS SQL Server'],
+ench:['MySQL and MariaDB','MySQL and PostgreSQL','Oracle and MariaDB','Oracle and MS SQL Server'],
+ans:1,exp:'<strong>Aurora 兼容 MySQL 和 PostgreSQL。</strong><br><br>• Aurora MySQL 兼容：现有 MySQL 驱动/代码无需修改即可连接<br>• Aurora PostgreSQL 兼容：现有 PostgreSQL 驱动/代码无需修改<br><br>Aurora 是 AWS 专有（Proprietary）技术，不是开源的，但与这两种开源数据库保持 API 兼容。Oracle 和 MS SQL Server 只能在标准 RDS 上运行，不在 Aurora 支持范围内。',ww:'MariaDB 是 RDS 支持的引擎，不是 Aurora 兼容的目标（A、C 错）。Oracle/MS SQL Server 只在标准 RDS 支持（D 错）。',rule:'Aurora 只兼容 MySQL 和 PostgreSQL（两种）。Oracle / MariaDB / MS SQL Server 不在 Aurora 兼容范围内。'},
+
+{id:'udemy_ec_21',topic:'ElastiCache',diff:'high',
+text:'游戏公司需要<em>实时对玩家排名</em>，设计一个高效且高可用的游戏排行榜。应该用什么？',
+en:'You work as a Solutions Architect for a gaming company. Players are ranked in real-time based on their score. Design an effective and highly available gaming leaderboard. What should you use?',
+ch:['RDS for MySQL','Amazon Aurora','ElastiCache for Memcached','ElastiCache for Redis — Sorted Sets'],
+ench:['Use RDS for MySQL','Use an Amazon Aurora','Use ElastiCache for Memcached','Use ElastiCache for Redis - Sorted Sets'],
+ans:3,exp:'<strong>ElastiCache Redis — Sorted Sets</strong> 是游戏排行榜的标准方案：<br><br>📊 <strong>Redis Sorted Sets 特性：</strong><br>• 每个元素包含 member（玩家ID）和 score（分数）<br>• 自动按 score 排序，保证<strong>唯一性</strong><br>• 新增/更新分数后，<strong>实时重新排序</strong><br>• O(log N) 时间复杂度，高效处理百万玩家<br>• ZRANK 命令直接获取排名，ZRANGE 获取排行榜<br><br>高可用：Redis 支持 Multi-AZ + Auto-Failover。<br><br>RDS/Aurora 每次排名需要 ORDER BY 查询，高并发下性能差（A、B 错）。Memcached 不支持 Sorted Set（C 错）。',ww:'RDS/Aurora ORDER BY 查询在高并发实时场景性能差（A、B 错）。Memcached 只支持 String，无 Sorted Set（C 错）。',rule:'实时游戏排行榜 → ElastiCache Redis Sorted Sets（实时排序 + 唯一性 + 高可用）。'},
+
+{id:'udemy_rds_22',topic:'RDS',diff:'high',
+text:'你需要对 AWS 上的 Oracle 数据库进行<em>完全自定义</em>，同时希望能使用 AWS 服务的优势。推荐什么？',
+en:'You need full customization of an Oracle Database on AWS. You would like to benefit from using the AWS services. What do you recommend?',
+ch:['RDS for Oracle','RDS Custom for Oracle','在 EC2 上部署 Oracle'],
+ench:['RDS for Oracle','RDS Custom for Oracle','Deploy Oracle on EC2'],
+ans:1,exp:'<strong>RDS Custom for Oracle</strong> 是"完全自定义 + 使用 AWS 服务"的最佳平衡：<br><br>• <strong>RDS for Oracle</strong>：托管服务，但 AWS 管理底层，你<strong>无法自定义 OS 和 DB</strong><br>• <strong>RDS Custom for Oracle</strong>：在 RDS 的托管基础上，提供<strong>底层 OS 和 DB 的完整访问权限</strong>，支持 SSH / SSM Session Manager<br>• <strong>EC2 部署 Oracle</strong>：完全控制，但要自己管理一切，无法受益于 AWS RDS 服务<br><br>关键：题目要求"完全自定义 + 享受 AWS 服务" → RDS Custom 是唯一同时满足两者的选项。',ww:'RDS for Oracle 无法完全自定义（A 错）。EC2 部署无法享受 RDS 托管服务优势（C 错）。',rule:'需要 Oracle 完全自定义 + AWS 托管服务 → RDS Custom for Oracle。'},
+
+{id:'udemy_rds_23',topic:'RDS',diff:'high',
+text:'你需要为 Aurora 数据库存储<em>长期备份</em>，用于灾难恢复和审计目的。推荐什么？',
+en:'You need to store long-term backups for your Aurora database for disaster recovery and audit purposes. What do you recommend?',
+ch:['启用自动备份（Automated Backups）','执行按需备份（On-Demand Backups / Manual Snapshots）','使用 Aurora Database Cloning'],
+ench:['Enable Automated Backups','Perform On Demand Backups','Use Aurora Database Cloning'],
+ans:1,exp:'<strong>On-Demand Backups（手动快照）</strong> 是长期备份的正确选择：<br><br>• <strong>自动备份（Automated Backups）</strong>：最多只能保留 <strong>1–35 天</strong>，超过后自动删除，<strong>不适合长期保存</strong><br>• <strong>手动快照（On-Demand / Manual Snapshots）</strong>：保留时间<strong>无限制</strong>，用户手动触发，<strong>想删时才删</strong>，非常适合灾难恢复和审计<br>• <strong>Aurora Cloning</strong>：用于快速创建测试环境，不是备份工具<br><br>关键词：<em>长期 / Long-term / 审计 / Audit → Manual Snapshot</em>',ww:'自动备份最多 35 天，不满足长期需求（A 错）。Aurora Cloning 是克隆数据库，不是备份（C 错）。',rule:'长期备份（超过 35 天）→ On-Demand / Manual Snapshot（无限期保留）。自动备份最多 35 天。'},
+
+{id:'udemy_rds_24',topic:'RDS',diff:'high',
+text:'开发团队需要对生产 Aurora 数据库执行<em>读写测试</em>，并且<em>需要尽快访问生产数据</em>。你建议什么？',
+en:'Development team would like to perform read and write tests against production Aurora database because they need access to production data as soon as possible. What do you advise?',
+ch:['为他们创建 Aurora Read Replica','直接在生产数据库上测试','拍 DB Snapshot 并恢复到新数据库','使用 Aurora Cloning 功能'],
+ench:['Create an Aurora Read Replica for them','Do the test against the production database','Make a DB Snapshot and Restore it into a new database','Use the Aurora Cloning feature'],
+ans:3,exp:'<strong>Aurora Database Cloning</strong> 是这个场景的最佳方案：<br><br>• 使用 <strong>Copy-on-write</strong> 协议，初始<strong>共享存储卷</strong>，几乎瞬间创建完成（比 Snapshot 快得多）<br>• <strong>不影响生产数据库</strong>（共享只读数据，写入时才分离）<br>• 开发团队获得<strong>完整的读写权限</strong>（包括写），这是 Read Replica 做不到的<br>• 数据和生产数据库完全相同，满足"尽快访问生产数据"的要求<br><br>Read Replica 只支持 SELECT（A 错）。直接测试生产库风险极高（B 错）。Snapshot 恢复比 Cloning 慢很多（C 可行但不是最优）。',ww:'Read Replica 只读，无法做写测试（A 错）。直接在生产 DB 上测试危险（B 错）。Snapshot 恢复更慢（C 错）。',rule:'需要读写测试 + 使用生产数据 + 快速 + 不影响生产 → Aurora Cloning（Copy-on-write，秒级完成）。'},
+
+
+/* ── Route 53 ── */
+{id:'r53_01',topic:'Route 53',diff:'high',
+text:'公司想把根域名 <span class="code-inline">example.com</span> 指向 Application Load Balancer。应使用哪种 DNS 记录类型？',
+en:'A company wants to point the root domain <span class="code-inline">example.com</span> to an Application Load Balancer. Which DNS record type should be used?',
+ch:['CNAME 记录','A 记录（普通）','Alias 记录（A 类型）','NS 记录'],
+ench:['CNAME record','A record (regular)','Alias record (type A)','NS record'],
+ans:2,exp:'<strong>Alias 记录</strong>是正确答案：<br><br>• CNAME <strong>不能用于根域名（Zone Apex）</strong>，如 example.com<br>• Alias 是 Route 53 对 DNS 的扩展，<strong>可以指向根域名</strong>（Zone Apex）<br>• Alias 指向 AWS 资源（ALB、CloudFront 等），类型为 A 或 AAAA<br>• Alias 免费，且自动跟踪 ALB IP 变化<br>• 普通 A 记录需要填写静态 IP，ALB 没有固定 IP',ww:'CNAME 不能用于根域名（A 错）。普通 A 记录无法指向域名（B 错）。NS 是 Name Server 记录，用途不同（D 错）。',rule:'根域名（Zone Apex）指向 AWS 资源 → Alias 记录。子域名才可以用 CNAME。'},
+
+{id:'r53_02',topic:'Route 53',diff:'high',
+text:'全球用户访问部署在 us-east-1 和 ap-southeast-1 的应用。要求<em>将用户路由到响应速度最快的 Region</em>。应使用哪种路由策略？',
+en:'Global users access an application deployed in us-east-1 and ap-southeast-1. The requirement is to <em>route users to the Region with the fastest response time</em>. Which routing policy should be used?',
+ch:['Geolocation','Weighted','Latency-based','Failover'],
+ench:['Geolocation','Weighted','Latency-based','Failover'],
+ans:2,exp:'<strong>Latency-based（延迟路由）</strong>：<br><br>• 根据用户到各 AWS Region 的<strong>实际网络延迟</strong>来路由<br>• 不是地理位置路由 — 德国用户可能被路由到 us-east-1（如果那里延迟更低）<br>• 可与 Health Check 结合，具备故障转移能力<br><br>Geolocation 按用户<strong>物理位置</strong>路由，不保证最低延迟（A 错）。Weighted 按权重比例分配（B 错）。Failover 是主备模式（D 错）。',ww:'Geolocation 是按地理位置路由，不是按速度（A 错）。Weighted 与速度无关（B 错）。Failover 是主备容灾而非性能优化（D 错）。',rule:'最低延迟 / 最佳性能 → Latency-based。用户位置 → Geolocation。'},
+
+{id:'r53_03',topic:'Route 53',diff:'high',
+text:'电商平台需要根据<em>用户所在国家</em>提供本地化内容，欧洲用户访问欧洲服务器，亚洲用户访问亚洲服务器。应使用哪种路由策略？',
+en:'An e-commerce platform needs to serve localized content based on <em>the country of the user</em>. European users go to European servers, Asian users go to Asian servers. Which routing policy should be used?',
+ch:['Latency-based','Geoproximity','Geolocation','Multi-Value Answer'],
+ench:['Latency-based','Geoproximity','Geolocation','Multi-Value Answer'],
+ans:2,exp:'<strong>Geolocation（地理位置路由）</strong>：<br><br>• 根据用户的<strong>物理地理位置（国家/大洲）</strong>来路由<br>• 适合：本地化内容、法规合规、区域内容限制<br>• 可以设置默认记录（当位置不匹配时使用）<br><br><strong>Geoproximity</strong>（A 错）：按资源位置路由，可用 bias 调整边界，不是按用户国家精确匹配<br><strong>Latency</strong>（A 错）：按速度，不保证用户访问本国服务器',ww:'Latency 按延迟，不保证地理匹配（A 错）。Geoproximity 按资源位置而非用户国家（B 错）。Multi-Value 是简单负载分散（D 错）。',rule:'用户所在国家 / 地区 / 合规 → Geolocation。资源位置 + 调整流量边界 → Geoproximity。'},
+
+{id:'r53_04',topic:'Route 53',diff:'high',
+text:'公司部署了主站点和备用站点。<em>主站点正常时所有流量走主站点；主站点故障时自动切换到备用站点</em>。应使用哪种路由策略？',
+en:'A company has a primary site and a backup site. <em>All traffic goes to the primary site when it is healthy; it automatically switches to the backup when the primary fails.</em> Which routing policy should be used?',
+ch:['Weighted（权重 99/1）','Latency-based','Simple','Failover'],
+ench:['Weighted (weight 99/1)','Latency-based','Simple','Failover'],
+ans:3,exp:'<strong>Failover（故障转移路由）</strong>：<br><br>• 专为 <strong>Active-Passive</strong> 架构设计<br>• 必须配合 <strong>Health Check</strong> 使用<br>• Primary 记录挂载 Health Check → 失败时自动切换到 Secondary<br>• Secondary 可以是 S3 静态页面、EC2、ALB 等<br><br>考试场景关键词：<strong>primary/backup、active-passive、主备切换 → Failover</strong>',ww:'Weighted 99/1 仍会有 1% 流量到备用，不是真正的主备（A 错）。Latency 按速度路由（B 错）。Simple 没有健康检查（C 错）。',rule:'主备切换 / Active-Passive / 故障自动转移 → Failover + Health Check。'},
+
+{id:'r53_05',topic:'Route 53',diff:'high',
+text:'Route 53 Health Check 无法直接监控私有 VPC 内的资源。公司想用 Health Check 实现 DNS 故障转移，目标是 VPC 私有子网中的 EC2。最佳方案是？',
+en:'Route 53 Health Checkers cannot directly access private VPC resources. A company wants DNS failover using Health Checks for an EC2 in a private subnet. What is the best solution?',
+ch:['将 EC2 移到公有子网','创建 VPC Peering 连接 Route 53','在 EC2 上创建 CloudWatch Metric + CloudWatch Alarm，再创建监控该 Alarm 的 Route 53 Health Check','不可能实现，Route 53 不支持私有资源'],
+ench:['Move EC2 to a public subnet','Create VPC Peering with Route 53','Create a CloudWatch Metric and Alarm for the EC2, then create a Route 53 Health Check that monitors the Alarm','It is not possible — Route 53 does not support private resources'],
+ans:2,exp:'<strong>CloudWatch Alarm + Route 53 Health Check</strong> 是标准解决方案：<br><br>① EC2 推送 Metrics 到 <strong>CloudWatch</strong>（在 VPC 内部）<br>② 创建 <strong>CloudWatch Alarm</strong>（如 CPU > 90% 或自定义健康指标）<br>③ 创建 Route 53 Health Check，设置为监控 <strong>CloudWatch Alarm 状态</strong><br>④ Alarm ALARM 状态 → Health Check 失败 → DNS 故障转移<br><br>Route 53 Health Checkers 位于 VPC <strong>外部</strong>，无法直接访问私有 IP（A 可行但破坏架构）',ww:'EC2 移公有子网破坏了私有架构（A 可行但不是最佳）。Route 53 和 VPC Peering 无关（B 错）。D 完全错误，有间接方案。',rule:'私有资源 Health Check → CloudWatch Metric + Alarm → Route 53 Health Check 监控 Alarm。'},
+
+{id:'r53_06',topic:'Route 53',diff:'mid',
+text:'运维团队计划在 48 小时后将 <span class="code-inline">api.example.com</span> 的 IP 从旧服务器切换到新服务器。为确保切换后<em>大多数用户能快速看到新 IP</em>，应提前做什么？',
+en:'The ops team plans to change the IP of <span class="code-inline">api.example.com</span> in 48 hours. To ensure that <em>most users quickly resolve the new IP after the change</em>, what should be done in advance?',
+ch:['切换时将 TTL 调高到 86400（24 小时）','切换前几天将 TTL 调低到 60 秒','在 Route 53 开启 Health Check','不需要任何准备，DNS 会自动更新'],
+ench:['Increase TTL to 86400 (24 hours) at switch time','Lower TTL to 60 seconds a few days before the switch','Enable Health Check in Route 53','No preparation needed — DNS updates automatically'],
+ans:1,exp:'<strong>提前降低 TTL</strong> 是 DNS 迁移的标准操作：<br><br>• TTL = 客户端和 DNS Resolver 缓存 DNS 结果的时长<br>• 高 TTL（如 86400 秒）= 记录变更后，旧 IP 仍被缓存 24 小时<br>• 提前将 TTL 调低到 60 秒 → 切换后 1 分钟内大多数用户可以解析到新 IP<br>• <strong>TTL 降低需要传播时间</strong>，所以要提前几天操作，而非切换时才改<br><br>切换时才调高 TTL 会让旧 IP 缓存更久（A 错）。',ww:'切换时才调高 TTL 会使旧缓存维持更久（A 错）。Health Check 与 TTL 无关（C 错）。DNS 不会自动绕过 TTL 缓存（D 错）。',rule:'DNS 迁移前 → 提前降低 TTL（如 60 秒）。迁移后稳定再升回高 TTL。'},
+
+{id:'r53_07',topic:'Route 53',diff:'mid',
+text:'以下哪个目标<em>不能</em>作为 Route 53 Alias 记录的指向？',
+en:'Which of the following targets CANNOT be used as the target of a Route 53 Alias record?',
+ch:['Application Load Balancer','Amazon CloudFront Distribution','EC2 实例的 DNS 名称（如 ec2-1-2-3-4.compute.amazonaws.com）','S3 静态网站端点'],
+ench:['Application Load Balancer','Amazon CloudFront Distribution','EC2 instance DNS name (e.g. ec2-1-2-3-4.compute.amazonaws.com)','S3 static website endpoint'],
+ans:2,exp:'<strong>EC2 DNS 名称不能作为 Alias 记录目标</strong>：<br><br>Alias 记录<strong>支持</strong>的目标：<br>• Elastic Load Balancers（ALB/NLB/CLB）<br>• CloudFront Distributions<br>• API Gateway<br>• Elastic Beanstalk environments<br>• S3 Websites<br>• VPC Interface Endpoints<br>• Global Accelerator<br>• Route 53 record in same Hosted Zone<br><br>❌ <strong>EC2 实例 DNS 名称</strong>不在支持列表中，必须使用 A 记录 + EC2 公网 IP',ww:'ALB、CloudFront、S3 静态网站都是 Alias 的合法目标（A/B/D 均正确，是干扰项）。',rule:'Alias 不能指向 EC2 DNS 名称。EC2 → 用普通 A 记录 + 弹性 IP。'},
+
+{id:'r53_08',topic:'Route 53',diff:'mid',
+text:'公司在 AWS VPC 内运行微服务，各服务需要通过域名相互调用（如 <span class="code-inline">payment.internal</span>），但这些域名<em>不应在公网暴露</em>。应使用哪种 Route 53 Hosted Zone 类型？',
+en:'A company runs microservices in an AWS VPC. Services need to call each other by domain name (e.g., <span class="code-inline">payment.internal</span>), but these names <em>must not be exposed on the public internet</em>. Which Route 53 Hosted Zone type should be used?',
+ch:['Public Hosted Zone（公共托管区）','Private Hosted Zone（私有托管区）绑定到 VPC','为每个服务创建单独的 Route 53 账号','使用 Elastic IP 替代域名'],
+ench:['Public Hosted Zone','Private Hosted Zone bound to a VPC','Create separate Route 53 accounts per service','Use Elastic IPs instead of domain names'],
+ans:1,exp:'<strong>Private Hosted Zone</strong> 是正确方案：<br><br>• 存储只在 VPC 内部可解析的 DNS 记录<br>• 域名（如 payment.internal）<strong>只能从绑定的 VPC 内部查询</strong><br>• 公网无法解析这些域名，天然隔离<br>• 收费标准：$0.50/月/Hosted Zone（同 Public）<br><br>Public Hosted Zone 的记录对互联网开放，不符合要求（A 错）',ww:'Public Hosted Zone 在公网可见（A 错）。Route 53 是 Account 级别服务，无需多账号（C 错）。Elastic IP 无法替代域名功能（D 错）。',rule:'VPC 内部服务间 DNS 通信 → Private Hosted Zone（绑定 VPC，公网不可见）。'},
+
+{id:'udemy_rds_25',topic:'RDS',diff:'high',
+text:'100 台 EC2 连接到 RDS。<em>每次 DB 维护时，所有应用都需要很长时间重新连接</em>，原因是应用逻辑较差。如何改善？',
+en:'You have 100 EC2 instances connected to your RDS database. Upon maintenance, all applications take a lot of time to reconnect to RDS due to poor application logic. How do you improve this?',
+ch:['修复所有应用程序代码','禁用 Multi-AZ','启用 Multi-AZ','使用 RDS Proxy'],
+ench:['Fix all the applications','Disable Multi-AZ','Enable Multi-AZ','Use an RDS Proxy'],
+ans:3,exp:'<strong>RDS Proxy</strong> 是解决连接问题的最优方案：<br><br>• RDS Proxy 在应用和 RDS 之间维护<strong>连接池</strong><br>• DB 维护/Failover 时，Proxy 会<strong>自动重新路由连接</strong>到新的 RDS 实例<br>• 应用只看到 Proxy 端点，感知不到 DB 切换<br>• 减少故障转移时间最多 <strong>66%</strong><br>• 不需要修改每个应用程序（题目说应用逻辑差但不想改 100 个应用）<br><br>修改 100 个应用成本极高（A 可行但代价大）。Multi-AZ 控制是无关项（B、C 错）。',ww:'修复 100 个应用成本过高（A 可行但不是最优）。Multi-AZ 开关与连接重建时间无关（B、C 错）。',rule:'DB 维护后应用重连慢 → RDS Proxy（维护连接池，自动重路由，减少 Failover 影响）。'}
 ];
 
 /* ═══════════════ QUIZ STATE ═══════════════ */
@@ -1255,7 +1493,7 @@ function go(id,btn){
   document.querySelectorAll('.mobile-nav-btn').forEach(b=>b.classList.remove('active'));
   const mmap={'home':0,'compare':1,'quiz-home':2,'records':3};
   const mi=mmap[id];if(mi!==undefined){const mb=document.querySelectorAll('.mobile-nav-btn')[mi];if(mb)mb.classList.add('active');}
-  const renders={home:pgHome,compare:pgCompare,'quiz-home':pgQuizHome,records:pgRecords,iam:pgIAM,'instance-types':pgInstanceTypes,'security-groups':pgSecurityGroups,purchasing:pgPurchasing,'ec2-network':pgEC2Network,scalability:pgScalability,elb:pgELB,asg:pgASG,ebs:pgEBS,'ebs-types':pgEBSTypes,snapshot:pgSnapshot,istore:pgIStore,efs:pgEFS,ami:pgAMI,rds:pgRDS,elasticache:pgElastiCache};
+  const renders={home:pgHome,compare:pgCompare,'quiz-home':pgQuizHome,records:pgRecords,iam:pgIAM,'instance-types':pgInstanceTypes,'security-groups':pgSecurityGroups,purchasing:pgPurchasing,'ec2-network':pgEC2Network,scalability:pgScalability,elb:pgELB,asg:pgASG,ebs:pgEBS,'ebs-types':pgEBSTypes,snapshot:pgSnapshot,istore:pgIStore,efs:pgEFS,ami:pgAMI,rds:pgRDS,elasticache:pgElastiCache,route53:pgRoute53};
   const v=document.getElementById('view');
   v.style.opacity='0';
   setTimeout(()=>{v.innerHTML=(renders[id]||pgHome)();v.style.opacity='1';v.scrollTop=0;updateSbProgress();},80);
@@ -1269,7 +1507,7 @@ function updateSbProgress(){
   if(bar)bar.style.width=pct+'%';
   if(txt)txt.textContent=pct+'% · '+ov.done+'/'+QS.length;
   // per-topic rates in sidebar
-  const tmap={'IAM':'sp-iam','Security Group':'sp-sg','Load Balancer':'sp-lb','Auto Scaling Group':'sp-asg','EBS':'sp-ebs','扩展性与高可用':'sp-ha','RDS':'sp-rds','ElastiCache':'sp-elasticache'};
+  const tmap={'IAM':'sp-iam','Security Group':'sp-sg','Load Balancer':'sp-lb','Auto Scaling Group':'sp-asg','EBS':'sp-ebs','扩展性与高可用':'sp-ha','RDS':'sp-rds','ElastiCache':'sp-elasticache','Route 53':'sp-r53'};
   Object.entries(tmap).forEach(([tp,elId])=>{
     const el=document.getElementById(elId);
     if(!el)return;
@@ -1336,7 +1574,8 @@ function pgHome(){
     {label:'EC2 镜像',color:'#C0392B',items:[{id:'ami',icon:'🖼️',name:'AMI',desc:'Region级别 · Public / Private / Marketplace · Golden AMI',tags:[{t:'Region级别',c:'#B45309',bg:'#FEF9EB'}]}]},
     {label:'数据库',color:'#C084FC',items:[
       {id:'rds',icon:'🗄️',name:'RDS & Aurora',desc:'Read Replica · Multi-AZ · RDS Proxy · Storage Auto Scaling',tags:[{t:'⭐极高频',c:'#C0392B',bg:'#FEF0EE'},{t:'ASYNC/SYNC',c:'#7C3AED',bg:'#F5F3FF'}]},
-      {id:'elasticache',icon:'🔴',name:'ElastiCache',desc:'Redis vs Memcached · Lazy Loading · Session · Global Datastore',tags:[{t:'Redis',c:'#DC2626',bg:'#FEF2F2'},{t:'缓存层',c:'#0369A1',bg:'#EFF6FF'}]}
+      {id:'elasticache',icon:'🔴',name:'ElastiCache',desc:'Redis vs Memcached · Lazy Loading · Session · Global Datastore',tags:[{t:'Redis',c:'#DC2626',bg:'#FEF2F2'},{t:'缓存层',c:'#0369A1',bg:'#EFF6FF'}]},
+      {id:'route53',icon:'🌐',name:'Route 53',desc:'CNAME vs Alias · 7种路由策略 · Health Check · TTL',tags:[{t:'⭐必考',c:'#C0392B',bg:'#FEF0EE'},{t:'DNS',c:'#7C3AED',bg:'#F5F3FF'}]}
     ]}
   ];
   return `
@@ -2998,6 +3237,297 @@ function pgElastiCache(){return`${back()}
   ${trapdiv("amber","高频","Redis AUTH vs IAM Auth","IAM Auth = AWS API 级别。Redis AUTH = Redis 集群密码，是 Security Group 之上的额外层。")}
   ${trapdiv("amber","中频","降低 DB 负载 → ElastiCache（速度快于 Read Replica）","ElastiCache 内存操作，极低延迟。")}
 </div>`}
+
+
+/* ═══════════════ ROUTE 53 PAGE ═══════════════ */
+function pgRoute53(){return`${back()}
+<div class="pg-title">Amazon Route 53</div>
+<div class="pg-tags">
+  <span class="tag tag-high">⭐ 必考高频</span>
+  <span class="tag tag-mid">Section 10</span>
+  <span class="tag tag-low">DNS / 路由策略</span>
+</div>
+
+<div class="s-card">
+  <h3>🌐 Route 53 是什么？</h3>
+  <p style="color:var(--ink2);font-size:15px;line-height:1.8">Route 53 是 AWS 的<strong>高可用、全托管、权威 DNS 服务</strong>。名字来源于 DNS 使用的传统端口 <strong>Port 53</strong>。它是 AWS 中<strong>唯一提供 100% 可用性 SLA</strong> 的服务，同时还是 <strong>Domain Registrar（域名注册商）</strong>，可直接注册域名。</p>
+  <div class="g2" style="margin-top:14px">
+    <div style="background:var(--aws-bg);border:1.5px solid var(--aws-border);border-radius:8px;padding:12px">
+      <div style="font-size:12px;font-weight:700;color:var(--aws);margin-bottom:8px">核心功能</div>
+      <div class="bl">
+        <div class="bl-item"><span class="bl-dot"></span><strong>Authoritative DNS</strong> — 你可以更新 DNS 记录</div>
+        <div class="bl-item"><span class="bl-dot"></span><strong>Domain Registrar</strong> — 直接注册域名</div>
+        <div class="bl-item"><span class="bl-dot"></span><strong>Health Check</strong> — 资源健康监控</div>
+        <div class="bl-item"><span class="bl-dot"></span><strong>100% Availability SLA</strong> — AWS 唯一</div>
+      </div>
+    </div>
+    <div style="background:var(--blue-bg);border:1.5px solid var(--blue-border);border-radius:8px;padding:12px">
+      <div style="font-size:12px;font-weight:700;color:var(--blue);margin-bottom:8px">工作流程示意</div>
+      <div style="text-align:center;font-size:13px;color:var(--ink2);line-height:1.9">
+        <span style="background:var(--surface);border:1px solid var(--border);border-radius:5px;padding:3px 8px">Client</span>
+        <span style="color:var(--ink3)"> → example.com? → </span>
+        <span style="background:#7C3AED;color:#fff;border-radius:5px;padding:3px 8px;font-weight:700">Route 53</span>
+        <br>
+        <span style="color:var(--ink3)">← 54.22.33.44 (TTL) ←</span>
+        <br>
+        <span style="font-size:11px;color:var(--ink3);margin-top:4px;display:block">Client 缓存结果，直接访问 EC2</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="s-card">
+  <h3>🗂️ DNS 工作原理 — How DNS Works</h3>
+  <div style="background:var(--surface2);border-radius:10px;padding:14px;margin-bottom:14px">
+    <div style="font-size:12px;font-weight:700;color:var(--ink3);margin-bottom:12px;text-transform:uppercase;letter-spacing:.8px">DNS 查询链路（访问 example.com）</div>
+    <div class="flow">
+      <div class="flow-step">
+        <div class="flow-n">1</div>
+        <div class="flow-body"><strong>Web Browser</strong> 查询本地 DNS（Local DNS Server）：example.com?</div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-n">2</div>
+        <div class="flow-body"><strong>Local DNS</strong> 询问 <strong>Root DNS Server</strong>（由 ICANN 管理）<br>→ 回答：.com NS = 1.2.3.4</div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-n">3</div>
+        <div class="flow-body"><strong>Local DNS</strong> 询问 <strong>TLD DNS Server (.com)</strong>（由 IANA 管理）<br>→ 回答：example.com NS = 5.6.7.8</div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-n">4</div>
+        <div class="flow-body"><strong>Local DNS</strong> 询问 <strong>SLD DNS Server (example.com)</strong>（由域名注册商管理）<br>→ 回答：example.com IP = 9.10.11.12</div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-n">5</div>
+        <div class="flow-body"><strong>Browser 收到 IP，缓存 TTL 时长</strong>，直接建立 HTTP 连接</div>
+      </div>
+    </div>
+  </div>
+  <div class="tbl-wrap">
+  <table class="tbl">
+    <tr><th>DNS Server 层级</th><th>管理方</th><th>返回内容</th></tr>
+    <tr><td>Root DNS Server</td><td>ICANN</td><td>.com / .org / .net NS 地址</td></tr>
+    <tr><td>TLD DNS Server</td><td>IANA（ICANN 分支）</td><td>具体域名 NS 地址</td></tr>
+    <tr><td>SLD DNS Server</td><td>Domain Registrar（如 Amazon Registrar）</td><td>最终 IP 地址</td></tr>
+  </table>
+  </div>
+</div>
+
+<div class="s-card">
+  <h3>📝 Record Types — 记录类型</h3>
+  <div class="tbl-wrap">
+  <table class="tbl">
+    <tr><th>类型</th><th>作用</th><th>考试要点</th></tr>
+    <tr><td><strong>A</strong></td><td>主机名 → IPv4 地址</td><td class="good">最常用，指向 IP</td></tr>
+    <tr><td><strong>AAAA</strong></td><td>主机名 → IPv6 地址</td><td>IPv6 版本</td></tr>
+    <tr><td><strong>CNAME</strong></td><td>主机名 → 另一个主机名</td><td class="bad">❌ 不能用于根域名（Zone Apex）<br>www.example.com → 可以<br>example.com → 不可以</td></tr>
+    <tr><td><strong>NS</strong></td><td>Hosted Zone 的 Name Server</td><td>控制域名流量路由</td></tr>
+    <tr><td><strong>Alias</strong></td><td>主机名 → AWS 资源</td><td class="good">✅ 可用于根域名！免费 + 自动跟踪 IP</td></tr>
+  </table>
+  </div>
+  <div style="margin-top:14px">
+    <div style="font-size:12px;font-weight:700;color:var(--ink3);margin-bottom:8px;text-transform:uppercase;letter-spacing:.8px">每条记录包含的字段</div>
+    <div class="g2-sm" style="font-size:13px;color:var(--ink2)">
+      <div style="background:var(--surface2);border-radius:6px;padding:10px"><strong>Domain/Subdomain Name</strong><br><span style="color:var(--ink3)">e.g., example.com</span></div>
+      <div style="background:var(--surface2);border-radius:6px;padding:10px"><strong>Record Type</strong><br><span style="color:var(--ink3)">A / AAAA / CNAME / NS</span></div>
+      <div style="background:var(--surface2);border-radius:6px;padding:10px"><strong>Value</strong><br><span style="color:var(--ink3)">e.g., 12.34.56.78</span></div>
+      <div style="background:var(--surface2);border-radius:6px;padding:10px"><strong>Routing Policy</strong><br><span style="color:var(--ink3)">Simple / Weighted / ...</span></div>
+      <div style="background:var(--surface2);border-radius:6px;padding:10px"><strong>TTL</strong><br><span style="color:var(--ink3)">缓存时长（秒）</span></div>
+    </div>
+  </div>
+</div>
+
+<div class="s-card">
+  <h3>🏠 Hosted Zones — 托管区</h3>
+  <div class="g2" style="margin-bottom:14px">
+    <div style="border:2px solid var(--blue-border);border-radius:8px;padding:14px">
+      <div style="font-size:13px;font-weight:700;color:var(--blue);margin-bottom:8px">🌍 Public Hosted Zone</div>
+      <div style="font-size:13px;color:var(--ink2);line-height:1.7">
+        • 互联网公开可访问<br>
+        • 示例：<span style="color:var(--blue)">app1.mypublicdomain.com</span><br>
+        • 可指向：EC2 公网 IP、ALB、CloudFront、S3
+      </div>
+    </div>
+    <div style="border:2px solid var(--green-border);border-radius:8px;padding:14px">
+      <div style="font-size:13px;font-weight:700;color:var(--green);margin-bottom:8px">🔒 Private Hosted Zone</div>
+      <div style="font-size:13px;color:var(--ink2);line-height:1.7">
+        • <strong>仅 VPC 内部</strong>可解析<br>
+        • 示例：<span style="color:var(--green)">app1.company.internal</span><br>
+        • 必须绑定到 VPC
+      </div>
+    </div>
+  </div>
+  <div style="background:var(--amber-bg);border:1px solid var(--amber-border);border-radius:8px;padding:12px;font-size:13px;color:var(--ink2)">
+    💰 <strong>费用：$0.50 / 月 / 每个 Hosted Zone</strong>（Public 和 Private 同价）
+  </div>
+</div>
+
+<div class="s-card">
+  <h3>⏱️ TTL（Time To Live）— 必考权衡</h3>
+  <div class="g2" style="margin-bottom:12px">
+    <div style="border:2px solid var(--red-border);border-radius:8px;padding:12px;background:var(--red-bg)">
+      <div style="font-size:13px;font-weight:700;color:var(--red);margin-bottom:6px">High TTL（如 24 小时）</div>
+      <div class="bl" style="font-size:13px">
+        <div class="bl-item"><span class="bl-dot" style="background:var(--green)"></span>Route 53 流量少（省钱）</div>
+        <div class="bl-item"><span class="bl-dot" style="background:var(--red)"></span>记录可能过期（DNS 更新慢）</div>
+      </div>
+    </div>
+    <div style="border:2px solid var(--green-border);border-radius:8px;padding:12px;background:var(--green-bg)">
+      <div style="font-size:13px;font-weight:700;color:var(--green);margin-bottom:6px">Low TTL（如 60 秒）</div>
+      <div class="bl" style="font-size:13px">
+        <div class="bl-item"><span class="bl-dot" style="background:var(--red)"></span>Route 53 流量多（费用稍高）</div>
+        <div class="bl-item"><span class="bl-dot" style="background:var(--green)"></span>记录变更快速生效</div>
+        <div class="bl-item"><span class="bl-dot" style="background:var(--green)"></span>DNS 迁移前必须降低 TTL</div>
+      </div>
+    </div>
+  </div>
+  ${trapdiv("amber","高频","DNS 迁移标准操作","迁移前几天先把 TTL 降低（如 60 秒）→ 等旧 TTL 过期 → 更新记录 → 迁移完成后再升回高 TTL。")}
+  <p style="font-size:13px;color:var(--ink3);margin-top:8px">⚠️ 除了 Alias 记录，TTL 对所有 DNS 记录<strong>都是必填项</strong></p>
+</div>
+
+<div class="s-card">
+  <h3>🆚 CNAME vs Alias — ⭐必考核心区别</h3>
+  ${trapdiv("red","极高频","根域名（Zone Apex）只能用 Alias，不能用 CNAME","example.com → 只能 Alias。www.example.com → CNAME 或 Alias 均可。")}
+  <div class="g2" style="margin:14px 0">
+    <div style="border:2px solid var(--red-border);border-radius:8px;padding:14px">
+      <div style="font-size:13px;font-weight:700;color:var(--red);margin-bottom:8px">CNAME</div>
+      <div class="bl" style="font-size:13px">
+        <div class="bl-item"><span class="bl-dot" style="background:var(--green)"></span>指向任意主机名</div>
+        <div class="bl-item"><span class="bl-dot" style="background:var(--red)"></span>❌ 不能用于根域名</div>
+        <div class="bl-item"><span class="bl-dot" style="background:var(--red)"></span>❌ 只能指向域名（有 A/AAAA 记录的）</div>
+        <div class="bl-item"><span class="bl-dot" style="background:var(--amber)"></span>标准 DNS 规范</div>
+      </div>
+    </div>
+    <div style="border:2px solid var(--green-border);border-radius:8px;padding:14px">
+      <div style="font-size:13px;font-weight:700;color:var(--green);margin-bottom:8px">Alias（Route 53 特有）</div>
+      <div class="bl" style="font-size:13px">
+        <div class="bl-item"><span class="bl-dot" style="background:var(--green)"></span>✅ 支持根域名</div>
+        <div class="bl-item"><span class="bl-dot" style="background:var(--green)"></span>✅ 指向 AWS 资源</div>
+        <div class="bl-item"><span class="bl-dot" style="background:var(--green)"></span>自动跟踪 IP 变化</div>
+        <div class="bl-item"><span class="bl-dot" style="background:var(--green)"></span>免费 + 原生 Health Check</div>
+        <div class="bl-item"><span class="bl-dot" style="background:var(--red)"></span>❌ 不能设置 TTL（自动管理）</div>
+        <div class="bl-item"><span class="bl-dot" style="background:var(--red)"></span>❌ 不能指向 EC2 DNS 名称</div>
+      </div>
+    </div>
+  </div>
+  <div style="font-size:12px;font-weight:700;color:var(--ink3);margin-bottom:8px;text-transform:uppercase;letter-spacing:.8px">Alias 支持的目标（必记）</div>
+  <div class="g3-sm" style="font-size:12px;color:var(--ink2)">
+    <div style="background:var(--surface2);border-radius:6px;padding:8px;text-align:center">⚖️ Elastic Load Balancer</div>
+    <div style="background:var(--surface2);border-radius:6px;padding:8px;text-align:center">☁️ CloudFront</div>
+    <div style="background:var(--surface2);border-radius:6px;padding:8px;text-align:center">🔌 API Gateway</div>
+    <div style="background:var(--surface2);border-radius:6px;padding:8px;text-align:center">🌿 Elastic Beanstalk</div>
+    <div style="background:var(--surface2);border-radius:6px;padding:8px;text-align:center">🪣 S3 Website</div>
+    <div style="background:var(--surface2);border-radius:6px;padding:8px;text-align:center">🌐 Global Accelerator</div>
+    <div style="background:var(--surface2);border-radius:6px;padding:8px;text-align:center">🔗 VPC Interface Endpoints</div>
+    <div style="background:var(--surface2);border-radius:6px;padding:8px;text-align:center">📋 同 Hosted Zone 其他记录</div>
+    <div style="background:var(--red-bg);border:1px solid var(--red-border);border-radius:6px;padding:8px;text-align:center;color:var(--red);font-weight:700">❌ EC2 DNS 名称</div>
+  </div>
+</div>
+
+<div class="s-card">
+  <h3>🗺️ 7种路由策略 — Routing Policies ⭐必考</h3>
+  ${trapdiv("amber","重要提醒","路由策略 ≠ 负载均衡","DNS 不路由流量，只响应 DNS 查询。路由策略决定 Route 53 如何回答查询。")}
+  <div class="tbl-wrap" style="margin-top:14px">
+  <table class="tbl">
+    <tr><th>策略</th><th>核心场景</th><th>Health Check</th><th>记忆口诀</th></tr>
+    <tr><td><strong>Simple</strong></td><td>单一资源；多值时客户端随机选</td><td class="bad">❌ 不支持</td><td>简单单资源</td></tr>
+    <tr><td><strong>Weighted</strong></td><td>按权重比例分流；A/B 测试；跨 Region 负载均衡</td><td class="good">✅</td><td>权重=百分比</td></tr>
+    <tr><td><strong>Failover</strong></td><td>主备切换（Active-Passive）</td><td class="good">✅ 必须</td><td>主死走备</td></tr>
+    <tr><td><strong>Latency-based</strong></td><td>路由到延迟最低的 Region</td><td class="good">✅</td><td>最快就走那</td></tr>
+    <tr><td><strong>Geolocation</strong></td><td>按用户<strong>地理位置</strong>（国家/大洲）路由</td><td class="good">✅</td><td>用户在哪走哪</td></tr>
+    <tr><td><strong>Geoproximity</strong></td><td>按资源位置路由；可用 Bias 扩大/缩小范围</td><td class="good">✅</td><td>资源位置+偏移</td></tr>
+    <tr><td><strong>Multi-Value</strong></td><td>返回多个健康 IP，客户端随机选（非 LB）</td><td class="good">✅</td><td>多值健康随机</td></tr>
+  </table>
+  </div>
+  <div style="margin-top:14px">
+    <div style="font-size:12px;font-weight:700;color:var(--ink3);margin-bottom:8px;text-transform:uppercase;letter-spacing:.8px">场景对比：Geolocation vs Geoproximity</div>
+    <div class="g2" style="font-size:13px;color:var(--ink2)">
+      <div style="background:var(--blue-bg);border-radius:8px;padding:12px">
+        <strong style="color:var(--blue)">Geolocation</strong><br>
+        • 基于<strong>用户所在位置</strong><br>
+        • 适合本地化内容、法规合规<br>
+        • 需要设置默认记录（兜底）<br>
+        • 关键词：所在国家 / 本地化 / 合规
+      </div>
+      <div style="background:var(--green-bg);border-radius:8px;padding:12px">
+        <strong style="color:var(--green)">Geoproximity</strong><br>
+        • 基于<strong>资源所在位置</strong><br>
+        • 可用 Bias 值扩大/缩小覆盖范围<br>
+        • 需要 Traffic Flow 功能<br>
+        • 关键词：调整流量边界 / 迁移流量
+      </div>
+    </div>
+  </div>
+  <div style="margin-top:12px">
+    <div style="font-size:12px;font-weight:700;color:var(--ink3);margin-bottom:8px;text-transform:uppercase;letter-spacing:.8px">Weighted 路由计算</div>
+    <div class="formula">traffic(%) = weight_for_record / sum_of_all_weights<br><br>例：weights = 70, 20, 10 → 70%, 20%, 10%<br>若所有 weight = 0 → 均等分配<br>将某 record weight 设为 0 → 停止流量</div>
+  </div>
+</div>
+
+<div class="s-card">
+  <h3>❤️ Health Checks — 健康检查</h3>
+  <div class="g2" style="margin-bottom:14px">
+    <div>
+      <div style="font-size:12px;font-weight:700;color:var(--ink3);margin-bottom:8px;text-transform:uppercase;letter-spacing:.8px">3 种 Health Check 类型</div>
+      <div class="bl">
+        <div class="bl-item"><span class="bl-dot"></span><strong>① 监控 Endpoint</strong><br>HTTP/HTTPS/TCP；15 个全球 Health Checker；&gt;18% 报健康 → 视为健康</div>
+        <div class="bl-item"><span class="bl-dot"></span><strong>② Calculated（计算型）</strong><br>组合多个子 Health Check（OR/AND/NOT）；最多 256 个子检查</div>
+        <div class="bl-item"><span class="bl-dot"></span><strong>③ CloudWatch Alarm</strong><br>监控 CW Alarm 状态；用于私有资源的间接健康检查</div>
+      </div>
+    </div>
+    <div>
+      <div style="font-size:12px;font-weight:700;color:var(--ink3);margin-bottom:8px;text-transform:uppercase;letter-spacing:.8px">Endpoint 检查参数</div>
+      <div class="pl">
+        <div class="pl-row"><span class="pl-k">健康/不健康阈值</span><span class="pl-v">3 次（默认）</span></div>
+        <div class="pl-row"><span class="pl-k">检查间隔</span><span class="pl-v">30 秒（可设 10 秒，费用更高）</span></div>
+        <div class="pl-row"><span class="pl-k">协议</span><span class="pl-v">HTTP / HTTPS / TCP</span></div>
+        <div class="pl-row"><span class="pl-k">判定健康</span><span class="pl-v">&gt;18% Checker 报告健康</span></div>
+        <div class="pl-row"><span class="pl-k">通过条件</span><span class="pl-v">2xx 或 3xx 状态码</span></div>
+        <div class="pl-row"><span class="pl-k">文本匹配</span><span class="pl-v">响应前 5120 字节</span></div>
+      </div>
+    </div>
+  </div>
+  <div style="background:var(--surface2);border-radius:10px;padding:14px">
+    <div style="font-size:12px;font-weight:700;color:var(--ink3);margin-bottom:10px;text-transform:uppercase;letter-spacing:.8px">私有资源 Health Check 解决方案（架构图）</div>
+    <div style="display:flex;align-items:center;justify-content:center;gap:16px;flex-wrap:wrap;font-size:12px;text-align:center">
+      <div style="border:2px solid var(--border);border-radius:8px;padding:10px;min-width:90px">
+        <div style="font-size:18px">📊</div>
+        <div style="font-weight:700">CloudWatch<br>Metric</div>
+        <div style="font-size:11px;color:var(--ink3)">VPC 内 EC2 推送</div>
+      </div>
+      <div style="font-size:18px;color:var(--ink3)">→</div>
+      <div style="border:2px solid var(--amber-border);border-radius:8px;padding:10px;min-width:90px;background:var(--amber-bg)">
+        <div style="font-size:18px">🔔</div>
+        <div style="font-weight:700">CloudWatch<br>Alarm</div>
+        <div style="font-size:11px;color:var(--ink3)">触发告警</div>
+      </div>
+      <div style="font-size:18px;color:var(--ink3)">→</div>
+      <div style="border:2px solid var(--red-border);border-radius:8px;padding:10px;min-width:90px;background:var(--red-bg)">
+        <div style="font-size:18px">❤️</div>
+        <div style="font-weight:700">Route 53<br>Health Check</div>
+        <div style="font-size:11px;color:var(--ink3)">监控 Alarm 状态</div>
+      </div>
+      <div style="font-size:18px;color:var(--ink3)">→</div>
+      <div style="border:2px solid var(--blue-border);border-radius:8px;padding:10px;min-width:90px;background:var(--blue-bg)">
+        <div style="font-size:18px">🔀</div>
+        <div style="font-weight:700">DNS<br>Failover</div>
+        <div style="font-size:11px;color:var(--ink3)">自动切换</div>
+      </div>
+    </div>
+  </div>
+  ${trapdiv("red","高频","HTTP Health Checks 只能监控公共资源","私有 VPC 内的资源必须通过 CloudWatch Alarm 间接健康检查。Health Checkers 在 VPC 外部，无法访问私有 IP。")}
+</div>
+
+<div class="s-card">
+  <h3>⚠️ 高频考试陷阱</h3>
+  ${trapdiv("red","极高频","根域名只能用 Alias，不能用 CNAME","example.com → Alias。www.example.com → CNAME 或 Alias 均可。")}
+  ${trapdiv("red","极高频","Alias 不能指向 EC2 DNS 名称","EC2 不在 Alias 支持目标列表中，必须用 A 记录 + 弹性 IP。")}
+  ${trapdiv("red","高频","Geolocation vs Geoproximity 混淆","Geolocation = 用户位置（国家）。Geoproximity = 资源位置（可 bias 偏移）。")}
+  ${trapdiv("amber","高频","Latency ≠ 地理位置最近","德国用户可能被路由到 us-east-1（如果那里延迟更低）。Latency 是实测延迟，不是地理距离。")}
+  ${trapdiv("amber","高频","DNS 迁移前必须提前降低 TTL","切换时才降 TTL 没用，旧缓存已经存在。需要提前几天降低 TTL，等旧缓存过期。")}
+  ${trapdiv("amber","中频","Health Check 只对公共资源直接有效","私有资源需要 CloudWatch Alarm 中转。别忘了在防火墙允许 Route 53 Health Checker IP 段。")}
+</div>
+`}
 
 /* ═══════════════ RECORDS PAGE ═══════════════ */
 function pgRecords(){
