@@ -1657,7 +1657,8 @@
       </div>
       <div class="sb-section">
         <div class="sb-label">架构与平台</div>
-        <button class="sb-item" onclick="go('classic-arch',this)"><span class="si-dot" style="background:#F59E0B"></span>经典架构<span id="sp-ca" class="sb-rate"></span></button>
+        <button class="sb-item" onclick="go('classic-arch',this)"><span class="si-dot"
+            style="background:#F59E0B"></span>经典架构<span id="sp-ca" class="sb-rate"></span></button>
       </div>
       <div style="padding:12px 16px;margin-top:auto;border-top:1px solid var(--border)">
         <div style="font-size:11px;color:var(--ink3);line-height:1.7">
@@ -3148,56 +3149,64 @@
       },
 
       /* ─── 经典架构 ─── */
-      { id: 'ca_01', topic: '经典架构', diff: 'high',
+      {
+        id: 'ca_01', topic: '经典架构', diff: 'high',
         text: '电商网站使用多台 EC2 + ELB，用户投诉<em>购物车内容在不同请求间丢失</em>。EC2 将 Session 存在本地内存中。最佳改进方案是？',
         en: 'An e-commerce site uses multiple EC2 instances behind an ELB. Users report shopping cart contents are lost between requests. EC2 stores session data in local memory. What is the best fix?',
         ch: ['启用 ELB Sticky Sessions', '将 Session 存入 ElastiCache，Cookie 只传 session_id', '将 Session 数据写入 RDS', '将所有请求路由到同一台 EC2'],
         ench: ['Enable ELB Sticky Sessions', 'Store session in ElastiCache, pass only session_id in cookie', 'Write session data to RDS', 'Route all requests to the same EC2'],
         ans: 1, exp: '<strong>ElastiCache Server Session</strong> 是最优方案：<br><br>① Cookie 只存 session_id（极小，安全）<br>② Session 数据存 ElastiCache → 毫秒级读写<br>③ 任意 EC2 都能读取同一 ElastiCache → EC2 完全无状态<br>④ EC2 宕机不影响 Session（数据在 ElastiCache 中）<br><br>Sticky Sessions（A）：若该实例宕机，购物车仍丢失。<br>RDS（C）：延迟比 ElastiCache 高，不适合频繁读写 Session。<br>D：单点故障，失去 ELB 意义。', ww: 'Sticky Sessions 在实例故障时仍丢失数据（A 不是最佳）。RDS 延迟过高且浪费（C 不合适）。D 是反模式。', rule: '多实例 Session 共享 → ElastiCache Server Session。Cookie 只存 ID，数据在缓存层。'
       },
-      { id: 'ca_02', topic: '经典架构', diff: 'high',
+      {
+        id: 'ca_02', topic: '经典架构', diff: 'high',
         text: 'WordPress 网站从单 EC2 扩展到多台后，<em>用户上传的图片只有部分用户能看到</em>，其余用户看到图片缺失。原因和解决方案是什么？',
         en: 'A WordPress site scales from one EC2 to multiple. Users report uploaded images are only visible to some users while others see missing images. What is the cause and fix?',
         ch: ['ELB 配置错误，应启用跨区负载均衡', '每台 EC2 的 EBS 卷相互独立，图片存于上传时所在实例，应改用 EFS', '需要配置 EBS 跨 AZ 复制', 'RDS 未同步图片元数据'],
         ench: ['ELB misconfiguration, enable cross-zone load balancing', 'Each EC2 has its own EBS; images are on the uploading instance only — switch to EFS', 'Enable EBS cross-AZ replication', 'RDS is not syncing image metadata'],
         ans: 1, exp: '<strong>根本原因：EBS 不能跨实例共享</strong><br><br>• EBS 是块存储，绑定到单台 EC2<br>• 用户 A 上传图片 → 写入 EC2-1 的 EBS<br>• 下次请求路由到 EC2-2 → EC2-2 的 EBS 没有该图片<br><br><strong>修复：改用 EFS（Elastic File System）</strong><br>• EFS 是托管 NFS，通过 ENI 挂载到每个 AZ<br>• 所有 EC2 挂载同一 EFS → 任意实例读写都可见<br>• Linux Only（WordPress 运行在 Linux）', ww: '跨区负载均衡只影响流量分配，不影响存储共享（A 错）。EBS 无原生跨 AZ 复制功能（C 错）。图片文件在文件系统层，不在 RDS（D 错）。', rule: '多 EC2 共享文件（图片/静态资源）→ EFS（NFS）。EBS 绑定单机，多实例场景必错。'
       },
-      { id: 'ca_03', topic: '经典架构', diff: 'mid',
+      {
+        id: 'ca_03', topic: '经典架构', diff: 'mid',
         text: '公司需要<em>最快速地启动预配置的 EC2 实例</em>，实例中需预装内部软件、安全配置和监控 Agent。启动速度是第一优先级，应选哪种方式？',
         en: 'A company needs to launch pre-configured EC2 instances as fast as possible. Each instance must have company software, security hardening, and monitoring agents pre-installed. Speed is the top priority. Which approach?',
         ch: ['User Data 脚本在启动时安装所有软件', '使用 AWS Systems Manager 在启动后推送配置', '构建 Golden AMI，包含所有预装软件和配置', 'CloudFormation 模板 + cfn-init'],
         ench: ['User Data script to install everything at launch', 'Use AWS Systems Manager to push config after launch', 'Build a Golden AMI with all software and config pre-installed', 'CloudFormation template + cfn-init'],
         ans: 2, exp: '<strong>Golden AMI</strong> 是最快方案：<br><br>• 将所有软件、配置、Agent <strong>预先烘焙（bake）</strong>到 AMI 中<br>• 启动时无需运行任何安装脚本<br>• 启动时间 = EC2 正常启动时间（最快）<br><br>User Data（A）：每次启动都要运行脚本安装，时间取决于软件包大小和网络速度（慢）。<br>SSM（B）：需要实例先启动，再推送配置（更慢）。<br>CloudFormation + cfn-init（D）：灵活但比 Golden AMI 慢。', ww: 'User Data 每次启动都要运行安装脚本，速度不如 Golden AMI（A 不是最快）。SSM 需要实例先启动（B 慢）。cfn-init 需要运行脚本（D 慢）。', rule: '最快启动 EC2 → Golden AMI（预装一切，启动即用）。速度：Golden AMI > Hybrid > User Data。'
       },
-      { id: 'ca_04', topic: '经典架构', diff: 'high',
+      {
+        id: 'ca_04', topic: '经典架构', diff: 'high',
         text: '开发团队不想管理 EC2、配置 ELB 和 ASG 策略，<em>只想专注于代码开发和部署</em>。应推荐哪种 AWS 服务？',
         en: 'A development team does not want to manage EC2 instances, configure ELB, or set ASG policies — they just want to focus on code development and deployment. Which AWS service should be recommended?',
         ch: ['ECS（Elastic Container Service）', 'AWS Lambda', 'Elastic Beanstalk', 'AWS CloudFormation'],
         ench: ['ECS (Elastic Container Service)', 'AWS Lambda', 'Elastic Beanstalk', 'AWS CloudFormation'],
         ans: 2, exp: '<strong>Elastic Beanstalk</strong> 是开发者中心化的托管平台：<br><br>• 开发者只需上传代码（zip 或 Docker）<br>• Beanstalk 自动处理：EC2 容量、ELB 配置、ASG 策略、Health Monitoring<br>• 底层仍使用 EC2/ELB/RDS（不是 serverless）<br>• Beanstalk 本身免费，只为底层资源付费<br>• 支持 Java / Node.js / Python / PHP / Ruby / Go / .NET / Docker<br><br>ECS 需要自己管理任务定义和集群（A 复杂）。Lambda 有执行时间和包大小限制（B 不适合大型 Web）。CloudFormation 是 IaC 工具，仍需定义所有资源（D 不解决问题）。', ww: 'ECS 仍需管理集群配置（A 不符合）。Lambda 适合轻量函数，有限制（B 不适合）。CloudFormation 是基础设施代码，不是 PaaS（D 错）。', rule: '开发者只想上传代码，不管基础设施 → Elastic Beanstalk（PaaS）。本身免费，底层用 EC2/ELB/ASG。'
       },
-      { id: 'ca_05', topic: '经典架构', diff: 'mid',
+      {
+        id: 'ca_05', topic: '经典架构', diff: 'mid',
         text: 'Elastic Beanstalk 应用需要处理<em>耗时的图片处理任务</em>（压缩、格式转换），不希望 Web 请求等待任务完成而超时。应选择哪种 Beanstalk 架构？',
         en: 'An Elastic Beanstalk application needs to handle time-consuming image processing tasks. You do not want web requests to wait for these tasks and time out. Which Beanstalk architecture should be used?',
         ch: ['增加 Web Server Tier 的实例数量', 'Web Server Tier 接收请求后写入 SQS，Worker Tier 异步处理图片', '切换到 Lambda 处理图片', '在 Web Server EC2 上开启多线程'],
         ench: ['Add more instances to the Web Server Tier', 'Web Server Tier writes to SQS, Worker Tier processes images asynchronously', 'Switch to Lambda for image processing', 'Enable multithreading on Web Server EC2'],
         ans: 1, exp: '<strong>Web Server Tier + Worker Tier 解耦</strong>：<br><br>① 用户上传图片 → Web Server Tier 接收请求<br>② Web Server 将图片任务写入 <strong>SQS Queue</strong>，立即响应用户（不等待）<br>③ <strong>Worker Tier</strong> 从 SQS 拉取消息，异步处理图片<br>④ Worker Tier 根据 <strong>SQS 消息数量</strong>自动扩缩<br><br>这是 Beanstalk 的标准解耦模式，适合所有耗时异步任务。', ww: '加实例（A）不解决超时问题，只是分担更多等待。Lambda（C）不在 Beanstalk 体系内。多线程（D）仍然阻塞同一请求。', rule: '耗时任务异步化 → Web Tier 写 SQS → Worker Tier 处理。Worker Tier 按 SQS 消息数扩缩。'
       },
-      { id: 'ca_06', topic: '经典架构', diff: 'high',
+      {
+        id: 'ca_06', topic: '经典架构', diff: 'high',
         text: '公司 Web 应用目前<em>将完整购物车数据存储在 Cookie 中</em>。安全团队发现 Cookie 内容可被用户篡改以修改价格。如何修复？',
         en: 'A company stores complete shopping cart data in user cookies. The security team finds that users can tamper with cookie contents to modify prices. How should this be fixed?',
         ch: ['对 Cookie 内容进行 Base64 编码', '只在 Cookie 中存储 session_id，将购物车数据移到 ElastiCache', '启用 HTTPS 防止 Cookie 被截获', '使用 ELB Stickiness 保证每次请求同一台 EC2'],
         ench: ['Base64 encode the cookie contents', 'Store only session_id in the cookie and move cart data to ElastiCache', 'Enable HTTPS to prevent cookie interception', 'Use ELB Stickiness to route each user to the same EC2'],
         ans: 1, exp: '<strong>Server Session 模式</strong>解决安全问题：<br><br>• Cookie 只存 <strong>session_id</strong>（随机生成的 UUID，无意义）<br>• 购物车数据（含价格）存在 <strong>ElastiCache</strong> 服务端<br>• 用户无法通过修改 session_id 来修改价格<br>• 价格由服务端控制，客户端永远无法直接篡改<br><br>Base64（A）：不是加密，可以轻松解码和篡改。<br>HTTPS（C）：防止传输层截获，但不防止用户修改自己发出的 Cookie。<br>Stickiness（D）：不解决安全问题，只解决路由问题。', ww: 'Base64 不是加密（A 无效）。HTTPS 防中间人，不防用户自己篡改（C 无效）。Stickiness 是路由策略，与数据安全无关（D 无效）。', rule: 'Cookie 数据可被篡改 → Server Session：Cookie 只存 ID，数据存服务端 ElastiCache。'
       },
-      { id: 'ca_07', topic: '经典架构', diff: 'mid',
+      {
+        id: 'ca_07', topic: '经典架构', diff: 'mid',
         text: '三层 Web 架构中，位于<em>数据子网（Data Subnet）</em>的 ElastiCache 安全组应如何配置入站规则？',
         en: 'In a 3-tier web architecture, how should the ElastiCache Security Group in the Data Subnet be configured for inbound access?',
         ch: ['允许来自 0.0.0.0/0 的入站流量', '允许来自 ELB Security Group 的入站流量', '允许来自 EC2（应用层）Security Group 的入站流量', '允许来自整个 VPC CIDR 的所有流量'],
         ench: ['Allow inbound from 0.0.0.0/0', 'Allow inbound from ELB Security Group', 'Allow inbound from EC2 (application tier) Security Group', 'Allow inbound from the entire VPC CIDR'],
         ans: 2, exp: '<strong>最小权限原则：只允许来自 EC2 SG 的流量</strong><br><br>三层架构 Security Group 链：<br>① ELB SG：允许来自 Internet（0.0.0.0/0）的 80/443<br>② EC2 SG：只允许来自 ELB SG 的流量<br>③ ElastiCache SG / RDS SG：只允许来自 <strong>EC2 SG</strong> 的流量<br><br>SG 引用另一个 SG 的好处：即使 EC2 IP 变化，规则自动适用（无需维护 IP 列表）', ww: '0.0.0.0/0 会将数据库暴露到公网（A 严重错误）。ELB 不直接访问 ElastiCache（B 错）。允许整个 VPC CIDR 权限过大（D 不是最小权限）。', rule: '数据层 SG → 只允许来自应用层 EC2 SG。SG 引用 SG 是最佳实践（动态、最小权限）。'
       },
-      { id: 'ca_08', topic: '经典架构', diff: 'high',
+      {
+        id: 'ca_08', topic: '经典架构', diff: 'high',
         text: 'Elastic Beanstalk 的<em>部署模式</em>中，开发测试环境应选 Single Instance，生产环境应选 HA with Load Balancer。两者的核心区别是什么？',
         en: 'In Elastic Beanstalk deployment modes, development uses Single Instance and production uses HA with Load Balancer. What is the core difference?',
         ch: ['Single Instance 使用 Spot 实例，HA 使用 On-Demand', 'Single Instance 有 1 台 EC2 + Elastic IP，HA 有 ALB + ASG 跨多个 AZ + RDS Standby', 'Single Instance 不支持 RDS，HA 才支持', 'Single Instance 使用 Lambda，HA 使用 EC2'],
@@ -3206,7 +3215,8 @@
       },
 
       // ── Udemy 官方题：Section 11 Classic Arch Quiz ──
-      { id: 'ca_09', topic: '经典架构', diff: 'high',
+      {
+        id: 'ca_09', topic: '经典架构', diff: 'high',
         text: 'TriangleSunglasses.com 运行在 ASG + ALB 上，ASG 根据 ALB 流量弹性扩缩，最小容量已设为 <em>2</em> 以保证高可用。在满足所有需求的前提下，如何进一步降低成本？',
         en: 'TriangleSunglasses.com runs on an ASG fronted by an ALB, scaling based on ALB traffic. The minimum ASG capacity is set to 2 for high availability. How can you further reduce costs while meeting all requirements?',
         ch: ['移除 ALB，改用 Elastic IP', '对两台 EC2 使用预留实例（Reserved Instances）', '将最小容量降为 1', '将最小容量降为 0'],
@@ -3217,7 +3227,8 @@
         rule: 'ASG min=N → 这 N 台永远在跑 → Reserved Instances 锁定折扣（承诺用量换折扣）'
       },
 
-      { id: 'ca_10', topic: '经典架构', diff: 'mid',
+      {
+        id: 'ca_10', topic: '经典架构', diff: 'mid',
         text: '电商网站运行在多台 EC2 实例上，由 ALB 分发请求。以下哪种存储用户购物车/Session 数据的方式<em>不适合</em>多实例架构？',
         en: 'An e-commerce site runs on multiple EC2 instances behind an ALB. Which session storage method is NOT suitable for a multi-instance architecture?',
         ch: ['存储在 Amazon ElastiCache', '存储在客户端 HTTP Cookie 中', '存储在 EBS 卷上', '存储在 Amazon RDS 中'],
@@ -3228,7 +3239,8 @@
         rule: 'EBS = 私有硬盘（1对1，不共享）。多实例 Session → ElastiCache；共享文件 → EFS'
       },
 
-      { id: 'ca_11', topic: '经典架构', diff: 'mid',
+      {
+        id: 'ca_11', topic: '经典架构', diff: 'mid',
         text: '你管理着 100 台 Linux EC2 实例，需要将软件更新存储在<em>共享存储</em>上，让所有实例启动时动态加载，且不需要繁重的运维操作。你建议什么方案？',
         en: 'You manage 100s of Linux EC2 instances and need to store software updates on shared storage that can be dynamically loaded by EC2 instances at startup without heavy operations. What do you suggest?',
         ch: ['将软件更新存在 EBS，并用数据复制软件从 master 同步到各 AZ', '将软件更新存在 EFS，启动时挂载为网络驱动器', '将软件更新打包为 EBS Snapshot，每次更新时创建新卷', '将软件更新存在 Amazon RDS'],
@@ -3239,7 +3251,8 @@
         rule: '多 EC2 共享文件（软件包/图片/配置）→ EFS（挂载即用，更新一处全局可见）'
       },
 
-      { id: 'ca_12', topic: '经典架构', diff: 'mid',
+      {
+        id: 'ca_12', topic: '经典架构', diff: 'mid',
         text: 'Elastic Beanstalk 部署过程非常慢。查看日志后发现，每次部署时，每台 EC2 实例都要重新下载安装所有<em>依赖包（dependencies）</em>。如何在最小影响的前提下加速部署？',
         en: 'You are deploying to Elastic Beanstalk but the process is painfully slow. Logs show that dependencies are resolved on each EC2 instance every time you deploy. How can you speed up the deployment process with minimal impact?',
         ch: ['删除部分代码依赖', '将依赖包放到 Amazon EFS 上共享', '创建包含所有依赖的 Golden AMI，用该镜像启动 EC2 实例', '将应用迁移到 Amazon RDS'],
@@ -3320,6 +3333,17 @@
     };
 
     function shuffle(a) { const b = [...a]; for (let i = b.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1));[b[i], b[j]] = [b[j], b[i]] } return b }
+
+    // 将解析文字中的原始 ABCD 标签映射到打乱后的显示字母
+    // shufMap[displayPos] = origIdx，所以 origIdx j → 显示位置 shufMap.indexOf(j) → 字母 ABCD[...]
+    function remapABCD(text, shufMap) {
+      if (!shufMap) return text;
+      const L = 'ABCD';
+      const remap = {};
+      for (let j = 0; j < 4; j++) remap[L[j]] = L[shufMap.indexOf(j)];
+      // 只替换非字母包围的孤立 A/B/C/D（选项标签语境），避免误改 ASG/ELB/EC2 等缩写
+      return text.replace(/(?<![A-Za-z])([ABCD])(?![A-Za-z0-9])/g, (m, c) => remap[c] || m);
+    }
 
     /* ═══════════════ NAVIGATION ═══════════════ */
     function go(id, btn) {
@@ -3675,10 +3699,11 @@ ${(() => {
       const eb = document.getElementById('exp-box');
       eb.className = `exp-box ${ok ? 'c' : 'w'}`;
       const kpId = TOPIC_PAGE[q.topic];
+      const sm = qz.shufMap;
       eb.innerHTML = `<div class="exp-title">${ok ? '✓ 答对了！' : '✗ 答错了'}</div>
-    <div class="exp-body">${q.exp}</div>
-    ${!ok && q.ww ? `<div class="why-wrong-box">${q.ww}</div>` : ''}
-    <div class="exp-rule-box">${q.rule}</div>
+    <div class="exp-body">${remapABCD(q.exp, sm)}</div>
+    ${!ok && q.ww ? `<div class="why-wrong-box">${remapABCD(q.ww, sm)}</div>` : ''}
+    <div class="exp-rule-box">${remapABCD(q.rule, sm)}</div>
     ${!ok && kpId ? `<div style="margin-top:14px;text-align:center"><button class="btn btn-sec" style="font-size:13px" onclick="go('${kpId}')">📖 查看知识页 → ${q.topic}</button></div>` : ''}
   `;
       eb.classList.remove('hidden');
@@ -5603,7 +5628,8 @@ Sub-ms 延迟 / 极致 IOPS                  → io2 Block Express（最高 256,
 
 
     /* ═══════════════ CLASSIC ARCHITECTURE PAGE ═══════════════ */
-    function pgClassicArch() { return `${back()}
+    function pgClassicArch() {
+      return `${back()}
 <div class="pg-title">Section 11 — 经典解决方案架构</div>
 <div class="pg-tags">
   <span class="tag tag-high">⭐ 高频</span>
