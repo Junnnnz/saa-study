@@ -3203,6 +3203,51 @@
         ch: ['Single Instance 使用 Spot 实例，HA 使用 On-Demand', 'Single Instance 有 1 台 EC2 + Elastic IP，HA 有 ALB + ASG 跨多个 AZ + RDS Standby', 'Single Instance 不支持 RDS，HA 才支持', 'Single Instance 使用 Lambda，HA 使用 EC2'],
         ench: ['Single Instance uses Spot, HA uses On-Demand', 'Single Instance has 1 EC2 + Elastic IP; HA has ALB + ASG across multiple AZs + RDS Standby', 'Single Instance does not support RDS; HA does', 'Single Instance uses Lambda; HA uses EC2'],
         ans: 1, exp: '<strong>核心区别在于高可用能力：</strong><br><br><strong>Single Instance（开发/测试）</strong>：<br>• 1 台 EC2 + Elastic IP<br>• RDS（单 AZ，无 Standby）<br>• 节省成本，但无冗余<br><br><strong>HA with Load Balancer（生产）</strong>：<br>• ALB → ASG（跨 AZ1 + AZ2）<br>• RDS Master + RDS Standby（Multi-AZ）<br>• 任意 AZ 故障不影响服务<br><br>两者都使用 EC2（不是 Lambda），都支持 RDS，实例类型由配置决定（非 Spot vs On-Demand 的根本区别）。', ww: '实例购买类型（Spot/On-Demand）不是两者定义的区别（A 错）。两者都支持 RDS（C 错）。两者都使用 EC2 不是 Lambda（D 错）。', rule: 'Beanstalk 部署模式：Single（1 EC2 + Elastic IP）→ dev；HA（ALB + ASG + Multi-AZ RDS）→ prod。'
+      },
+
+      // ── Udemy 官方题：Section 11 Classic Arch Quiz ──
+      { id: 'ca_09', topic: '经典架构', diff: 'high',
+        text: 'TriangleSunglasses.com 运行在 ASG + ALB 上，ASG 根据 ALB 流量弹性扩缩，最小容量已设为 <em>2</em> 以保证高可用。在满足所有需求的前提下，如何进一步降低成本？',
+        en: 'TriangleSunglasses.com runs on an ASG fronted by an ALB, scaling based on ALB traffic. The minimum ASG capacity is set to 2 for high availability. How can you further reduce costs while meeting all requirements?',
+        ch: ['移除 ALB，改用 Elastic IP', '对两台 EC2 使用预留实例（Reserved Instances）', '将最小容量降为 1', '将最小容量降为 0'],
+        ench: ['Remove the ALB and use an Elastic IP instead', 'Reserve two EC2 instances', 'Reduce the minimum capacity to 1', 'Reduce the minimum capacity to 0'],
+        ans: 1,
+        exp: '核心逻辑：<strong>ASG 最小容量 = 2，意味着这 2 台 EC2 无论流量高低都 24 小时持续运行</strong>。既然确定要一直用这两台机器，就可以购买 <strong>Reserved Instances（预留实例）</strong>——承诺使用 1 年或 3 年，换取 40%～60% 折扣（比按需 On-Demand 便宜很多）。<br><br>比喻：就像买年票比每次买单程票便宜——你本来就天天要坐地铁，提前承诺比临时买更划算。<br><br>弹性扩容的部分（min 之上）仍然用 On-Demand，因为这部分不确定会运行多久，不值得提前承诺。',
+        ww: '❌ 移除 ALB：ALB 是流量分发 + Health Check 的关键，题目要求高可用，移除后一台实例挂掉整个服务就挂了。❌ 降为 1：违反高可用需求（题目明确要求 min=2）。❌ 降为 0：完全关停，无法提供服务。',
+        rule: 'ASG min=N → 这 N 台永远在跑 → Reserved Instances 锁定折扣（承诺用量换折扣）'
+      },
+
+      { id: 'ca_10', topic: '经典架构', diff: 'mid',
+        text: '电商网站运行在多台 EC2 实例上，由 ALB 分发请求。以下哪种存储用户购物车/Session 数据的方式<em>不适合</em>多实例架构？',
+        en: 'An e-commerce site runs on multiple EC2 instances behind an ALB. Which session storage method is NOT suitable for a multi-instance architecture?',
+        ch: ['存储在 Amazon ElastiCache', '存储在客户端 HTTP Cookie 中', '存储在 EBS 卷上', '存储在 Amazon RDS 中'],
+        ench: ['Store in Amazon ElastiCache', 'Store in client HTTP cookies', 'Store on EBS volumes', 'Store in Amazon RDS'],
+        ans: 2,
+        exp: '<strong>EBS 是块存储设备，相当于"私有硬盘"——每块 EBS 只能同时挂载到一台 EC2 实例</strong>。多实例架构下会发生：<br><br>① 用户第 1 次请求 → ALB 路由到 EC2-A → Session 写入 EC2-A 的 EBS-A（私有）<br>② 用户第 2 次请求 → ALB 路由到 EC2-B（不同实例）→ EC2-B 挂载的是自己的 EBS-B → 根本看不到 EBS-A 的数据 → <strong>购物车/Session 丢失！</strong><br><br>正确方案：<br>• <strong>ElastiCache</strong>：独立内存缓存集群，所有 EC2 共同访问 → Session 共享无问题 ✅<br>• <strong>HTTP Cookie</strong>：Session 存在用户浏览器，每次请求都带来 → 路由到任何 EC2 都能读到 ✅<br>• <strong>RDS</strong>：关系型数据库，所有 EC2 共享同一数据库 → 技术上可行 ✅（但比 ElastiCache 慢，不是最优选）',
+        ww: 'EBS 最常被误认为"能存储就能共享"，关键误区是：EBS 是"一对一"绑定（一块 EBS 对应一台 EC2），多实例架构需要"一对多"的共享访问。EFS 是共享文件系统，ElastiCache 是共享缓存/Session，RDS 是共享数据库。EBS 不能做任何共享。',
+        rule: 'EBS = 私有硬盘（1对1，不共享）。多实例 Session → ElastiCache；共享文件 → EFS'
+      },
+
+      { id: 'ca_11', topic: '经典架构', diff: 'mid',
+        text: '你管理着 100 台 Linux EC2 实例，需要将软件更新存储在<em>共享存储</em>上，让所有实例启动时动态加载，且不需要繁重的运维操作。你建议什么方案？',
+        en: 'You manage 100s of Linux EC2 instances and need to store software updates on shared storage that can be dynamically loaded by EC2 instances at startup without heavy operations. What do you suggest?',
+        ch: ['将软件更新存在 EBS，并用数据复制软件从 master 同步到各 AZ', '将软件更新存在 EFS，启动时挂载为网络驱动器', '将软件更新打包为 EBS Snapshot，每次更新时创建新卷', '将软件更新存在 Amazon RDS'],
+        ench: ['Store on EBS and sync using data replication software from one master in each AZ', 'Store on EFS and mount EFS as a network drive at startup', 'Package updates as an EBS Snapshot and create EBS volumes for each new update', 'Store the software updates on Amazon RDS'],
+        ans: 1,
+        exp: '<strong>EFS（Elastic File System，弹性文件系统）</strong>是基于 NFS 协议的共享文件系统，支持同时被数千台 EC2 挂载读写。<br><br>方案工作原理：<br>① 将软件包上传到 EFS<br>② 每台 EC2 在启动脚本（User Data）中执行 mount EFS → 立即访问同一批软件文件<br>③ 软件有更新时 → 只需更新 EFS 上的文件 → 所有实例自动获取新版本，无需逐台操作<br><br>❌ <strong>EBS 为什么不行</strong>：100 台实例 = 100 块独立 EBS，每次更新要同步 100 次 → 繁重运维，违反需求。而且 EBS 不能被多台 EC2 同时挂载（单实例专属）。<br><br>❌ <strong>EBS Snapshot 为什么不行</strong>：每次软件更新要创建新 Snapshot、为 100 台实例各创建新卷 → 更繁重，操作量翻倍。<br><br>❌ <strong>RDS 为什么不行</strong>：RDS 是关系型数据库，存结构化数据（表/行），不能当文件系统使用（不能直接运行 .sh/.py 文件）。',
+        ww: '关键词识别："100 台共享"+"动态加载"+"无繁重运维" → 三个条件全部指向 EFS。EBS = 单实例私有块存储，RDS = 结构化数据库，两者都不满足"多实例共享文件"的需求。',
+        rule: '多 EC2 共享文件（软件包/图片/配置）→ EFS（挂载即用，更新一处全局可见）'
+      },
+
+      { id: 'ca_12', topic: '经典架构', diff: 'mid',
+        text: 'Elastic Beanstalk 部署过程非常慢。查看日志后发现，每次部署时，每台 EC2 实例都要重新下载安装所有<em>依赖包（dependencies）</em>。如何在最小影响的前提下加速部署？',
+        en: 'You are deploying to Elastic Beanstalk but the process is painfully slow. Logs show that dependencies are resolved on each EC2 instance every time you deploy. How can you speed up the deployment process with minimal impact?',
+        ch: ['删除部分代码依赖', '将依赖包放到 Amazon EFS 上共享', '创建包含所有依赖的 Golden AMI，用该镜像启动 EC2 实例', '将应用迁移到 Amazon RDS'],
+        ench: ['Remove some dependencies in your code', 'Place the dependencies in Amazon EFS', 'Create a Golden AMI that contains the dependencies and use that image to launch EC2 instances', 'Migrate the application to Amazon RDS'],
+        ans: 2,
+        exp: '<strong>问题根源</strong>：每次 Beanstalk 部署，新 EC2 实例启动后都要重新从网络下载并安装依赖（如 npm install / pip install），少则几分钟，多则更长。<br><br><strong>Golden AMI 解法</strong>：<br>① 手动启动一台 EC2，安装好所有依赖（运行一次 npm install / pip install）<br>② 将这台 EC2 创建为 AMI 镜像（"Golden AMI"，即"黄金镜像"）<br>③ 配置 Beanstalk 使用这个 Golden AMI 启动新实例<br>④ 之后部署：新 EC2 从 Golden AMI 启动 → 依赖已预装 → 只需拉取新代码 → 部署时间大幅缩短<br><br>❌ <strong>EFS 为什么不行</strong>：把依赖放在 EFS（网络文件系统）上，每次读取是网络 I/O，延迟比本地磁盘高；且 node_modules 等依赖需要在本地才能正常运行，放网络存储上还是慢。<br><br>❌ <strong>删依赖为什么不行</strong>：可能破坏功能，不符合"最小影响"要求。',
+        ww: '"依赖每次重装"是 Golden AMI 的典型使用场景。核心思路：把"环境准备"工作前置（bake into the AMI），而不是每次实例启动时重做。记忆点：Beanstalk + 启动慢 + 依赖 → Golden AMI。',
+        rule: 'Beanstalk 部署慢（依赖安装）→ Golden AMI 预装依赖 → 启动即用，部署只传代码'
       }
     ];
 
@@ -5616,7 +5661,7 @@ Sub-ms 延迟 / 极致 IOPS                  → io2 Block Express（最高 256,
     <div style="font-weight:700;color:#15803D;margin-bottom:4px">⑥ Multi-AZ + Reserved Instances（最终生产架构）</div>
     <div class="g2">
       <div style="font-size:13px;color:var(--ink2)">ELB Multi-AZ → ASG 跨 AZ1 / AZ2 / AZ3 部署</div>
-      <div style="font-size:12px;color:#15803D;background:#DCFCE7;padding:5px 8px;border-radius:6px"><strong>解决：</strong>AZ 故障不影响服务。最小容量用 Reserved（省钱），弹性部分用 On-Demand</div>
+      <div style="font-size:12px;color:#15803D;background:#DCFCE7;padding:5px 8px;border-radius:6px"><strong>解决：</strong>AZ 故障不影响服务。<br><strong>成本优化：</strong>最小容量（这 N 台机器一直跑）→ <strong>Reserved Instances 省 40-60%</strong>（承诺使用 1-3 年换折扣）；弹性扩容部分（不确定跑多久）→ On-Demand</div>
     </div>
   </div>
 </div>
@@ -5676,12 +5721,49 @@ Sub-ms 延迟 / 极致 IOPS                  → io2 Block Express（最高 256,
 <h2 class="pg-h2">案例三：MyWordPress.com（图片存储演进）</h2>
 <div class="g2">
   <div style="border:1.5px solid #FCA5A5;border-radius:8px;padding:12px;background:#FEF2F2">
-    <div style="font-weight:700;color:#DC2626;margin-bottom:6px">❌ EBS — 单实例陷阱</div>
-    <div style="font-size:13px;color:var(--ink2)">每台 EC2 有自己的 EBS 卷<br>用户 A 上传图片 → 写入 EC2-1 的 EBS<br>下次路由到 EC2-2 → <strong>找不到图片</strong><br><br>根本原因：EBS 是块存储，绑定单台实例，多实例间<strong>不共享</strong></div>
+    <div style="font-weight:700;color:#DC2626;margin-bottom:6px">❌ EBS — 私有硬盘，不能共享</div>
+    <div style="font-size:13px;color:var(--ink2)">每台 EC2 挂载<strong>自己专属</strong>的 EBS，其他实例无法访问</div>
+    <div style="margin-top:8px;background:#fff;border:1px solid #FCA5A5;border-radius:6px;padding:8px;font-size:12px">
+      <div style="color:#6B7280;margin-bottom:4px;font-weight:600">失败场景（路由 = 问题根源）</div>
+      <div style="display:flex;align-items:center;gap:4px;margin-bottom:3px">
+        <span style="background:#DBEAFE;color:#1E40AF;padding:1px 6px;border-radius:4px;font-size:11px">用户请求①</span>
+        <span style="color:#9CA3AF">→</span>
+        <span style="background:#FEF3C7;padding:1px 6px;border-radius:4px;font-size:11px">EC2-A</span>
+        <span style="color:#9CA3AF">→ 写入</span>
+        <span style="background:#FEE2E2;padding:1px 6px;border-radius:4px;font-size:11px">EBS-A 🔒</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:4px;margin-bottom:3px">
+        <span style="background:#DBEAFE;color:#1E40AF;padding:1px 6px;border-radius:4px;font-size:11px">用户请求②</span>
+        <span style="color:#9CA3AF">→</span>
+        <span style="background:#FEF3C7;padding:1px 6px;border-radius:4px;font-size:11px">EC2-B</span>
+        <span style="color:#9CA3AF">→ 读</span>
+        <span style="background:#FEE2E2;padding:1px 6px;border-radius:4px;font-size:11px">EBS-B 🔒</span>
+      </div>
+      <div style="color:#DC2626;font-weight:700;font-size:12px;margin-top:4px">EBS-B 看不到 EBS-A → 数据丢失！</div>
+    </div>
   </div>
   <div style="border:1.5px solid #BBF7D0;border-radius:8px;padding:12px;background:#F0FDF4">
-    <div style="font-weight:700;color:#15803D;margin-bottom:6px">✅ EFS — 共享网络文件系统</div>
-    <div style="font-size:13px;color:var(--ink2)">EFS（Elastic File System）通过 ENI 挂载到各 AZ<br>所有 EC2 挂载<strong>同一个 EFS</strong><br>任意实例读写 → 所有实例可见<br><br>适用：多 AZ、多 EC2 共享文件（Linux Only）</div>
+    <div style="font-weight:700;color:#15803D;margin-bottom:6px">✅ EFS — 共享网盘，全部可见</div>
+    <div style="font-size:13px;color:var(--ink2)">EFS（NFS 协议）：所有 EC2 挂载<strong>同一个文件系统</strong></div>
+    <div style="margin-top:8px;background:#fff;border:1px solid #BBF7D0;border-radius:6px;padding:8px;font-size:12px">
+      <div style="color:#6B7280;margin-bottom:4px;font-weight:600">正确场景（任意路由都 OK）</div>
+      <div style="display:flex;align-items:center;gap:4px;margin-bottom:3px">
+        <span style="background:#DBEAFE;color:#1E40AF;padding:1px 6px;border-radius:4px;font-size:11px">用户请求①</span>
+        <span style="color:#9CA3AF">→</span>
+        <span style="background:#FEF3C7;padding:1px 6px;border-radius:4px;font-size:11px">EC2-A</span>
+        <span style="color:#9CA3AF">→ 写入</span>
+        <span style="background:#DCFCE7;padding:1px 6px;border-radius:4px;font-size:11px">EFS 🌐</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:4px;margin-bottom:3px">
+        <span style="background:#DBEAFE;color:#1E40AF;padding:1px 6px;border-radius:4px;font-size:11px">用户请求②</span>
+        <span style="color:#9CA3AF">→</span>
+        <span style="background:#FEF3C7;padding:1px 6px;border-radius:4px;font-size:11px">EC2-B</span>
+        <span style="color:#9CA3AF">→ 读</span>
+        <span style="background:#DCFCE7;padding:1px 6px;border-radius:4px;font-size:11px">EFS 🌐</span>
+      </div>
+      <div style="color:#15803D;font-weight:700;font-size:12px;margin-top:4px">同一个 EFS → 数据一致！✅</div>
+    </div>
+    <div style="font-size:12px;color:var(--ink3);margin-top:6px">适用：多 AZ、多 EC2 共享文件（Linux Only）</div>
   </div>
 </div>
 <div style="background:#F8FAFC;border:1.5px solid var(--border);border-radius:10px;padding:12px;margin:12px 0;text-align:center">
