@@ -1655,10 +1655,14 @@
         <button class="sb-item" onclick="go('route53',this)"><span class="si-dot"
             style="background:#8B5CF6"></span>Route 53<span id="sp-r53" class="sb-rate"></span></button>
       </div>
+      <div class="sb-section">
+        <div class="sb-label">架构与平台</div>
+        <button class="sb-item" onclick="go('classic-arch',this)"><span class="si-dot" style="background:#F59E0B"></span>经典架构<span id="sp-ca" class="sb-rate"></span></button>
+      </div>
       <div style="padding:12px 16px;margin-top:auto;border-top:1px solid var(--border)">
         <div style="font-size:11px;color:var(--ink3);line-height:1.7">
           <div style="font-weight:700;color:var(--ink2);margin-bottom:4px">📋 下一章预告</div>
-          <div>Classic Architecture · S3 · CloudFront</div>
+          <div>S3 · CloudFront</div>
         </div>
       </div>
     </nav>
@@ -3141,6 +3145,64 @@
         ch: ['修复所有应用程序代码', '禁用 Multi-AZ', '启用 Multi-AZ', '使用 RDS Proxy'],
         ench: ['Fix all the applications', 'Disable Multi-AZ', 'Enable Multi-AZ', 'Use an RDS Proxy'],
         ans: 3, exp: '<strong>RDS Proxy</strong> 是解决连接问题的最优方案：<br><br>• RDS Proxy 在应用和 RDS 之间维护<strong>连接池</strong><br>• DB 维护/Failover 时，Proxy 会<strong>自动重新路由连接</strong>到新的 RDS 实例<br>• 应用只看到 Proxy 端点，感知不到 DB 切换<br>• 减少故障转移时间最多 <strong>66%</strong><br>• 不需要修改每个应用程序（题目说应用逻辑差但不想改 100 个应用）<br><br>修改 100 个应用成本极高（A 可行但代价大）。Multi-AZ 控制是无关项（B、C 错）。', ww: '修复 100 个应用成本过高（A 可行但不是最优）。Multi-AZ 开关与连接重建时间无关（B、C 错）。', rule: 'DB 维护后应用重连慢 → RDS Proxy（维护连接池，自动重路由，减少 Failover 影响）。'
+      },
+
+      /* ─── 经典架构 ─── */
+      { id: 'ca_01', topic: '经典架构', diff: 'high',
+        text: '电商网站使用多台 EC2 + ELB，用户投诉<em>购物车内容在不同请求间丢失</em>。EC2 将 Session 存在本地内存中。最佳改进方案是？',
+        en: 'An e-commerce site uses multiple EC2 instances behind an ELB. Users report shopping cart contents are lost between requests. EC2 stores session data in local memory. What is the best fix?',
+        ch: ['启用 ELB Sticky Sessions', '将 Session 存入 ElastiCache，Cookie 只传 session_id', '将 Session 数据写入 RDS', '将所有请求路由到同一台 EC2'],
+        ench: ['Enable ELB Sticky Sessions', 'Store session in ElastiCache, pass only session_id in cookie', 'Write session data to RDS', 'Route all requests to the same EC2'],
+        ans: 1, exp: '<strong>ElastiCache Server Session</strong> 是最优方案：<br><br>① Cookie 只存 session_id（极小，安全）<br>② Session 数据存 ElastiCache → 毫秒级读写<br>③ 任意 EC2 都能读取同一 ElastiCache → EC2 完全无状态<br>④ EC2 宕机不影响 Session（数据在 ElastiCache 中）<br><br>Sticky Sessions（A）：若该实例宕机，购物车仍丢失。<br>RDS（C）：延迟比 ElastiCache 高，不适合频繁读写 Session。<br>D：单点故障，失去 ELB 意义。', ww: 'Sticky Sessions 在实例故障时仍丢失数据（A 不是最佳）。RDS 延迟过高且浪费（C 不合适）。D 是反模式。', rule: '多实例 Session 共享 → ElastiCache Server Session。Cookie 只存 ID，数据在缓存层。'
+      },
+      { id: 'ca_02', topic: '经典架构', diff: 'high',
+        text: 'WordPress 网站从单 EC2 扩展到多台后，<em>用户上传的图片只有部分用户能看到</em>，其余用户看到图片缺失。原因和解决方案是什么？',
+        en: 'A WordPress site scales from one EC2 to multiple. Users report uploaded images are only visible to some users while others see missing images. What is the cause and fix?',
+        ch: ['ELB 配置错误，应启用跨区负载均衡', '每台 EC2 的 EBS 卷相互独立，图片存于上传时所在实例，应改用 EFS', '需要配置 EBS 跨 AZ 复制', 'RDS 未同步图片元数据'],
+        ench: ['ELB misconfiguration, enable cross-zone load balancing', 'Each EC2 has its own EBS; images are on the uploading instance only — switch to EFS', 'Enable EBS cross-AZ replication', 'RDS is not syncing image metadata'],
+        ans: 1, exp: '<strong>根本原因：EBS 不能跨实例共享</strong><br><br>• EBS 是块存储，绑定到单台 EC2<br>• 用户 A 上传图片 → 写入 EC2-1 的 EBS<br>• 下次请求路由到 EC2-2 → EC2-2 的 EBS 没有该图片<br><br><strong>修复：改用 EFS（Elastic File System）</strong><br>• EFS 是托管 NFS，通过 ENI 挂载到每个 AZ<br>• 所有 EC2 挂载同一 EFS → 任意实例读写都可见<br>• Linux Only（WordPress 运行在 Linux）', ww: '跨区负载均衡只影响流量分配，不影响存储共享（A 错）。EBS 无原生跨 AZ 复制功能（C 错）。图片文件在文件系统层，不在 RDS（D 错）。', rule: '多 EC2 共享文件（图片/静态资源）→ EFS（NFS）。EBS 绑定单机，多实例场景必错。'
+      },
+      { id: 'ca_03', topic: '经典架构', diff: 'mid',
+        text: '公司需要<em>最快速地启动预配置的 EC2 实例</em>，实例中需预装内部软件、安全配置和监控 Agent。启动速度是第一优先级，应选哪种方式？',
+        en: 'A company needs to launch pre-configured EC2 instances as fast as possible. Each instance must have company software, security hardening, and monitoring agents pre-installed. Speed is the top priority. Which approach?',
+        ch: ['User Data 脚本在启动时安装所有软件', '使用 AWS Systems Manager 在启动后推送配置', '构建 Golden AMI，包含所有预装软件和配置', 'CloudFormation 模板 + cfn-init'],
+        ench: ['User Data script to install everything at launch', 'Use AWS Systems Manager to push config after launch', 'Build a Golden AMI with all software and config pre-installed', 'CloudFormation template + cfn-init'],
+        ans: 2, exp: '<strong>Golden AMI</strong> 是最快方案：<br><br>• 将所有软件、配置、Agent <strong>预先烘焙（bake）</strong>到 AMI 中<br>• 启动时无需运行任何安装脚本<br>• 启动时间 = EC2 正常启动时间（最快）<br><br>User Data（A）：每次启动都要运行脚本安装，时间取决于软件包大小和网络速度（慢）。<br>SSM（B）：需要实例先启动，再推送配置（更慢）。<br>CloudFormation + cfn-init（D）：灵活但比 Golden AMI 慢。', ww: 'User Data 每次启动都要运行安装脚本，速度不如 Golden AMI（A 不是最快）。SSM 需要实例先启动（B 慢）。cfn-init 需要运行脚本（D 慢）。', rule: '最快启动 EC2 → Golden AMI（预装一切，启动即用）。速度：Golden AMI > Hybrid > User Data。'
+      },
+      { id: 'ca_04', topic: '经典架构', diff: 'high',
+        text: '开发团队不想管理 EC2、配置 ELB 和 ASG 策略，<em>只想专注于代码开发和部署</em>。应推荐哪种 AWS 服务？',
+        en: 'A development team does not want to manage EC2 instances, configure ELB, or set ASG policies — they just want to focus on code development and deployment. Which AWS service should be recommended?',
+        ch: ['ECS（Elastic Container Service）', 'AWS Lambda', 'Elastic Beanstalk', 'AWS CloudFormation'],
+        ench: ['ECS (Elastic Container Service)', 'AWS Lambda', 'Elastic Beanstalk', 'AWS CloudFormation'],
+        ans: 2, exp: '<strong>Elastic Beanstalk</strong> 是开发者中心化的托管平台：<br><br>• 开发者只需上传代码（zip 或 Docker）<br>• Beanstalk 自动处理：EC2 容量、ELB 配置、ASG 策略、Health Monitoring<br>• 底层仍使用 EC2/ELB/RDS（不是 serverless）<br>• Beanstalk 本身免费，只为底层资源付费<br>• 支持 Java / Node.js / Python / PHP / Ruby / Go / .NET / Docker<br><br>ECS 需要自己管理任务定义和集群（A 复杂）。Lambda 有执行时间和包大小限制（B 不适合大型 Web）。CloudFormation 是 IaC 工具，仍需定义所有资源（D 不解决问题）。', ww: 'ECS 仍需管理集群配置（A 不符合）。Lambda 适合轻量函数，有限制（B 不适合）。CloudFormation 是基础设施代码，不是 PaaS（D 错）。', rule: '开发者只想上传代码，不管基础设施 → Elastic Beanstalk（PaaS）。本身免费，底层用 EC2/ELB/ASG。'
+      },
+      { id: 'ca_05', topic: '经典架构', diff: 'mid',
+        text: 'Elastic Beanstalk 应用需要处理<em>耗时的图片处理任务</em>（压缩、格式转换），不希望 Web 请求等待任务完成而超时。应选择哪种 Beanstalk 架构？',
+        en: 'An Elastic Beanstalk application needs to handle time-consuming image processing tasks. You do not want web requests to wait for these tasks and time out. Which Beanstalk architecture should be used?',
+        ch: ['增加 Web Server Tier 的实例数量', 'Web Server Tier 接收请求后写入 SQS，Worker Tier 异步处理图片', '切换到 Lambda 处理图片', '在 Web Server EC2 上开启多线程'],
+        ench: ['Add more instances to the Web Server Tier', 'Web Server Tier writes to SQS, Worker Tier processes images asynchronously', 'Switch to Lambda for image processing', 'Enable multithreading on Web Server EC2'],
+        ans: 1, exp: '<strong>Web Server Tier + Worker Tier 解耦</strong>：<br><br>① 用户上传图片 → Web Server Tier 接收请求<br>② Web Server 将图片任务写入 <strong>SQS Queue</strong>，立即响应用户（不等待）<br>③ <strong>Worker Tier</strong> 从 SQS 拉取消息，异步处理图片<br>④ Worker Tier 根据 <strong>SQS 消息数量</strong>自动扩缩<br><br>这是 Beanstalk 的标准解耦模式，适合所有耗时异步任务。', ww: '加实例（A）不解决超时问题，只是分担更多等待。Lambda（C）不在 Beanstalk 体系内。多线程（D）仍然阻塞同一请求。', rule: '耗时任务异步化 → Web Tier 写 SQS → Worker Tier 处理。Worker Tier 按 SQS 消息数扩缩。'
+      },
+      { id: 'ca_06', topic: '经典架构', diff: 'high',
+        text: '公司 Web 应用目前<em>将完整购物车数据存储在 Cookie 中</em>。安全团队发现 Cookie 内容可被用户篡改以修改价格。如何修复？',
+        en: 'A company stores complete shopping cart data in user cookies. The security team finds that users can tamper with cookie contents to modify prices. How should this be fixed?',
+        ch: ['对 Cookie 内容进行 Base64 编码', '只在 Cookie 中存储 session_id，将购物车数据移到 ElastiCache', '启用 HTTPS 防止 Cookie 被截获', '使用 ELB Stickiness 保证每次请求同一台 EC2'],
+        ench: ['Base64 encode the cookie contents', 'Store only session_id in the cookie and move cart data to ElastiCache', 'Enable HTTPS to prevent cookie interception', 'Use ELB Stickiness to route each user to the same EC2'],
+        ans: 1, exp: '<strong>Server Session 模式</strong>解决安全问题：<br><br>• Cookie 只存 <strong>session_id</strong>（随机生成的 UUID，无意义）<br>• 购物车数据（含价格）存在 <strong>ElastiCache</strong> 服务端<br>• 用户无法通过修改 session_id 来修改价格<br>• 价格由服务端控制，客户端永远无法直接篡改<br><br>Base64（A）：不是加密，可以轻松解码和篡改。<br>HTTPS（C）：防止传输层截获，但不防止用户修改自己发出的 Cookie。<br>Stickiness（D）：不解决安全问题，只解决路由问题。', ww: 'Base64 不是加密（A 无效）。HTTPS 防中间人，不防用户自己篡改（C 无效）。Stickiness 是路由策略，与数据安全无关（D 无效）。', rule: 'Cookie 数据可被篡改 → Server Session：Cookie 只存 ID，数据存服务端 ElastiCache。'
+      },
+      { id: 'ca_07', topic: '经典架构', diff: 'mid',
+        text: '三层 Web 架构中，位于<em>数据子网（Data Subnet）</em>的 ElastiCache 安全组应如何配置入站规则？',
+        en: 'In a 3-tier web architecture, how should the ElastiCache Security Group in the Data Subnet be configured for inbound access?',
+        ch: ['允许来自 0.0.0.0/0 的入站流量', '允许来自 ELB Security Group 的入站流量', '允许来自 EC2（应用层）Security Group 的入站流量', '允许来自整个 VPC CIDR 的所有流量'],
+        ench: ['Allow inbound from 0.0.0.0/0', 'Allow inbound from ELB Security Group', 'Allow inbound from EC2 (application tier) Security Group', 'Allow inbound from the entire VPC CIDR'],
+        ans: 2, exp: '<strong>最小权限原则：只允许来自 EC2 SG 的流量</strong><br><br>三层架构 Security Group 链：<br>① ELB SG：允许来自 Internet（0.0.0.0/0）的 80/443<br>② EC2 SG：只允许来自 ELB SG 的流量<br>③ ElastiCache SG / RDS SG：只允许来自 <strong>EC2 SG</strong> 的流量<br><br>SG 引用另一个 SG 的好处：即使 EC2 IP 变化，规则自动适用（无需维护 IP 列表）', ww: '0.0.0.0/0 会将数据库暴露到公网（A 严重错误）。ELB 不直接访问 ElastiCache（B 错）。允许整个 VPC CIDR 权限过大（D 不是最小权限）。', rule: '数据层 SG → 只允许来自应用层 EC2 SG。SG 引用 SG 是最佳实践（动态、最小权限）。'
+      },
+      { id: 'ca_08', topic: '经典架构', diff: 'high',
+        text: 'Elastic Beanstalk 的<em>部署模式</em>中，开发测试环境应选 Single Instance，生产环境应选 HA with Load Balancer。两者的核心区别是什么？',
+        en: 'In Elastic Beanstalk deployment modes, development uses Single Instance and production uses HA with Load Balancer. What is the core difference?',
+        ch: ['Single Instance 使用 Spot 实例，HA 使用 On-Demand', 'Single Instance 有 1 台 EC2 + Elastic IP，HA 有 ALB + ASG 跨多个 AZ + RDS Standby', 'Single Instance 不支持 RDS，HA 才支持', 'Single Instance 使用 Lambda，HA 使用 EC2'],
+        ench: ['Single Instance uses Spot, HA uses On-Demand', 'Single Instance has 1 EC2 + Elastic IP; HA has ALB + ASG across multiple AZs + RDS Standby', 'Single Instance does not support RDS; HA does', 'Single Instance uses Lambda; HA uses EC2'],
+        ans: 1, exp: '<strong>核心区别在于高可用能力：</strong><br><br><strong>Single Instance（开发/测试）</strong>：<br>• 1 台 EC2 + Elastic IP<br>• RDS（单 AZ，无 Standby）<br>• 节省成本，但无冗余<br><br><strong>HA with Load Balancer（生产）</strong>：<br>• ALB → ASG（跨 AZ1 + AZ2）<br>• RDS Master + RDS Standby（Multi-AZ）<br>• 任意 AZ 故障不影响服务<br><br>两者都使用 EC2（不是 Lambda），都支持 RDS，实例类型由配置决定（非 Spot vs On-Demand 的根本区别）。', ww: '实例购买类型（Spot/On-Demand）不是两者定义的区别（A 错）。两者都支持 RDS（C 错）。两者都使用 EC2 不是 Lambda（D 错）。', rule: 'Beanstalk 部署模式：Single（1 EC2 + Elastic IP）→ dev；HA（ALB + ASG + Multi-AZ RDS）→ prod。'
       }
     ];
 
@@ -3164,9 +3226,9 @@
       };
     })();
 
-    const TOPIC_PAGE = { 'IAM': 'iam', 'Security Group': 'security-groups', 'Load Balancer': 'elb', 'Auto Scaling Group': 'asg', 'EBS': 'ebs', '扩展性与高可用': 'scalability', '购买模式': 'purchasing', 'RDS': 'rds', 'ElastiCache': 'elasticache', 'Route 53': 'route53' };
+    const TOPIC_PAGE = { 'IAM': 'iam', 'Security Group': 'security-groups', 'Load Balancer': 'elb', 'Auto Scaling Group': 'asg', 'EBS': 'ebs', '扩展性与高可用': 'scalability', '购买模式': 'purchasing', 'RDS': 'rds', 'ElastiCache': 'elasticache', 'Route 53': 'route53', '经典架构': 'classic-arch' };
 
-    const CONFUSED_TOPICS = { 'RDS': ['ElastiCache'], 'ElastiCache': ['RDS'], 'EBS': ['扩展性与高可用'], 'Load Balancer': ['Auto Scaling Group'], 'Auto Scaling Group': ['Load Balancer'], 'Security Group': ['IAM'], 'IAM': ['Security Group'], '购买模式': ['扩展性与高可用'], '扩展性与高可用': ['购买模式', 'EBS'], 'Route 53': ['Load Balancer'] };
+    const CONFUSED_TOPICS = { 'RDS': ['ElastiCache'], 'ElastiCache': ['RDS'], 'EBS': ['扩展性与高可用'], 'Load Balancer': ['Auto Scaling Group'], 'Auto Scaling Group': ['Load Balancer'], 'Security Group': ['IAM'], 'IAM': ['Security Group'], '购买模式': ['扩展性与高可用'], '扩展性与高可用': ['购买模式', 'EBS'], 'Route 53': ['Load Balancer'], '经典架构': ['Load Balancer', 'Auto Scaling Group', 'ElastiCache'] };
 
     function getDueQuestions() {
       const now = Date.now();
@@ -3223,7 +3285,7 @@
       document.querySelectorAll('.mobile-nav-btn').forEach(b => b.classList.remove('active'));
       const mmap = { 'home': 0, 'compare': 1, 'quiz-home': 2, 'records': 3 };
       const mi = mmap[id]; if (mi !== undefined) { const mb = document.querySelectorAll('.mobile-nav-btn')[mi]; if (mb) mb.classList.add('active'); }
-      const renders = { home: pgHome, compare: pgCompare, 'quiz-home': pgQuizHome, records: pgRecords, iam: pgIAM, 'instance-types': pgInstanceTypes, 'security-groups': pgSecurityGroups, purchasing: pgPurchasing, 'ec2-network': pgEC2Network, scalability: pgScalability, elb: pgELB, asg: pgASG, ebs: pgEBS, 'ebs-types': pgEBSTypes, snapshot: pgSnapshot, istore: pgIStore, efs: pgEFS, ami: pgAMI, rds: pgRDS, elasticache: pgElastiCache, route53: pgRoute53 };
+      const renders = { home: pgHome, compare: pgCompare, 'quiz-home': pgQuizHome, records: pgRecords, iam: pgIAM, 'instance-types': pgInstanceTypes, 'security-groups': pgSecurityGroups, purchasing: pgPurchasing, 'ec2-network': pgEC2Network, scalability: pgScalability, elb: pgELB, asg: pgASG, ebs: pgEBS, 'ebs-types': pgEBSTypes, snapshot: pgSnapshot, istore: pgIStore, efs: pgEFS, ami: pgAMI, rds: pgRDS, elasticache: pgElastiCache, route53: pgRoute53, 'classic-arch': pgClassicArch };
       const v = document.getElementById('view');
       v.style.opacity = '0';
       setTimeout(() => { v.innerHTML = (renders[id] || pgHome)(); v.style.opacity = '1'; v.scrollTop = 0; updateSbProgress(); }, 80);
@@ -3237,7 +3299,7 @@
       if (bar) bar.style.width = pct + '%';
       if (txt) txt.textContent = pct + '% · ' + ov.done + '/' + QS.length;
       // per-topic rates in sidebar
-      const tmap = { 'IAM': 'sp-iam', 'Security Group': 'sp-sg', 'Load Balancer': 'sp-lb', 'Auto Scaling Group': 'sp-asg', 'EBS': 'sp-ebs', '扩展性与高可用': 'sp-ha', 'RDS': 'sp-rds', 'ElastiCache': 'sp-elasticache', 'Route 53': 'sp-r53' };
+      const tmap = { 'IAM': 'sp-iam', 'Security Group': 'sp-sg', 'Load Balancer': 'sp-lb', 'Auto Scaling Group': 'sp-asg', 'EBS': 'sp-ebs', '扩展性与高可用': 'sp-ha', 'RDS': 'sp-rds', 'ElastiCache': 'sp-elasticache', 'Route 53': 'sp-r53', '经典架构': 'sp-ca' };
       Object.entries(tmap).forEach(([tp, elId]) => {
         const el = document.getElementById(elId);
         if (!el) return;
@@ -3348,6 +3410,11 @@
             { id: 'rds', icon: '🗄️', name: 'RDS & Aurora', desc: 'Read Replica · Multi-AZ · RDS Proxy · Storage Auto Scaling', tags: [{ t: '⭐极高频', c: '#C0392B', bg: '#FEF0EE' }, { t: 'ASYNC/SYNC', c: '#7C3AED', bg: '#F5F3FF' }] },
             { id: 'elasticache', icon: '🔴', name: 'ElastiCache', desc: 'Redis vs Memcached · Lazy Loading · Session · Global Datastore', tags: [{ t: 'Redis', c: '#DC2626', bg: '#FEF2F2' }, { t: '缓存层', c: '#0369A1', bg: '#EFF6FF' }] },
             { id: 'route53', icon: '🌐', name: 'Route 53', desc: 'CNAME vs Alias · 7种路由策略 · Health Check · TTL', tags: [{ t: '⭐必考', c: '#C0392B', bg: '#FEF0EE' }, { t: 'DNS', c: '#7C3AED', bg: '#F5F3FF' }] }
+          ]
+        },
+        {
+          label: '架构与平台', color: '#F59E0B', items: [
+            { id: 'classic-arch', icon: '🏗️', name: '经典架构', desc: 'WhatIsTheTime · MyClothes · Beanstalk · 三层架构', tags: [{ t: '⭐高频', c: '#C0392B', bg: '#FEF0EE' }, { t: '架构演进', c: '#0369A1', bg: '#EFF6FF' }] }
           ]
         }
       ];
@@ -5485,6 +5552,238 @@ Sub-ms 延迟 / 极致 IOPS                  → io2 Block Express（最高 256,
   ${trapdiv("amber", "中频", "Geoproximity 必须用 Traffic Flow", "普通 Route 53 记录无法使用 Geoproximity，必须开启 Traffic Flow 高级功能。")}
   ${trapdiv("amber", "中频", "Geolocation 必须有 Default 记录", "没有 Default 记录时，未匹配地区的用户会 DNS 解析失败，而不是随机选一个。")}
   ${trapdiv("amber", "低频", "Inbound vs Outbound Endpoint 方向", "Inbound = 外部（机房）查 AWS；Outbound = AWS 查外部（机房）。方向常被考反。")}
+</div>
+`}
+
+
+
+    /* ═══════════════ CLASSIC ARCHITECTURE PAGE ═══════════════ */
+    function pgClassicArch() { return `${back()}
+<div class="pg-title">Section 11 — 经典解决方案架构</div>
+<div class="pg-tags">
+  <span class="tag tag-high">⭐ 高频</span>
+  <span class="tag tag-mid">Section 11</span>
+  <span class="tag tag-low">架构演进 · Beanstalk</span>
+</div>
+
+<h2 class="pg-h2">是什么（What）</h2>
+<p>经典解决方案架构通过三个真实案例展示<strong>从单机到高可用、从无状态到有状态</strong>的完整演进过程，帮助理解 AWS 服务如何协同工作解决实际问题。</p>
+<div class="tip-card">
+  <div class="tip-label">📌 本章核心思路</div>
+  <div class="tip-text">每次加一个 AWS 服务，是为了解决上一阶段遗留的<strong>哪个具体问题</strong>？理解驱动力比记忆步骤更重要。</div>
+</div>
+
+<h2 class="pg-h2">案例一：WhatIsTheTime.com（无状态应用演进）</h2>
+<p>只显示当前时间，<strong>无需数据库，无用户状态</strong>。目标：从单机演进到多区域高可用。</p>
+
+<div style="display:flex;flex-direction:column;gap:8px;margin:12px 0">
+  <div style="border:1.5px solid #FED7AA;border-radius:8px;padding:10px 14px;background:#FFF7ED">
+    <div style="font-weight:700;color:var(--aws);margin-bottom:4px">① 起步：单台 EC2 + Elastic IP</div>
+    <div class="g2">
+      <div style="font-size:13px;color:var(--ink2)">用户 → Elastic IP → EC2 (t2)</div>
+      <div style="font-size:12px;color:#DC2626;background:#FEF2F2;padding:5px 8px;border-radius:6px"><strong>问题：</strong>实例重启 IP 变化，需绑定 Elastic IP</div>
+    </div>
+  </div>
+  <div style="border:1.5px solid #FED7AA;border-radius:8px;padding:10px 14px;background:#FFF7ED">
+    <div style="font-weight:700;color:var(--aws);margin-bottom:4px">② 垂直扩展：换更大实例（M5）</div>
+    <div class="g2">
+      <div style="font-size:13px;color:var(--ink2)">t2 → M5 → M5.xlarge → …</div>
+      <div style="font-size:12px;color:#DC2626;background:#FEF2F2;padding:5px 8px;border-radius:6px"><strong>问题：</strong>升级需要停机（downtime），有上限</div>
+    </div>
+  </div>
+  <div style="border:1.5px solid #FED7AA;border-radius:8px;padding:10px 14px;background:#FFF7ED">
+    <div style="font-weight:700;color:var(--aws);margin-bottom:4px">③ 水平扩展：多台 EC2 + Route 53 A Record（TTL 1hr）</div>
+    <div class="g2">
+      <div style="font-size:13px;color:var(--ink2)">用户 → Route 53 → EC2-1 / EC2-2 / EC2-3</div>
+      <div style="font-size:12px;color:#DC2626;background:#FEF2F2;padding:5px 8px;border-radius:6px"><strong>问题：</strong>TTL 1小时内删除实例，用户仍访问旧 IP（缓存期）</div>
+    </div>
+  </div>
+  <div style="border:1.5px solid #BBF7D0;border-radius:8px;padding:10px 14px;background:#F0FDF4">
+    <div style="font-weight:700;color:#15803D;margin-bottom:4px">④ 引入 ELB + Health Check + SG 限制</div>
+    <div class="g2">
+      <div style="font-size:13px;color:var(--ink2)">用户 → Route 53 (Alias) → ELB → EC2（SG 只允许 LB SG）</div>
+      <div style="font-size:12px;color:#15803D;background:#DCFCE7;padding:5px 8px;border-radius:6px"><strong>解决：</strong>Health Check 自动剔除故障实例；SG 隔离保护</div>
+    </div>
+  </div>
+  <div style="border:1.5px solid #BBF7D0;border-radius:8px;padding:10px 14px;background:#F0FDF4">
+    <div style="font-weight:700;color:#15803D;margin-bottom:4px">⑤ 加入 ASG — 按需弹性扩缩</div>
+    <div class="g2">
+      <div style="font-size:13px;color:var(--ink2)">ELB → ASG（自动增减 EC2）← CloudWatch 触发</div>
+      <div style="font-size:12px;color:#15803D;background:#DCFCE7;padding:5px 8px;border-radius:6px"><strong>解决：</strong>流量峰值自动扩容，低谷缩容节省成本</div>
+    </div>
+  </div>
+  <div style="border:1.5px solid #BBF7D0;border-radius:8px;padding:10px 14px;background:#F0FDF4">
+    <div style="font-weight:700;color:#15803D;margin-bottom:4px">⑥ Multi-AZ + Reserved Instances（最终生产架构）</div>
+    <div class="g2">
+      <div style="font-size:13px;color:var(--ink2)">ELB Multi-AZ → ASG 跨 AZ1 / AZ2 / AZ3 部署</div>
+      <div style="font-size:12px;color:#15803D;background:#DCFCE7;padding:5px 8px;border-radius:6px"><strong>解决：</strong>AZ 故障不影响服务。最小容量用 Reserved（省钱），弹性部分用 On-Demand</div>
+    </div>
+  </div>
+</div>
+<div class="trap amber"><span class="trap-icon">⚠️</span><div><strong>TTL 陷阱<span class="trap-freq">高频</span></strong>Route 53 TTL 设置过高时，即使删除 EC2，客户端在 TTL 到期前仍会访问旧 IP。引入 ELB（固定 DNS 名）可彻底消除此问题。</div></div>
+
+<h2 class="pg-h2">案例二：MyClothes.com（有状态应用）</h2>
+<p>电商购物车网站，需要在多次请求之间<strong>保持用户状态（购物车）</strong>。三种方案对比：</p>
+<div class="tbl-wrap">
+<table class="tbl"><thead><tr><th>方案</th><th>机制</th><th>优点</th><th>风险</th></tr></thead><tbody>
+<tr>
+  <td><strong>① ELB Stickiness</strong><br><span style="font-size:11px;color:var(--ink3)">粘性会话</span></td>
+  <td>同一用户始终路由到同一台 EC2</td>
+  <td>无需改代码</td>
+  <td>实例故障 → 购物车丢失；负载不均匀</td>
+</tr>
+<tr>
+  <td><strong>② User Cookies</strong><br><span style="font-size:11px;color:var(--ink3)">客户端存储</span></td>
+  <td>购物车数据存在浏览器 Cookie 中，每次请求携带</td>
+  <td>EC2 完全无状态，可自由扩缩</td>
+  <td>Cookie 可被篡改（安全风险）；每次 HTTP 带更多数据；上限 4KB</td>
+</tr>
+<tr>
+  <td><strong>③ Server Session ⭐推荐</strong><br><span style="font-size:11px;color:var(--ink3)">服务端存储</span></td>
+  <td>Cookie 只存 session_id，购物车存 ElastiCache</td>
+  <td>安全；EC2 无状态；毫秒级读取</td>
+  <td>需要 ElastiCache 额外成本</td>
+</tr>
+</tbody></table>
+</div>
+
+<h3 class="pg-h3">MyClothes.com 完整数据架构</h3>
+<div style="background:#F8FAFC;border:1.5px solid var(--border);border-radius:10px;padding:14px;margin:12px 0">
+  <div style="text-align:center;margin-bottom:10px">
+    <span style="background:#E0F2FE;color:#0369A1;padding:5px 12px;border-radius:6px;font-weight:700;font-size:13px">👥 用户</span>
+    <span style="color:var(--ink3);margin:0 8px">→</span>
+    <span style="background:var(--aws);color:#fff;padding:5px 12px;border-radius:6px;font-weight:700;font-size:13px">ELB (Multi-AZ)</span>
+    <span style="color:var(--ink3);margin:0 8px">→</span>
+    <span style="background:#FEF3C7;color:#92400E;padding:5px 12px;border-radius:6px;font-weight:700;font-size:13px">ASG EC2 × N</span>
+  </div>
+  <div class="g2" style="gap:12px">
+    <div style="text-align:center">
+      <div style="font-size:11px;color:var(--ink3);margin-bottom:4px">① session 读写（毫秒级）</div>
+      <div style="background:#F2EEFF;border:1.5px solid #C4B5FD;padding:8px 12px;border-radius:8px;font-weight:700;font-size:13px;color:#4C1D95">ElastiCache<br><span style="font-size:11px;font-weight:400">session_id → 购物车数据</span></div>
+    </div>
+    <div style="text-align:center">
+      <div style="font-size:11px;color:var(--ink3);margin-bottom:4px">② 用户数据 + Read Replica 扩展读</div>
+      <div style="background:#F5F0FF;border:1.5px solid #C084FC;padding:8px 12px;border-radius:8px;font-weight:700;font-size:13px;color:#581C87">RDS (Multi-AZ)<br><span style="font-size:11px;font-weight:400">用户信息 · 订单</span></div>
+    </div>
+  </div>
+  <div style="text-align:center;margin-top:8px;font-size:12px;color:var(--ink3)">安全组链：EC2 SG → 允许访问 ElastiCache SG + RDS SG（最小权限）</div>
+</div>
+<div class="tip-card" style="background:#F2EEFF;border-color:#C4B5FD">
+  <div class="tip-label" style="color:#7C3AED">💡 Lazy Loading（延迟加载）</div>
+  <div class="tip-text">① 先读 ElastiCache；② Cache Miss → 读 RDS → 写入 Cache；③ 下次命中 Cache 直接返回。减少 RDS 读压力。</div>
+</div>
+
+<h2 class="pg-h2">案例三：MyWordPress.com（图片存储演进）</h2>
+<div class="g2">
+  <div style="border:1.5px solid #FCA5A5;border-radius:8px;padding:12px;background:#FEF2F2">
+    <div style="font-weight:700;color:#DC2626;margin-bottom:6px">❌ EBS — 单实例陷阱</div>
+    <div style="font-size:13px;color:var(--ink2)">每台 EC2 有自己的 EBS 卷<br>用户 A 上传图片 → 写入 EC2-1 的 EBS<br>下次路由到 EC2-2 → <strong>找不到图片</strong><br><br>根本原因：EBS 是块存储，绑定单台实例，多实例间<strong>不共享</strong></div>
+  </div>
+  <div style="border:1.5px solid #BBF7D0;border-radius:8px;padding:12px;background:#F0FDF4">
+    <div style="font-weight:700;color:#15803D;margin-bottom:6px">✅ EFS — 共享网络文件系统</div>
+    <div style="font-size:13px;color:var(--ink2)">EFS（Elastic File System）通过 ENI 挂载到各 AZ<br>所有 EC2 挂载<strong>同一个 EFS</strong><br>任意实例读写 → 所有实例可见<br><br>适用：多 AZ、多 EC2 共享文件（Linux Only）</div>
+  </div>
+</div>
+<div style="background:#F8FAFC;border:1.5px solid var(--border);border-radius:10px;padding:12px;margin:12px 0;text-align:center">
+  <div style="font-size:12px;color:var(--ink3);margin-bottom:8px">EFS 架构：所有实例共享同一文件系统</div>
+  <div style="display:flex;justify-content:center;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px">
+    <span style="background:#FEF3C7;color:#92400E;padding:4px 10px;border-radius:6px;font-size:12px">EC2 (AZ-1)</span>
+    <span style="background:#FEF3C7;color:#92400E;padding:4px 10px;border-radius:6px;font-size:12px">EC2 (AZ-2)</span>
+    <span style="background:#FEF3C7;color:#92400E;padding:4px 10px;border-radius:6px;font-size:12px">EC2 (AZ-3)</span>
+  </div>
+  <div style="color:var(--ink3);margin-bottom:6px;font-size:13px">↕ ENI（每 AZ 各一个挂载点）</div>
+  <div style="background:#DBEAFE;color:#1E40AF;padding:8px 20px;border-radius:8px;font-weight:700;display:inline-block">EFS（NFS 共享存储）</div>
+</div>
+
+<h2 class="pg-h2">快速实例化（Instantiating Apps Quickly）</h2>
+<div class="tbl-wrap">
+<table class="tbl"><thead><tr><th>方法</th><th>适用层</th><th>原理</th><th>速度</th></tr></thead><tbody>
+<tr><td><strong>Golden AMI</strong></td><td>EC2</td><td>预装所有依赖/软件/OS 配置，启动即用</td><td>⚡ 最快</td></tr>
+<tr><td><strong>User Data</strong></td><td>EC2</td><td>启动脚本动态安装/配置（适合动态参数）</td><td>较慢（需运行脚本）</td></tr>
+<tr><td><strong>Hybrid</strong></td><td>EC2</td><td>Golden AMI 预装 + User Data 动态注入配置</td><td>快</td></tr>
+<tr><td><strong>RDS Snapshot 恢复</strong></td><td>RDS</td><td>直接恢复含数据的快照，Schema + 数据已就位</td><td>快</td></tr>
+<tr><td><strong>EBS Snapshot 恢复</strong></td><td>EBS</td><td>直接恢复含数据的卷，格式化 + 数据已就位</td><td>快</td></tr>
+</tbody></table>
+</div>
+
+<h2 class="pg-h2">三层 Web 架构（Typical 3-Tier）</h2>
+<div style="background:#F8FAFC;border:1.5px solid var(--border);border-radius:10px;padding:14px;margin:12px 0">
+  <div style="display:flex;flex-direction:column;gap:8px">
+    <div style="background:#DBEAFE;border-radius:8px;padding:10px 14px">
+      <div style="font-weight:700;color:#1E40AF;margin-bottom:4px">PUBLIC SUBNET — 公网层</div>
+      <div style="font-size:13px;color:var(--ink2)">ELB（Multi-AZ）— 接收用户流量，转发到私有子网 EC2</div>
+    </div>
+    <div style="text-align:center;color:var(--ink3);font-size:13px">↓ EC2 SG 只允许来自 ELB SG 的流量</div>
+    <div style="background:#FEF3C7;border-radius:8px;padding:10px 14px">
+      <div style="font-weight:700;color:#92400E;margin-bottom:4px">PRIVATE SUBNET — 应用层</div>
+      <div style="font-size:13px;color:var(--ink2)">ASG + EC2（跨 3 个 AZ）— 处理业务逻辑</div>
+    </div>
+    <div style="text-align:center;color:var(--ink3);font-size:13px">↓ 数据层 SG 只允许来自 EC2 SG 的流量</div>
+    <div style="background:#F2EEFF;border-radius:8px;padding:10px 14px">
+      <div style="font-weight:700;color:#7C3AED;margin-bottom:4px">DATA SUBNET — 数据层</div>
+      <div style="font-size:13px;color:var(--ink2)">ElastiCache（会话/缓存） · RDS（读写分离，Multi-AZ）</div>
+    </div>
+  </div>
+</div>
+
+<h2 class="pg-h2">Elastic Beanstalk — 开发者视角 PaaS</h2>
+<div class="g2">
+  <div>
+    <h3 class="pg-h3">是什么</h3>
+    <p><strong>Elastic Beanstalk</strong>（弹性豆茎）是面向开发者的<strong>托管平台（PaaS）</strong>。底层使用 EC2/ASG/ELB/RDS，但开发者只需上传代码，AWS 自动处理：容量规划、负载均衡、自动扩缩、健康监控、实例配置。</p>
+    <div style="background:#F0FDF4;border-radius:6px;padding:8px 12px;font-size:13px;color:#15803D;margin-top:8px"><strong>Beanstalk 本身免费</strong>，只为底层 EC2/RDS 等资源付费</div>
+  </div>
+  <div>
+    <h3 class="pg-h3">核心组件</h3>
+    <div style="font-size:13px;color:var(--ink2);line-height:1.8">
+      <div style="background:#F8FAFC;border-radius:6px;padding:8px 10px;margin-bottom:6px"><strong>Application</strong> — 所有组件的集合（顶层容器）</div>
+      <div style="background:#F8FAFC;border-radius:6px;padding:8px 10px;margin-bottom:6px"><strong>Application Version</strong> — 代码的某个迭代版本（可回滚）</div>
+      <div style="background:#F8FAFC;border-radius:6px;padding:8px 10px"><strong>Environment</strong> — 运行某版本代码的 AWS 资源集合<br><span style="color:var(--ink3)">可同时维护 dev / test / prod 多套 env</span></div>
+    </div>
+  </div>
+</div>
+
+<h3 class="pg-h3">Web Server Tier vs Worker Tier</h3>
+<div class="tbl-wrap">
+<table class="tbl"><thead><tr><th>维度</th><th>Web Server Tier</th><th>Worker Tier</th></tr></thead><tbody>
+<tr><td><strong>流量入口</strong></td><td>ELB → ASG EC2（HTTP/HTTPS 请求）</td><td>SQS Queue → ASG EC2（消息驱动）</td></tr>
+<tr><td><strong>扩缩依据</strong></td><td>HTTP 请求数 / CPU</td><td><strong>SQS 队列消息数</strong></td></tr>
+<tr><td><strong>典型用途</strong></td><td>用户直接访问的 API / 网站</td><td>异步任务（发邮件、图片处理、数据导出）</td></tr>
+<tr><td><strong>联动</strong></td><td colspan="2">Web Tier 收到耗时请求 → 写入 SQS → Worker Tier 异步处理</td></tr>
+</tbody></table>
+</div>
+
+<h3 class="pg-h3">部署模式对比</h3>
+<div class="tbl-wrap">
+<table class="tbl"><thead><tr><th>模式</th><th>架构</th><th>用途</th></tr></thead><tbody>
+<tr><td><strong>Single Instance</strong></td><td>1 台 EC2 + Elastic IP + RDS（单 AZ）</td><td>开发 / 测试环境</td></tr>
+<tr><td><strong>HA with Load Balancer</strong></td><td>ALB → ASG（跨 AZ1+AZ2）+ RDS Standby</td><td>生产环境（高可用）</td></tr>
+</tbody></table>
+</div>
+
+<h3 class="pg-h3">支持的平台</h3>
+<div class="g3-sm" style="gap:6px;margin:8px 0">
+  <div style="background:#F1F5F9;border-radius:6px;padding:6px 10px;font-size:12px;font-weight:600;text-align:center;color:var(--ink2)">Go</div>
+  <div style="background:#F1F5F9;border-radius:6px;padding:6px 10px;font-size:12px;font-weight:600;text-align:center;color:var(--ink2)">Java SE</div>
+  <div style="background:#F1F5F9;border-radius:6px;padding:6px 10px;font-size:12px;font-weight:600;text-align:center;color:var(--ink2)">Java / Tomcat</div>
+  <div style="background:#F1F5F9;border-radius:6px;padding:6px 10px;font-size:12px;font-weight:600;text-align:center;color:var(--ink2)">.NET Core / Linux</div>
+  <div style="background:#F1F5F9;border-radius:6px;padding:6px 10px;font-size:12px;font-weight:600;text-align:center;color:var(--ink2)">.NET / Windows</div>
+  <div style="background:#F1F5F9;border-radius:6px;padding:6px 10px;font-size:12px;font-weight:600;text-align:center;color:var(--ink2)">Node.js</div>
+  <div style="background:#F1F5F9;border-radius:6px;padding:6px 10px;font-size:12px;font-weight:600;text-align:center;color:var(--ink2)">PHP</div>
+  <div style="background:#F1F5F9;border-radius:6px;padding:6px 10px;font-size:12px;font-weight:600;text-align:center;color:var(--ink2)">Python</div>
+  <div style="background:#F1F5F9;border-radius:6px;padding:6px 10px;font-size:12px;font-weight:600;text-align:center;color:var(--ink2)">Ruby</div>
+  <div style="background:#F1F5F9;border-radius:6px;padding:6px 10px;font-size:12px;font-weight:600;text-align:center;color:var(--ink2)">Docker（Single/Multi）</div>
+  <div style="background:#F1F5F9;border-radius:6px;padding:6px 10px;font-size:12px;font-weight:600;text-align:center;color:var(--ink2)">Packer Builder</div>
+</div>
+
+<h2 class="pg-h2">考试重点</h2>
+<div class="g2">
+  <div class="trap red"><span class="trap-icon">🚨</span><div><strong>多实例共享文件 → EFS，非 EBS<span class="trap-freq">⭐极高频</span></strong>EBS 绑定单台 EC2，多实例场景必须用 EFS（NFS）。考题常给 EBS 作干扰项。</div></div>
+  <div class="trap red"><span class="trap-icon">🚨</span><div><strong>购物车/Session → ElastiCache Server Session<span class="trap-freq">⭐极高频</span></strong>最安全、最高效方案。Stickiness 有单点风险，Cookies 有安全风险（可被篡改）。</div></div>
+  <div class="trap amber"><span class="trap-icon">⚠️</span><div><strong>最快启动 EC2 → Golden AMI<span class="trap-freq">高频</span></strong>User Data 需要运行脚本（慢）。Golden AMI 预装一切，启动即用，是最快方案。</div></div>
+  <div class="trap amber"><span class="trap-icon">⚠️</span><div><strong>开发者只想上传代码 → Elastic Beanstalk<span class="trap-freq">高频</span></strong>Beanstalk 自动管理 EC2/ASG/ELB，开发者只负责代码。本身免费，为底层资源付费。</div></div>
+  <div class="trap amber"><span class="trap-icon">⚠️</span><div><strong>Worker Tier 扩缩依据是 SQS 消息数<span class="trap-freq">中频</span></strong>Web Tier 按 HTTP 请求/CPU 扩缩。Worker Tier 专门根据 SQS 积压消息数动态扩缩。</div></div>
+  <div class="trap amber"><span class="trap-icon">⚠️</span><div><strong>Beanstalk 免费，底层资源付费<span class="trap-freq">中频</span></strong>Beanstalk 服务本身不收费。运行的 EC2、RDS、ELB 等资源按正常价格计费。</div></div>
 </div>
 `}
 
