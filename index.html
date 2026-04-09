@@ -6159,26 +6159,31 @@ Sub-ms 延迟 / 极致 IOPS                  → io2 Block Express（最高 256,
 <div class="s-card">
   <h3>🪣 S3 是什么？— What</h3>
   <p style="color:var(--ink2);font-size:15px;line-height:1.8"><strong>Amazon S3（Simple Storage Service，简单存储服务）</strong>是 AWS 的<strong>对象存储（Object Storage）</strong>服务。类比：把 S3 想象成一个<strong>无限容量的网盘</strong>——你上传文件，AWS 负责存储、冗余、持久性，你只需要通过 HTTP 读写数据，无需管理任何服务器或磁盘。</p>
-  <div style="display:flex;flex-wrap:wrap;gap:14px;margin-top:14px">
-    <div style="flex:1;min-width:320px;background:var(--aws-bg);border:1.5px solid var(--aws-border);border-radius:8px;padding:14px">
-      <div style="font-size:12px;font-weight:700;color:var(--aws);margin-bottom:8px">S3 两大核心概念</div>
-      <div class="bl">
-        <div class="bl-item"><span class="bl-dot"></span><strong>Bucket（桶）</strong> — 存放对象的顶级容器，类比"文件夹的根目录"</div>
-        <div class="bl-item"><span class="bl-dot"></span><strong>Object（对象）</strong> — 实际存储的文件，由 Key（键）+ Value（数据）+ Metadata 组成</div>
-        <div class="bl-item"><span class="bl-dot"></span>Bucket 名称<strong>全球唯一</strong>（跨所有账号），但 Bucket 是 <strong>Region 级别</strong>资源</div>
-        <div class="bl-item"><span class="bl-dot"></span>Object Key = 完整路径（如 <code>photos/2024/cat.jpg</code>），S3 中没有真正的"文件夹"</div>
-      </div>
-    </div>
-    <div style="flex:1;min-width:320px;background:var(--blue-bg);border:1.5px solid var(--blue-border);border-radius:8px;padding:14px">
-      <div style="font-size:12px;font-weight:700;color:var(--blue);margin-bottom:8px">Object 的组成</div>
-      <div class="bl">
-        <div class="bl-item"><span class="bl-dot"></span><strong>Key</strong> — 对象在 Bucket 中的唯一标识（完整路径）</div>
-        <div class="bl-item"><span class="bl-dot"></span><strong>Value</strong> — 实际数据（字节序列）</div>
-        <div class="bl-item"><span class="bl-dot"></span><strong>单个最大 5 TB</strong>，>100 MB 推荐 Multi-Part，>5 GB 必须 Multi-Part</div>
-        <div class="bl-item"><span class="bl-dot"></span><strong>Metadata</strong> — 键值对（系统/用户自定义）</div>
-        <div class="bl-item"><span class="bl-dot"></span><strong>Tags</strong> — 最多 10 个，用于生命周期/权限控制</div>
-        <div class="bl-item"><span class="bl-dot"></span><strong>Version ID</strong> — 开启 Versioning 后存在</div>
-      </div>
+
+  <div style="background:var(--surface2);border-radius:10px;padding:16px;margin-top:14px;font-size:13px;line-height:2.2;color:var(--ink2)">
+    <div style="font-size:11px;font-weight:700;color:var(--ink3);margin-bottom:8px;text-transform:uppercase;letter-spacing:.5px">S3 层次结构</div>
+    <div style="color:var(--ink3)">AWS 账号</div>
+    <div style="margin-left:20px">└── <strong style="color:var(--aws)">Bucket</strong>（桶）— 容器，名称<strong>全球唯一</strong>，属于某个 <strong>Region</strong></div>
+    <div style="margin-left:40px">├── <strong style="color:var(--blue)">Object</strong> — photos/2024/cat.jpg</div>
+    <div style="margin-left:40px">├── <strong style="color:var(--blue)">Object</strong> — docs/resume.pdf</div>
+    <div style="margin-left:40px">└── <strong style="color:var(--blue)">Object</strong> — data/log.csv</div>
+    <div style="margin-top:8px;background:var(--surface);border-radius:6px;padding:8px 10px;font-size:12px;color:var(--ink3)">⚠️ S3 没有真正的“文件夹”。<code>photos/2024/cat.jpg</code> 整个字符串就是 Object 的 <strong>Key</strong>，路径中的 <code>/</code> 只是名称的一部分。</div>
+  </div>
+
+  <div style="margin-top:14px">
+    <div style="font-size:12px;font-weight:700;color:var(--blue);margin-bottom:8px">Object 的 6 个组成部分</div>
+    <div class="tbl-wrap">
+      <table>
+        <thead><tr><th>字段</th><th>内容</th><th>考试重点</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Key</strong></td><td>对象在 Bucket 中的唯一标识（完整路径字符串）</td><td>不是真实路径，是字符串</td></tr>
+          <tr><td><strong>Value</strong></td><td>实际数据（字节序列）</td><td>—</td></tr>
+          <tr><td><strong>单个大小</strong></td><td>最大 <strong>5 TB</strong></td><td>&gt;100 MB 推荐 Multi-Part；&gt;5 GB 必须</td></tr>
+          <tr><td><strong>Metadata</strong></td><td>键值对（系统 / 用户自定义）</td><td>—</td></tr>
+          <tr><td><strong>Tags</strong></td><td>最多 10 个标签</td><td>用于生命周期 / 权限控制</td></tr>
+          <tr><td><strong>Version ID</strong></td><td>版本标识</td><td>仅开启 Versioning 后存在</td></tr>
+        </tbody>
+      </table>
     </div>
   </div>
 </div>
@@ -6202,25 +6207,24 @@ Sub-ms 延迟 / 极致 IOPS                  → io2 Block Express（最高 256,
       </div>
     </div>
   </div>
-  <div style="display:flex;flex-wrap:wrap;gap:14px">
-    <div style="flex:1;min-width:300px;background:#FEF9EB;border:1.5px solid #F59E0B44;border-radius:8px;padding:14px">
-      <div style="font-size:12px;font-weight:700;color:#B45309;margin-bottom:8px">Bucket Policy 结构</div>
-      <div style="font-size:12px;color:var(--ink2);line-height:1.8">
-        <code>Principal</code> — 谁（账号/用户）<br>
-        <code>Action</code> — 什么操作（s3:GetObject）<br>
-        <code>Resource</code> — 哪个 Bucket/对象<br>
-        <code>Effect</code> — Allow / Deny<br>
-        Resource-based，不依赖 IAM
-      </div>
+
+  <div style="background:#FEF9EB;border-left:4px solid #F59E0B;border-radius:0 8px 8px 0;padding:14px 16px;margin-bottom:10px">
+    <div style="font-size:12px;font-weight:700;color:#B45309;margin-bottom:10px">Bucket Policy 结构（Resource-based，不依赖 IAM）</div>
+    <div style="display:grid;grid-template-columns:auto 1fr;gap:5px 14px;font-size:13px;color:var(--ink2);align-items:baseline">
+      <code style="color:#B45309">Principal</code><span>谁可以访问（账号 / 用户 / * 公开）</span>
+      <code style="color:#B45309">Action</code><span>什么操作（如 s3:GetObject、s3:PutObject）</span>
+      <code style="color:#B45309">Resource</code><span>哪个 Bucket / 对象（ARN 格式）</span>
+      <code style="color:#B45309">Effect</code><span>Allow 或 Deny</span>
     </div>
-    <div style="flex:1;min-width:300px;background:#FEF0EE;border:1.5px solid #C0392B44;border-radius:8px;padding:14px">
-      <div style="font-size:12px;font-weight:700;color:#C0392B;margin-bottom:8px">Block Public Access（新账号默认开启）</div>
-      <div class="bl">
-        <div class="bl-item"><span class="bl-dot" style="background:#C0392B"></span>BlockPublicAcls — 禁止新建公开 ACL</div>
-        <div class="bl-item"><span class="bl-dot" style="background:#C0392B"></span>IgnorePublicAcls — 忽略已有公开 ACL</div>
-        <div class="bl-item"><span class="bl-dot" style="background:#C0392B"></span>BlockPublicPolicy — 禁止新建公开 Policy</div>
-        <div class="bl-item"><span class="bl-dot" style="background:#C0392B"></span>RestrictPublicBuckets — 拒绝公开 Policy 生效</div>
-      </div>
+  </div>
+
+  <div style="background:#FEF0EE;border-left:4px solid #C0392B;border-radius:0 8px 8px 0;padding:14px 16px">
+    <div style="font-size:12px;font-weight:700;color:#C0392B;margin-bottom:10px">Block Public Access — 新账号默认全部开启（4 个开关）</div>
+    <div class="bl">
+      <div class="bl-item"><span class="bl-dot" style="background:#C0392B"></span><strong>BlockPublicAcls</strong> — 禁止新建公开 ACL</div>
+      <div class="bl-item"><span class="bl-dot" style="background:#C0392B"></span><strong>IgnorePublicAcls</strong> — 忽略已有公开 ACL</div>
+      <div class="bl-item"><span class="bl-dot" style="background:#C0392B"></span><strong>BlockPublicPolicy</strong> — 禁止新建公开 Bucket Policy</div>
+      <div class="bl-item"><span class="bl-dot" style="background:#C0392B"></span><strong>RestrictPublicBuckets</strong> — 拒绝所有公开访问的 Policy 生效</div>
     </div>
   </div>
 </div>
@@ -6232,7 +6236,7 @@ Sub-ms 延迟 / 极致 IOPS                  → io2 Block Express（最高 256,
     <div class="flow">
       <div class="flow-step">
         <div class="flow-n">1</div>
-        <div class="flow-body">开启 Versioning 前已有的对象：Version ID = <strong>null</strong>（"null 版本"）</div>
+        <div class="flow-body">开启 Versioning 前已有的对象：Version ID = <strong>null</strong>（“null 版本”）</div>
       </div>
       <div class="flow-step">
         <div class="flow-n">2</div>
@@ -6252,7 +6256,7 @@ Sub-ms 延迟 / 极致 IOPS                  → io2 Block Express（最高 256,
       </div>
     </div>
   </div>
-  <div style="background:#F0FFF4;border:1.5px solid #34D39944;border-radius:8px;padding:12px">
+  <div style="background:#F0FFF4;border-left:4px solid #34D399;border-radius:0 8px 8px 0;padding:12px 16px">
     <div style="font-size:12px;font-weight:700;color:#065F46;margin-bottom:6px">MFA Delete（双重保护）</div>
     <div style="font-size:13px;color:var(--ink2);line-height:1.8">
       需要 MFA 的操作：① <strong>永久删除某个版本</strong> ② <strong>暂停 Versioning</strong><br>
@@ -6263,37 +6267,23 @@ Sub-ms 延迟 / 极致 IOPS                  → io2 Block Express（最高 256,
 
 <div class="s-card">
   <h3>🌍 S3 Replication（复制）</h3>
-  <div class="g2" style="margin-bottom:14px">
-    <div style="background:var(--aws-bg);border:1.5px solid var(--aws-border);border-radius:8px;padding:12px">
-      <div style="font-size:12px;font-weight:700;color:var(--aws);margin-bottom:8px">CRR — 跨 Region 复制</div>
-      <div class="bl">
-        <div class="bl-item"><span class="bl-dot"></span>Copy to <strong>different Region</strong></div>
-        <div class="bl-item"><span class="bl-dot"></span>用途：合规、低延迟读取、灾备</div>
-        <div class="bl-item"><span class="bl-dot"></span>例：us-east-1 → eu-west-1</div>
-      </div>
-    </div>
-    <div style="background:var(--blue-bg);border:1.5px solid var(--blue-border);border-radius:8px;padding:12px">
-      <div style="font-size:12px;font-weight:700;color:var(--blue);margin-bottom:8px">SRR — 同 Region 复制</div>
-      <div class="bl">
-        <div class="bl-item"><span class="bl-dot"></span>Copy to <strong>same Region</strong></div>
-        <div class="bl-item"><span class="bl-dot"></span>用途：日志聚合、生产→测试同步</div>
-        <div class="bl-item"><span class="bl-dot"></span>例：us-east-1 → us-east-1</div>
-      </div>
-    </div>
+  <div class="tbl-wrap" style="margin-bottom:14px">
+    <table>
+      <thead><tr><th></th><th style="color:var(--aws)">CRR — Cross-Region Replication</th><th style="color:var(--blue)">SRR — Same-Region Replication</th></tr></thead>
+      <tbody>
+        <tr><td>目标</td><td>不同 Region</td><td>相同 Region</td></tr>
+        <tr><td>典型用途</td><td>守规、低延迟读取、灰备</td><td>日志聚合、生产→测试同步</td></tr>
+        <tr><td>举例</td><td>us-east-1 → eu-west-1</td><td>us-east-1 → us-east-1（不同账号）</td></tr>
+      </tbody>
+    </table>
   </div>
-  <div style="background:#FEF9EB;border:1.5px solid #F59E0B44;border-radius:8px;padding:12px">
-    <div style="font-size:12px;font-weight:700;color:#B45309;margin-bottom:8px">⚠️ 复制的重要规则</div>
-    <div class="g2-sm">
-      <div class="bl">
-        <div class="bl-item"><span class="bl-dot" style="background:#B45309"></span>源和目标 Bucket <strong>都必须开启 Versioning</strong></div>
-        <div class="bl-item"><span class="bl-dot" style="background:#B45309"></span>复制是<strong>异步（Async）</strong>进行</div>
-        <div class="bl-item"><span class="bl-dot" style="background:#B45309"></span>需要配置 <strong>IAM 权限</strong>（允许 S3 读源/写目标）</div>
-      </div>
-      <div class="bl">
-        <div class="bl-item"><span class="bl-dot" style="background:#B45309"></span>只复制激活后<strong>新上传</strong>的对象</div>
-        <div class="bl-item"><span class="bl-dot" style="background:#B45309"></span>旧对象用 <strong>S3 Batch Replication</strong></div>
-        <div class="bl-item"><span class="bl-dot" style="background:#B45309"></span>Delete Marker 默认<strong>不复制</strong>（可选开启）</div>
-      </div>
+  <div style="background:#FEF9EB;border-left:4px solid #F59E0B;border-radius:0 8px 8px 0;padding:14px 16px">
+    <div style="font-size:12px;font-weight:700;color:#B45309;margin-bottom:10px">⚠️ 复制的重要规则（必考）</div>
+    <div class="bl">
+      <div class="bl-item"><span class="bl-dot" style="background:#B45309"></span>源和目标 Bucket <strong>都必须开启 Versioning</strong></div>
+      <div class="bl-item"><span class="bl-dot" style="background:#B45309"></span>复制是<strong>异步（Async）</strong>进行，需要配置 <strong>IAM 权限</strong>（允许 S3 读源/写目标）</div>
+      <div class="bl-item"><span class="bl-dot" style="background:#B45309"></span>只复制激活后<strong>新上传</strong>的对象；旧对象用 <strong>S3 Batch Replication</strong></div>
+      <div class="bl-item"><span class="bl-dot" style="background:#B45309"></span>Delete Marker 默认<strong>不复制</strong>（可选开启）</div>
     </div>
   </div>
 </div>
@@ -6314,9 +6304,9 @@ Sub-ms 延迟 / 极致 IOPS                  → io2 Block Express（最高 256,
       </tbody>
     </table>
   </div>
-  <div style="margin-top:12px;background:#F5F3FF;border:1.5px solid #C4B5FD;border-radius:8px;padding:12px">
+  <div style="margin-top:12px;background:#F5F3FF;border-left:4px solid #C4B5FD;border-radius:0 8px 8px 0;padding:12px 16px">
     <div style="font-size:12px;font-weight:700;color:#6D28D9;margin-bottom:6px">Glacier Flexible Retrieval 检索速度</div>
-    <div style="font-size:13px;color:var(--ink2);display:flex;gap:20px;flex-wrap:wrap">
+    <div style="font-size:13px;color:var(--ink2);display:flex;gap:24px;flex-wrap:wrap">
       <span><strong>Expedited</strong>：1-5 分钟</span>
       <span><strong>Standard</strong>：3-5 小时</span>
       <span><strong>Bulk</strong>：5-12 小时（最便宜）</span>
@@ -6338,35 +6328,34 @@ Sub-ms 延迟 / 极致 IOPS                  → io2 Block Express（最高 256,
       <div style="background:#FEF0EE;border:1.5px solid #C0392B44;border-radius:6px;padding:6px 10px;text-align:center"><strong>365天</strong><br><span style="color:#C0392B">删除</span></div>
     </div>
   </div>
-  <div class="g2">
-    <div style="background:var(--green-bg);border:1.5px solid var(--green-border);border-radius:8px;padding:12px">
-      <div style="font-size:12px;font-weight:700;color:var(--green);margin-bottom:8px">Transition Actions（转换）</div>
-      <div class="bl">
-        <div class="bl-item"><span class="bl-dot" style="background:var(--green)"></span>N 天后移动到另一存储类</div>
-        <div class="bl-item"><span class="bl-dot" style="background:var(--green)"></span>可以设置多个阶段（阶梯迁移）</div>
-        <div class="bl-item"><span class="bl-dot" style="background:var(--green)"></span>按 prefix 或 tag 过滤</div>
-      </div>
-    </div>
-    <div style="background:#FEF0EE;border:1.5px solid #C0392B44;border-radius:8px;padding:12px">
-      <div style="font-size:12px;font-weight:700;color:#C0392B;margin-bottom:8px">Expiration Actions（过期删除）</div>
-      <div class="bl">
-        <div class="bl-item"><span class="bl-dot" style="background:#C0392B"></span>N 天后永久删除对象</div>
-        <div class="bl-item"><span class="bl-dot" style="background:#C0392B"></span>删除旧版本（Versioning 开启时）</div>
-        <div class="bl-item"><span class="bl-dot" style="background:#C0392B"></span>清理未完成的 Multipart Upload</div>
-      </div>
-    </div>
+  <div class="tbl-wrap">
+    <table>
+      <thead><tr><th>类型</th><th>作用</th><th>典型用途</th></tr></thead>
+      <tbody>
+        <tr>
+          <td><strong style="color:var(--green)">Transition Actions</strong><br><span style="font-size:11px;color:var(--ink3)">转换存储类</span></td>
+          <td>N 天后将对象移动到另一存储类，可设置多个阶段</td>
+          <td>Standard → Standard-IA → Glacier（阶梯节省费用）</td>
+        </tr>
+        <tr>
+          <td><strong style="color:#C0392B">Expiration Actions</strong><br><span style="font-size:11px;color:var(--ink3)">过期删除</span></td>
+          <td>N 天后永久删除对象</td>
+          <td>删除旧版本 / 清理未完成的 Multi-Part Upload</td>
+        </tr>
+      </tbody>
+    </table>
   </div>
 </div>
 
 <div class="s-card">
   <h3>🔒 S3 加密（4种方式）</h3>
-  <div style="background:var(--surface2);border-radius:10px;padding:14px;margin-bottom:14px">
+  <div style="background:var(--surface2);border-radius:10px;padding:14px">
     <div style="font-size:12px;font-weight:700;color:var(--ink3);margin-bottom:12px;text-transform:uppercase">加密方式对比</div>
     <div class="flow">
       <div class="flow-step">
         <div class="flow-n" style="background:var(--green)">1</div>
         <div class="flow-body">
-          <strong>SSE-S3（默认）</strong> — AWS 托管密钥，AES-256<br>
+          <strong>SSE-S3（默认）</strong> — AWS 托管密鑰，AES-256<br>
           请求头：<code>x-amz-server-side-encryption: AES256</code><br>
           完全透明，无额外费用
         </div>
@@ -6374,7 +6363,7 @@ Sub-ms 延迟 / 极致 IOPS                  → io2 Block Express（最高 256,
       <div class="flow-step">
         <div class="flow-n" style="background:var(--blue)">2</div>
         <div class="flow-body">
-          <strong>SSE-KMS</strong> — AWS KMS 管理密钥<br>
+          <strong>SSE-KMS</strong> — AWS KMS 管理密鑰<br>
           请求头：<code>x-amz-server-side-encryption: aws:kms</code><br>
           CloudTrail 审计 ⚠️ <strong>KMS API 限流</strong>，高并发需申请提升配额
         </div>
@@ -6382,8 +6371,8 @@ Sub-ms 延迟 / 极致 IOPS                  → io2 Block Express（最高 256,
       <div class="flow-step">
         <div class="flow-n" style="background:#F59E0B">3</div>
         <div class="flow-body">
-          <strong>SSE-C</strong> — 客户自提供密钥<br>
-          必须使用 <strong>HTTPS</strong>，密钥在请求头传输，AWS 用完即丢
+          <strong>SSE-C</strong> — 客户自提供密鑰<br>
+          必须使用 <strong>HTTPS</strong>，密鑰在请求头传输，AWS 用完即丢
         </div>
       </div>
       <div class="flow-step">
@@ -6399,94 +6388,105 @@ Sub-ms 延迟 / 极致 IOPS                  → io2 Block Express（最高 256,
 
 <div class="s-card">
   <h3>⚡ S3 性能优化</h3>
-  <div class="g2" style="margin-bottom:14px">
-    <div style="background:var(--aws-bg);border:1.5px solid var(--aws-border);border-radius:8px;padding:12px">
-      <div style="font-size:12px;font-weight:700;color:var(--aws);margin-bottom:8px">基准吞吐量（每 prefix）</div>
-      <div style="text-align:center;padding:8px 0">
-        <div style="font-size:22px;font-weight:800;color:var(--aws)">3,500</div>
-        <div style="font-size:11px;color:var(--ink3)">PUT/COPY/POST/DELETE 每秒</div>
-        <div style="font-size:22px;font-weight:800;color:var(--blue);margin-top:8px">5,500</div>
-        <div style="font-size:11px;color:var(--ink3)">GET/HEAD 每秒</div>
+  <div style="background:var(--aws-bg);border:1.5px solid var(--aws-border);border-radius:8px;padding:16px;margin-bottom:14px">
+    <div style="font-size:12px;font-weight:700;color:var(--aws);margin-bottom:12px">基准吞吐量（每个 prefix，可线性扩展）</div>
+    <div style="display:flex;gap:32px;flex-wrap:wrap;align-items:center">
+      <div style="text-align:center">
+        <div style="font-size:30px;font-weight:800;color:var(--aws)">3,500</div>
+        <div style="font-size:12px;color:var(--ink3);margin-top:2px">PUT / COPY / POST / DELETE 每秒</div>
       </div>
-      <div style="font-size:12px;color:var(--ink3);margin-top:8px">prefix 越多，总吞吐越高（随 prefix 数线性扩展）</div>
+      <div style="color:var(--ink3);font-size:20px">+</div>
+      <div style="text-align:center">
+        <div style="font-size:30px;font-weight:800;color:var(--blue)">5,500</div>
+        <div style="font-size:12px;color:var(--ink3);margin-top:2px">GET / HEAD 每秒</div>
+      </div>
     </div>
-    <div style="background:var(--blue-bg);border:1.5px solid var(--blue-border);border-radius:8px;padding:12px">
-      <div style="font-size:12px;font-weight:700;color:var(--blue);margin-bottom:8px">三大加速工具</div>
-      <div class="bl">
-        <div class="bl-item"><span class="bl-dot"></span><strong>Multi-Part Upload</strong> — 大文件分片并行上传，>100MB 推荐，>5GB 必须</div>
-        <div class="bl-item"><span class="bl-dot"></span><strong>Transfer Acceleration</strong> — 使用 CloudFront 边缘节点接收上传，走 AWS 专线到目标 Region（跨地域上传利器）</div>
-        <div class="bl-item"><span class="bl-dot"></span><strong>Byte-Range Fetches</strong> — 分块并行 GET，加速下载；也可只取文件特定字节（如只读文件头）</div>
-      </div>
+    <div style="margin-top:10px;font-size:12px;color:var(--ink3)">💡 prefix 越多，总吞吐量成倍增加（如 4 个 prefix = 4x 吹吐量）</div>
+  </div>
+  <div class="flow">
+    <div class="flow-step">
+      <div class="flow-n">A</div>
+      <div class="flow-body"><strong>Multi-Part Upload</strong> — 大文件分片并行上传<br><span style="color:var(--ink3)">&gt;100 MB 推荐；&gt;5 GB 必须</span></div>
+    </div>
+    <div class="flow-step">
+      <div class="flow-n">B</div>
+      <div class="flow-body"><strong>Transfer Acceleration</strong> — 使用 CloudFront 边缘节点接收上传，走 AWS 专线到目标 Region<br><span style="color:var(--ink3)">适合：跨地域上传（用户在海外，Bucket 在美东）</span></div>
+    </div>
+    <div class="flow-step">
+      <div class="flow-n">C</div>
+      <div class="flow-body"><strong>Byte-Range Fetches</strong> — 分块并行 GET<br><span style="color:var(--ink3)">可加速下载 / 只取文件头部（如只读 metadata）</span></div>
     </div>
   </div>
 </div>
 
 <div class="s-card">
-  <h3>📣 S3 Event Notifications + 🛡️ 高级安全功能</h3>
-  <div class="g2" style="margin-bottom:14px">
-    <div style="background:var(--surface2);border-radius:8px;padding:12px">
-      <div style="font-size:12px;font-weight:700;color:var(--ink2);margin-bottom:8px">Event Notifications 目的地</div>
-      <div class="bl">
-        <div class="bl-item"><span class="bl-dot"></span>直接：<strong>SNS / SQS / Lambda</strong></div>
-        <div class="bl-item"><span class="bl-dot"></span>通过 <strong>EventBridge</strong>：18+ 目的地，支持所有事件类型，高级过滤</div>
-      </div>
-    </div>
-    <div style="background:#FEF0EE;border:1.5px solid #C0392B44;border-radius:8px;padding:12px">
-      <div style="font-size:12px;font-weight:700;color:#C0392B;margin-bottom:8px">Object Lock — WORM 模型</div>
-      <div class="bl">
-        <div class="bl-item"><span class="bl-dot" style="background:#C0392B"></span><strong>Compliance</strong>：连 root 都不能删，Retention 不可缩短</div>
-        <div class="bl-item"><span class="bl-dot" style="background:#C0392B"></span><strong>Governance</strong>：特权用户可绕过，更灵活</div>
-        <div class="bl-item"><span class="bl-dot" style="background:#C0392B"></span><strong>Legal Hold</strong>：无到期，手动解除</div>
-      </div>
+  <h3>📣 事件通知 · 锁定 · 预签名 URL · 日志</h3>
+
+  <div style="border-left:3px solid var(--blue);padding-left:14px;margin-bottom:16px">
+    <div style="font-size:12px;font-weight:700;color:var(--blue);margin-bottom:8px">S3 Event Notifications — 对象操作触发事件</div>
+    <div class="bl">
+      <div class="bl-item"><span class="bl-dot"></span>直接目的地：<strong>SNS / SQS / Lambda</strong></div>
+      <div class="bl-item"><span class="bl-dot"></span>通过 <strong>EventBridge</strong>：支持 18+ 目的地，支持所有事件类型，高级过滤</div>
     </div>
   </div>
-  <div class="g2">
-    <div style="background:#F5F3FF;border:1.5px solid #C4B5FD;border-radius:8px;padding:12px">
-      <div style="font-size:12px;font-weight:700;color:#6D28D9;margin-bottom:8px">Pre-signed URL（预签名 URL）</div>
-      <div class="bl">
-        <div class="bl-item"><span class="bl-dot" style="background:#6D28D9"></span>以生成者的身份授权临时访问</div>
-        <div class="bl-item"><span class="bl-dot" style="background:#6D28D9"></span>控制台最长 <strong>12 小时</strong>，CLI 最长 <strong>168 小时</strong></div>
-        <div class="bl-item"><span class="bl-dot" style="background:#6D28D9"></span>临时下载/上传私有对象</div>
-      </div>
+
+  <div style="border-left:3px solid #C0392B;padding-left:14px;margin-bottom:16px">
+    <div style="font-size:12px;font-weight:700;color:#C0392B;margin-bottom:8px">Object Lock — WORM 模型（Write Once Read Many）</div>
+    <div class="bl">
+      <div class="bl-item"><span class="bl-dot" style="background:#C0392B"></span><strong>Compliance 模式</strong>：连 root 都不能删，Retention 不可缩短（最严）</div>
+      <div class="bl-item"><span class="bl-dot" style="background:#C0392B"></span><strong>Governance 模式</strong>：特权用户可绕过，更灵活</div>
+      <div class="bl-item"><span class="bl-dot" style="background:#C0392B"></span><strong>Legal Hold</strong>：无到期，手动解除</div>
     </div>
-    <div style="background:var(--surface2);border-radius:8px;padding:12px">
-      <div style="font-size:12px;font-weight:700;color:var(--ink2);margin-bottom:8px">Access Logs / S3 Select</div>
-      <div class="bl">
-        <div class="bl-item"><span class="bl-dot"></span>Access Logs：<strong>必须写到另一个 Bucket</strong>（同 Bucket = 无限循环！）</div>
-        <div class="bl-item"><span class="bl-dot"></span>S3 Select：服务端 SQL 过滤，减少传输 80%，速度提升 400%</div>
-      </div>
+  </div>
+
+  <div style="border-left:3px solid #6D28D9;padding-left:14px;margin-bottom:16px">
+    <div style="font-size:12px;font-weight:700;color:#6D28D9;margin-bottom:8px">Pre-signed URL（预签名 URL）</div>
+    <div class="bl">
+      <div class="bl-item"><span class="bl-dot" style="background:#6D28D9"></span>以生成者的身份授权临时访问私有对象</div>
+      <div class="bl-item"><span class="bl-dot" style="background:#6D28D9"></span>控制台最长 <strong>12 小时</strong>，CLI 最长 <strong>168 小时</strong></div>
+      <div class="bl-item"><span class="bl-dot" style="background:#6D28D9"></span>常见场景：临时分享下载链接 / 临时上传窗口</div>
+    </div>
+  </div>
+
+  <div style="border-left:3px solid var(--ink3);padding-left:14px">
+    <div style="font-size:12px;font-weight:700;color:var(--ink2);margin-bottom:8px">Access Logs · S3 Select</div>
+    <div class="bl">
+      <div class="bl-item"><span class="bl-dot"></span>Access Logs：记录所有请求。<strong>必须写到另一个 Bucket</strong>（同 Bucket = 无限循环！）</div>
+      <div class="bl-item"><span class="bl-dot"></span>S3 Select：服务端 SQL 过滤，减少传输 80%，速度提升 400%</div>
     </div>
   </div>
 </div>
 
 <div class="s-card">
   <h3>🔗 S3 Access Points &amp; CORS</h3>
-  <div class="g2">
-    <div style="background:var(--aws-bg);border:1.5px solid var(--aws-border);border-radius:8px;padding:12px">
-      <div style="font-size:12px;font-weight:700;color:var(--aws);margin-bottom:8px">S3 Access Points（访问点）</div>
-      <div style="background:var(--surface2);border-radius:8px;padding:10px;margin-bottom:8px;font-size:12px;text-align:center;line-height:2;color:var(--ink2)">
-        <span style="background:var(--aws-bg);border:1px solid var(--aws-border);border-radius:4px;padding:2px 8px">S3 Bucket</span>
-        <br>↙ ↓ ↘<br>
-        <span style="background:var(--blue-bg);border:1px solid var(--blue-border);border-radius:4px;padding:2px 6px;font-size:11px">AP-Finance</span>
-        <span style="margin:0 4px;background:var(--blue-bg);border:1px solid var(--blue-border);border-radius:4px;padding:2px 6px;font-size:11px">AP-Sales</span>
-        <span style="background:var(--blue-bg);border:1px solid var(--blue-border);border-radius:4px;padding:2px 6px;font-size:11px">AP-DevOps</span>
-        <br><span style="font-size:11px">各有独立 DNS + 独立 Policy</span>
-      </div>
-      <div class="bl">
-        <div class="bl-item"><span class="bl-dot"></span>替代复杂 Bucket Policy，每个 AP 独立管理</div>
-        <div class="bl-item"><span class="bl-dot"></span>可绑定 VPC（仅 VPC 内访问）</div>
-      </div>
+
+  <div style="background:var(--aws-bg);border:1.5px solid var(--aws-border);border-radius:8px;padding:14px;margin-bottom:14px">
+    <div style="font-size:12px;font-weight:700;color:var(--aws);margin-bottom:10px">S3 Access Points（访问点）— 简化复杂 Bucket Policy</div>
+    <div style="background:var(--surface2);border-radius:8px;padding:12px;margin-bottom:10px;font-size:12px;text-align:center;line-height:2.2;color:var(--ink2)">
+      <span style="background:var(--aws-bg);border:1px solid var(--aws-border);border-radius:4px;padding:3px 10px;font-weight:600">S3 Bucket</span>
+      <br>↙️ ↓ ↘️<br>
+      <span style="background:var(--blue-bg);border:1px solid var(--blue-border);border-radius:4px;padding:2px 8px">AP-Finance</span>
+      &nbsp;&nbsp;
+      <span style="background:var(--blue-bg);border:1px solid var(--blue-border);border-radius:4px;padding:2px 8px">AP-Sales</span>
+      &nbsp;&nbsp;
+      <span style="background:var(--blue-bg);border:1px solid var(--blue-border);border-radius:4px;padding:2px 8px">AP-DevOps</span>
+      <br><span style="font-size:11px">各有独立 DNS + 独立 Policy</span>
     </div>
-    <div style="background:var(--blue-bg);border:1.5px solid var(--blue-border);border-radius:8px;padding:12px">
-      <div style="font-size:12px;font-weight:700;color:var(--blue);margin-bottom:8px">CORS（跨源资源共享）</div>
-      <div style="background:var(--surface2);border-radius:8px;padding:10px;font-size:12px;line-height:1.9;margin-bottom:8px;color:var(--ink2)">
-        浏览器 → 网站A的JS → 请求 <strong>Bucket B</strong> 的图片<br>
-        ⚠️ 跨源！配置在 <strong>被访问的 Bucket B</strong> 上
-      </div>
-      <div class="bl">
-        <div class="bl-item"><span class="bl-dot"></span>配置 <code>AllowedOrigins</code> 允许特定域名</div>
-        <div class="bl-item"><span class="bl-dot"></span>仅浏览器场景需要，后端 SDK 不需要</div>
-      </div>
+    <div class="bl">
+      <div class="bl-item"><span class="bl-dot"></span>替代复杂 Bucket Policy，每个 AP 独立管理权限</div>
+      <div class="bl-item"><span class="bl-dot"></span>可绑定 VPC（仅 VPC 内访问）</div>
+    </div>
+  </div>
+
+  <div style="background:var(--blue-bg);border:1.5px solid var(--blue-border);border-radius:8px;padding:14px">
+    <div style="font-size:12px;font-weight:700;color:var(--blue);margin-bottom:10px">CORS（跨源资源共享）— 浏览器跨域请求必用</div>
+    <div style="background:var(--surface);border-radius:8px;padding:10px;font-size:13px;line-height:1.9;margin-bottom:10px;color:var(--ink2)">
+      浏览器 → 网站A的JS → 请求 <strong>Bucket B</strong> 的图片<br>
+      ⚠️ 跨源！CORS 配置在<strong>被访问的 Bucket B</strong> 上
+    </div>
+    <div class="bl">
+      <div class="bl-item"><span class="bl-dot"></span>配置 <code>AllowedOrigins</code> 允许特定域名</div>
+      <div class="bl-item"><span class="bl-dot"></span>仅浏览器场景需要，后端 SDK 不需要</div>
     </div>
   </div>
 </div>
@@ -6500,7 +6500,7 @@ Sub-ms 延迟 / 极致 IOPS                  → io2 Block Express（最高 256,
     </div>
     <div style="background:var(--surface);border-radius:8px;padding:10px">
       <div style="font-size:11px;font-weight:700;color:var(--blue);margin-bottom:6px">场景 2：存储类选择</div>
-      <div style="font-size:12px;color:var(--ink2);line-height:1.7">极少+毫秒检索 → <strong>Glacier Instant</strong><br>12h可接受+>180天 → <strong>Deep Archive</strong><br>不可预测 → <strong>Intelligent-Tiering</strong></div>
+      <div style="font-size:12px;color:var(--ink2);line-height:1.7">极少+毫秒检索 → <strong>Glacier Instant</strong><br>12h可接受+&gt;180天 → <strong>Deep Archive</strong><br>不可预测 → <strong>Intelligent-Tiering</strong></div>
     </div>
     <div style="background:var(--surface);border-radius:8px;padding:10px">
       <div style="font-size:11px;font-weight:700;color:#C0392B;margin-bottom:6px">场景 3：安全陷阱</div>
@@ -6516,7 +6516,7 @@ Sub-ms 延迟 / 极致 IOPS                  → io2 Block Express（最高 256,
     </div>
     <div style="background:var(--surface);border-radius:8px;padding:10px">
       <div style="font-size:11px;font-weight:700;color:#B45309;margin-bottom:6px">场景 6：复制规则</div>
-      <div style="font-size:12px;color:var(--ink2);line-height:1.7">跨 Region 灾备 → CRR<br>旧对象也要复制 → S3 Batch Replication<br>两端必须开 Versioning</div>
+      <div style="font-size:12px;color:var(--ink2);line-height:1.7">跨 Region 灰备 → CRR<br>旧对象也要复制 → S3 Batch Replication<br>两端必须开 Versioning</div>
     </div>
   </div>
 </div>
