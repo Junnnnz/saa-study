@@ -1462,25 +1462,25 @@
     /* Responsive grid utility classes */
     .g2 {
       display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 10px
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 14px
     }
 
     .g3 {
       display: grid;
-      grid-template-columns: repeat(3, 1fr);
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
       gap: 10px
     }
 
     .g2-sm {
       display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 8px
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 10px
     }
 
     .g3-sm {
       display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
       gap: 6px;
       font-size: 12px;
       text-align: center
@@ -6159,8 +6159,8 @@ Sub-ms 延迟 / 极致 IOPS                  → io2 Block Express（最高 256,
 <div class="s-card">
   <h3>🪣 S3 是什么？— What</h3>
   <p style="color:var(--ink2);font-size:15px;line-height:1.8"><strong>Amazon S3（Simple Storage Service，简单存储服务）</strong>是 AWS 的<strong>对象存储（Object Storage）</strong>服务。类比：把 S3 想象成一个<strong>无限容量的网盘</strong>——你上传文件，AWS 负责存储、冗余、持久性，你只需要通过 HTTP 读写数据，无需管理任何服务器或磁盘。</p>
-  <div style="display:flex;flex-wrap:wrap;gap:10px;margin-top:14px">
-    <div style="flex:1;min-width:280px;background:var(--aws-bg);border:1.5px solid var(--aws-border);border-radius:8px;padding:12px">
+  <div style="display:flex;flex-wrap:wrap;gap:14px;margin-top:14px">
+    <div style="flex:1;min-width:320px;background:var(--aws-bg);border:1.5px solid var(--aws-border);border-radius:8px;padding:14px">
       <div style="font-size:12px;font-weight:700;color:var(--aws);margin-bottom:8px">S3 两大核心概念</div>
       <div class="bl">
         <div class="bl-item"><span class="bl-dot"></span><strong>Bucket（桶）</strong> — 存放对象的顶级容器，类比"文件夹的根目录"</div>
@@ -6169,7 +6169,7 @@ Sub-ms 延迟 / 极致 IOPS                  → io2 Block Express（最高 256,
         <div class="bl-item"><span class="bl-dot"></span>Object Key = 完整路径（如 <code>photos/2024/cat.jpg</code>），S3 中没有真正的"文件夹"</div>
       </div>
     </div>
-    <div style="flex:1;min-width:280px;background:var(--blue-bg);border:1.5px solid var(--blue-border);border-radius:8px;padding:12px">
+    <div style="flex:1;min-width:320px;background:var(--blue-bg);border:1.5px solid var(--blue-border);border-radius:8px;padding:14px">
       <div style="font-size:12px;font-weight:700;color:var(--blue);margin-bottom:8px">Object 的组成</div>
       <div class="bl">
         <div class="bl-item"><span class="bl-dot"></span><strong>Key</strong> — 对象在 Bucket 中的唯一标识（完整路径）</div>
@@ -6202,8 +6202,8 @@ Sub-ms 延迟 / 极致 IOPS                  → io2 Block Express（最高 256,
       </div>
     </div>
   </div>
-  <div style="display:flex;flex-wrap:wrap;gap:10px">
-    <div style="flex:1;min-width:260px;background:#FEF9EB;border:1.5px solid #F59E0B44;border-radius:8px;padding:12px">
+  <div style="display:flex;flex-wrap:wrap;gap:14px">
+    <div style="flex:1;min-width:300px;background:#FEF9EB;border:1.5px solid #F59E0B44;border-radius:8px;padding:14px">
       <div style="font-size:12px;font-weight:700;color:#B45309;margin-bottom:8px">Bucket Policy 结构</div>
       <div style="font-size:12px;color:var(--ink2);line-height:1.8">
         <code>Principal</code> — 谁（账号/用户）<br>
@@ -6213,7 +6213,7 @@ Sub-ms 延迟 / 极致 IOPS                  → io2 Block Express（最高 256,
         Resource-based，不依赖 IAM
       </div>
     </div>
-    <div style="flex:1;min-width:260px;background:#FEF0EE;border:1.5px solid #C0392B44;border-radius:8px;padding:12px">
+    <div style="flex:1;min-width:300px;background:#FEF0EE;border:1.5px solid #C0392B44;border-radius:8px;padding:14px">
       <div style="font-size:12px;font-weight:700;color:#C0392B;margin-bottom:8px">Block Public Access（新账号默认开启）</div>
       <div class="bl">
         <div class="bl-item"><span class="bl-dot" style="background:#C0392B"></span>BlockPublicAcls — 禁止新建公开 ACL</div>
