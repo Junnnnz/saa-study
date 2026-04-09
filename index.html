@@ -1660,10 +1660,14 @@
         <button class="sb-item" onclick="go('classic-arch',this)"><span class="si-dot"
             style="background:#F59E0B"></span>经典架构<span id="sp-ca" class="sb-rate"></span></button>
       </div>
+      <div class="sb-section">
+        <div class="sb-label">对象存储</div>
+        <button class="sb-item" onclick="go('s3',this)"><span class="si-dot" style="background:#E8831A"></span>Amazon S3<span id="sp-s3" class="sb-rate"></span></button>
+      </div>
       <div style="padding:12px 16px;margin-top:auto;border-top:1px solid var(--border)">
         <div style="font-size:11px;color:var(--ink3);line-height:1.7">
           <div style="font-weight:700;color:var(--ink2);margin-bottom:4px">📋 下一章预告</div>
-          <div>S3 · CloudFront</div>
+          <div>CloudFront · Global Accelerator</div>
         </div>
       </div>
     </nav>
@@ -3261,7 +3265,248 @@
         exp: '<strong>问题根源</strong>：每次 Beanstalk 部署，新 EC2 实例启动后都要重新从网络下载并安装依赖（如 npm install / pip install），少则几分钟，多则更长。<br><br><strong>Golden AMI 解法</strong>：<br>① 手动启动一台 EC2，安装好所有依赖（运行一次 npm install / pip install）<br>② 将这台 EC2 创建为 AMI 镜像（"Golden AMI"，即"黄金镜像"）<br>③ 配置 Beanstalk 使用这个 Golden AMI 启动新实例<br>④ 之后部署：新 EC2 从 Golden AMI 启动 → 依赖已预装 → 只需拉取新代码 → 部署时间大幅缩短<br><br>❌ <strong>EFS 为什么不行</strong>：把依赖放在 EFS（网络文件系统）上，每次读取是网络 I/O，延迟比本地磁盘高；且 node_modules 等依赖需要在本地才能正常运行，放网络存储上还是慢。<br><br>❌ <strong>删依赖为什么不行</strong>：可能破坏功能，不符合"最小影响"要求。',
         ww: '"依赖每次重装"是 Golden AMI 的典型使用场景。核心思路：把"环境准备"工作前置（bake into the AMI），而不是每次实例启动时重做。记忆点：Beanstalk + 启动慢 + 依赖 → Golden AMI。',
         rule: 'Beanstalk 部署慢（依赖安装）→ Golden AMI 预装依赖 → 启动即用，部署只传代码'
+      },
+
+      {
+        id: 's3_01', topic: 'S3', diff: 'mid',
+        text: 'S3 存储桶（Bucket）的<em>命名</em>规则是什么？',
+        en: 'Which statement about Amazon S3 bucket naming is correct?',
+        ch: ['Bucket 名称在同一 AWS 账号内唯一', 'Bucket 名称在同一 Region 内唯一', 'Bucket 名称全球唯一（跨账号、跨 Region）', 'Bucket 名称可以包含大写字母'],
+        ench: ['Bucket names must be unique within the same AWS account', 'Bucket names must be unique within the same region', 'Bucket names must be globally unique (across all accounts and regions)', 'Bucket names can contain uppercase letters'],
+        ans: 2,
+        exp: '<strong>S3 Bucket 名称是全球唯一的</strong>（globally unique），跨所有 AWS 账号和所有 Region。即使两个账号互不相关，也不能创建同名 Bucket。<br><br>命名规则：<br>• 3-63 个字符<br>• <strong>只能包含小写字母、数字、连字符（-）</strong><br>• 以字母或数字开头/结尾<br>• 不能是 IP 格式（如 192.168.1.1）<br><br>虽然名称是全球唯一的，但 <strong>Bucket 本身是 Region 级别的资源</strong>（在某个 Region 中创建，数据物理存储在该 Region）。这是 S3 的常见混淆点。',
+        ww: 'A 错：同账号唯一不够，不同账号之间也不能重名。B 错：Region 内唯一不够，要求全球唯一。D 错：不能有大写字母，只能小写+数字+连字符。',
+        rule: 'S3 Bucket 命名 = 全球唯一（globally unique）+ 全小写 + 3-63字符。但存储是 Region 级别。'
+      },
+
+      {
+        id: 's3_02', topic: 'S3', diff: 'mid',
+        text: 'S3 单个对象最大支持多大？上传超过多少 MB 时推荐使用 Multi-Part Upload？',
+        en: 'What is the maximum size of a single S3 object? Above what size is multi-part upload recommended?',
+        ch: ['最大 5 GB，超过 100 MB 推荐 Multi-Part', '最大 5 TB，超过 100 MB 推荐、超过 5 GB 必须 Multi-Part', '最大 5 TB，超过 1 GB 推荐 Multi-Part', '最大无限制，超过 5 GB 必须 Multi-Part'],
+        ench: ['Max 5 GB, multi-part recommended above 100 MB', 'Max 5 TB, multi-part recommended above 100 MB and required above 5 GB', 'Max 5 TB, multi-part recommended above 1 GB', 'Unlimited size, multi-part required above 5 GB'],
+        ans: 1,
+        exp: '<strong>S3 对象大小限制</strong>：<br>• 单个对象最大：<strong>5 TB（Terabytes）</strong><br>• 单次 PUT 请求最大：<strong>5 GB</strong><br><br><strong>Multi-Part Upload</strong>：<br>• 推荐：超过 <strong>100 MB</strong><br>• 必须使用：超过 <strong>5 GB</strong>（单次 PUT 无法上传）<br><br>Multi-Part Upload 的优点：<br>① 并行上传各个分片 → 速度更快<br>② 某个分片失败只需重传该分片 → 更可靠<br>③ 可以暂停和恢复上传',
+        ww: 'A 错：最大是 5 TB 而非 5 GB。C 错：推荐阈值是 100 MB 不是 1 GB。D 错：单个对象有 5 TB 上限，不是无限制。关键数字：5 TB 上限、100 MB 推荐、5 GB 必须。',
+        rule: 'S3 对象：最大 5 TB，>100 MB 推荐 Multi-Part，>5 GB 必须 Multi-Part'
+      },
+
+      {
+        id: 's3_03', topic: 'S3', diff: 'high',
+        text: '公司要求让所有 AWS 用户都无法公开访问 S3 Bucket，即使 Bucket Policy 有误设置了 public 规则。最简单的实现方式是什么？',
+        en: 'A company wants to ensure S3 buckets cannot be publicly accessible, even if a bucket policy is misconfigured to allow public access. What is the simplest solution?',
+        ch: ['为每个 Bucket 单独删除 Bucket Policy', '在 Bucket 层面开启 Block Public Access', '用 IAM Policy 拒绝所有匿名用户', '用 SCP（Service Control Policy）在 Organization 层面限制'],
+        ench: ['Delete the bucket policy for each bucket individually', 'Enable Block Public Access at the bucket level', 'Use IAM policies to deny all anonymous users', 'Use SCPs at the organization level to restrict access'],
+        ans: 1,
+        exp: '<strong>Block Public Access（阻止公开访问）</strong> 是 S3 的安全防护层，设计目的正是防止意外公开。<br><br>它有 4 个设置项，开启后：<br>• <strong>覆盖并忽略</strong>所有授予公开访问的 Bucket Policy<br>• <strong>覆盖并忽略</strong>所有公开的 ACL<br>• 即使 Bucket Policy 写错了允许 public access，Block Public Access 也会拦截<br><br>Block Public Access 可以在两个级别设置：<br>① <strong>账号（Account）级别</strong> — 应用到该账号下所有 Bucket（推荐企业用）<br>② <strong>Bucket 级别</strong> — 只影响特定 Bucket<br><br>这是 AWS 推荐的最简单防止数据泄露的手段，新建账号默认开启。',
+        ww: 'A 错：删 policy 不够，以后误加还会重现。C 错：IAM Policy 管用户，但匿名访问走的是 Bucket Policy/ACL 逻辑，较复杂。D 错：SCP 可以，但不是"最简单"——Block Public Access 就是为这个场景设计的。',
+        rule: '防止 S3 意外公开 → Block Public Access（会覆盖 Bucket Policy，级别：账号 or Bucket）'
+      },
+
+      {
+        id: 's3_04', topic: 'S3', diff: 'high',
+        text: '开启 S3 <em>Versioning（版本控制）</em>后，对对象执行"删除"操作会发生什么？',
+        en: 'After enabling S3 Versioning, what happens when you delete an object?',
+        ch: ['对象被永久删除，无法恢复', '对象被放入 Recycle Bin（回收站），30 天后永久删除', 'S3 添加一个 Delete Marker，对象实际未被删除，可以恢复', '对象的所有版本都被删除'],
+        ench: ['The object is permanently deleted and cannot be recovered', 'The object is moved to a Recycle Bin for 30 days', 'S3 adds a Delete Marker; the object is not actually deleted and can be restored', 'All versions of the object are deleted'],
+        ans: 2,
+        exp: '<strong>Versioning 的删除机制</strong>：<br><br>当你"删除"一个开启了版本控制的对象时，S3 <strong>不会真正删除数据</strong>，而是在最新版本前插入一个 <strong>Delete Marker（删除标记）</strong>。<br><br>① 普通 GET 请求 → 看到 Delete Marker → 返回 404（看起来像被删除了）<br>② 实际上所有历史版本依然存在<br>③ <strong>恢复方法</strong>：删除那个 Delete Marker → 最新版本重新可见 → 对象"复活"<br><br>要<strong>真正永久删除</strong>某个版本，必须：<br>• 指定具体的 <strong>Version ID</strong> 来删除<br>• 这种操作是不可逆的<br><br>MFA Delete 功能可以要求在永久删除版本时提供 MFA 验证，增加安全性。',
+        ww: 'A 错：开启 Versioning 后普通删除不是永久删除，只是加 Delete Marker。B 错：Recycle Bin 是独立功能，不是 Versioning 的标准行为。D 错：普通删除只影响最新版本（加 Delete Marker），不会删除所有版本。',
+        rule: 'Versioning 开启后删除 = 加 Delete Marker（非真正删除）。恢复 = 删除那个 Marker。真正删除 = 指定 Version ID'
+      },
+
+      {
+        id: 's3_05', topic: 'S3', diff: 'high',
+        text: '公司想将生产环境 S3 数据<em>复制</em>到另一 Region 的 S3 以实现合规灾备。目前有大量已存在的旧对象需要一起复制。正确的方案是？',
+        en: 'A company wants to replicate existing S3 objects to another region for disaster recovery. What is the correct approach?',
+        ch: ['开启 CRR（Cross-Region Replication），所有对象自动复制', '开启 CRR，然后用 S3 Batch Replication 复制已有对象', '开启 SRR（Same-Region Replication），CRR 不支持灾备场景', '先手动下载再上传到目标 Bucket'],
+        ench: ['Enable CRR and all objects are automatically replicated', 'Enable CRR, then use S3 Batch Replication for existing objects', 'Enable SRR (Same-Region Replication) as CRR does not support DR', 'Manually download and re-upload to the destination bucket'],
+        ans: 1,
+        exp: '<strong>S3 Replication 的关键规则</strong>：<br><br>① <strong>CRR（Cross-Region Replication）</strong>：复制到<strong>不同 Region</strong> → 用于合规、低延迟、灾备<br>② <strong>SRR（Same-Region Replication）</strong>：复制到<strong>同 Region</strong> → 用于日志聚合、生产与测试账号同步<br><br>⚠️ <strong>重要限制</strong>：<br>• CRR/SRR 只复制<strong>开启后新上传的对象</strong><br>• <strong>已有的旧对象不会自动复制</strong><br>• 要复制旧对象 → 必须另外使用 <strong>S3 Batch Replication</strong><br><br>前提条件：<br>• 源和目标 Bucket <strong>都必须开启 Versioning</strong><br>• 需要配置 <strong>IAM 权限</strong>（允许 S3 复制服务读取源/写入目标）<br>• Delete Marker 默认<strong>不复制</strong>（可选开启）',
+        ww: 'A 错：CRR 只对激活后的新对象有效，旧对象不会自动复制。C 错：跨 Region 应该用 CRR，SRR 是同 Region 复制。D 错：手动下载上传不可扩展，不是正确方案。',
+        rule: 'CRR = 跨 Region，SRR = 同 Region。CRR 激活后只复制新对象，旧对象 → S3 Batch Replication'
+      },
+
+      {
+        id: 's3_06', topic: 'S3', diff: 'mid',
+        text: '以下 S3 存储类别中，哪一个<em>不支持</em>多 AZ 冗余，且在 AZ 故障时存在数据丢失风险？',
+        en: 'Which S3 storage class does NOT provide multi-AZ redundancy and risks data loss if an AZ fails?',
+        ch: ['S3 Standard', 'S3 Standard-IA', 'S3 One Zone-IA', 'S3 Glacier Flexible Retrieval'],
+        ench: ['S3 Standard', 'S3 Standard-IA', 'S3 One Zone-IA', 'S3 Glacier Flexible Retrieval'],
+        ans: 2,
+        exp: '<strong>S3 One Zone-IA（单可用区低频访问）</strong>是唯一将数据存储在<strong>单个 AZ</strong>（而非 3+ AZ）的存储类别。<br><br>对比：<br>• <strong>Standard</strong>：≥3 AZ，99.99% 可用性，高频访问<br>• <strong>Standard-IA</strong>：≥3 AZ，99.9% 可用性，低频访问（有检索费）<br>• <strong>One Zone-IA</strong>：<strong>1 AZ</strong>，99.5% 可用性，AZ 故障 → 数据丢失！成本比 Standard-IA 低 20%<br>• <strong>Glacier Flexible Retrieval</strong>：≥3 AZ，99.99% 耐久性，但检索需要 minutes~hours<br><br>适合 One Zone-IA 的场景：<br>• 可以从其他地方重新生成的数据（如缩略图）<br>• 已在其他地方备份的数据的二级副本',
+        ww: 'Standard 和 Standard-IA 都是多 AZ 存储。Glacier Flexible Retrieval 也是多 AZ。只有 One Zone-IA 是单 AZ，这也是它比 Standard-IA 便宜约 20% 的原因。',
+        rule: 'One Zone-IA = 唯一单 AZ 存储类 → AZ 挂了数据丢 → 只用于可再生成/已有主备份的数据'
+      },
+
+      {
+        id: 's3_07', topic: 'S3', diff: 'high',
+        text: '你有大量很少访问的数据，偶尔需要<em>毫秒级</em>检索。存储时间会超过 90 天。最合适的 S3 存储类是？',
+        en: 'You have large amounts of rarely accessed data that requires millisecond retrieval occasionally. Data will be stored for more than 90 days. Which storage class is most suitable?',
+        ch: ['S3 Standard', 'S3 Standard-IA', 'S3 Glacier Instant Retrieval', 'S3 Glacier Deep Archive'],
+        ench: ['S3 Standard', 'S3 Standard-IA', 'S3 Glacier Instant Retrieval', 'S3 Glacier Deep Archive'],
+        ans: 2,
+        exp: '<strong>S3 Glacier Instant Retrieval</strong> 专为以下场景设计：<br>• 数据访问极少（每季度一次左右）<br>• 但需要时必须<strong>毫秒级</strong>立即获取<br>• 最低存储时长：<strong>90 天</strong><br><br>Glacier 系列对比：<br>• <strong>Glacier Instant Retrieval</strong>：毫秒级检索，最低 90 天存储，比 Standard-IA 更便宜但检索费更高<br>• <strong>Glacier Flexible Retrieval</strong>：Expedited（1-5 分钟）/ Standard（3-5 小时）/ Bulk（5-12 小时），最低 90 天<br>• <strong>Glacier Deep Archive</strong>：Standard（12 小时）/ Bulk（48 小时），最低 <strong>180 天</strong>，最便宜<br><br>Standard-IA 的检索也很快，但题目强调"很少访问"，用 Glacier Instant Retrieval 存储成本更低。',
+        ww: 'Standard 和 Standard-IA 检索快但存储成本高，浪费在"很少访问"的数据上。Glacier Deep Archive 检索时间是小时级，不满足毫秒级要求。Glacier Instant Retrieval 正好满足：低存储成本+毫秒级检索。',
+        rule: '很少访问+毫秒级检索+>90天 → Glacier Instant Retrieval。12小时可接受+>180天 → Deep Archive'
+      },
+
+      {
+        id: 's3_08', topic: 'S3', diff: 'mid',
+        text: '你需要自动将 S3 Standard 中超过 30 天的对象移到 Standard-IA，再将超过 90 天的对象移到 Glacier。应使用什么功能？',
+        en: 'You need to automatically move S3 Standard objects to Standard-IA after 30 days, then to Glacier after 90 days. What feature should you use?',
+        ch: ['S3 Replication Rules', 'S3 Lifecycle Rules（生命周期规则）', 'S3 Intelligent-Tiering', 'S3 Event Notifications'],
+        ench: ['S3 Replication Rules', 'S3 Lifecycle Rules', 'S3 Intelligent-Tiering', 'S3 Event Notifications'],
+        ans: 1,
+        exp: '<strong>S3 Lifecycle Rules（生命周期规则）</strong> 可以自动管理对象在存储类之间的迁移：<br><br><strong>Transition Actions（转换动作）</strong>：<br>• 30 天后：Standard → Standard-IA<br>• 90 天后：Standard-IA → Glacier Flexible Retrieval<br>（可以设置多个阶段，形成"阶梯迁移"）<br><br><strong>Expiration Actions（过期动作）</strong>：<br>• 删除超过 N 天的对象<br>• 删除旧版本（Versioning 开启时）<br>• 清理未完成的 Multipart Upload<br><br>可以按 <strong>prefix</strong>（路径前缀）或 <strong>tag</strong>（标签）过滤，只对特定对象应用规则。',
+        ww: 'S3 Replication 是复制到另一个 Bucket，不是存储类迁移。Intelligent-Tiering 是自动迁移，但它有月度监控费，且迁移策略由 AWS 自动决定，不能精确控制"30 天后到 IA"。Event Notifications 是触发 Lambda/SNS/SQS，不做迁移。Lifecycle Rules 才是自定义时间点迁移的正确工具。',
+        rule: '定时自动迁移存储类 → Lifecycle Rules（Transition Actions）。删除旧版本/过期对象 → Lifecycle Rules（Expiration Actions）'
+      },
+
+      {
+        id: 's3_09', topic: 'S3', diff: 'high',
+        text: 'S3 默认加密方式是什么？使用 <em>SSE-KMS</em> 加密时需要注意什么潜在性能问题？',
+        en: 'What is the default S3 encryption? What is a potential performance issue with SSE-KMS encryption?',
+        ch: ['默认是 SSE-C；SSE-KMS 无性能问题', '默认是 SSE-S3（AES-256）；SSE-KMS 会产生 KMS API 调用，受 KMS 限流影响', '默认是客户端加密；SSE-KMS 密钥必须每次传输', '默认是 SSE-KMS；SSE-S3 会增加延迟'],
+        ench: ['Default is SSE-C; SSE-KMS has no performance issues', 'Default is SSE-S3 (AES-256); SSE-KMS incurs KMS API calls which may be throttled', 'Default is client-side encryption; SSE-KMS key must be transmitted each time', 'Default is SSE-KMS; SSE-S3 adds latency'],
+        ans: 1,
+        exp: '<strong>S3 加密方式概览</strong>：<br><br>① <strong>SSE-S3（默认）</strong>：AWS 托管密钥，AES-256，请求头 <code>x-amz-server-side-encryption: AES256</code>，对用户完全透明，无额外费用<br><br>② <strong>SSE-KMS</strong>：AWS KMS 管理密钥，请求头 <code>x-amz-server-side-encryption: aws:kms</code>。优点：通过 CloudTrail 审计每次密钥使用记录。<strong>潜在问题</strong>：每次上传/下载都要调用 KMS API，KMS 有 API 限流（默认 5,500~30,000 次/秒），高并发场景可能触发 throttling<br><br>③ <strong>SSE-C</strong>：客户提供密钥，必须用 <strong>HTTPS</strong>，密钥在请求头中传输，AWS 使用后立即丢弃<br><br>④ <strong>Client-Side Encryption</strong>：数据在本地加密后再上传，AWS 存储的始终是加密数据',
+        ww: 'SSE-C 不是默认选项，它需要自己管理密钥很麻烦。SSE-S3 才是 AWS 的默认加密。SSE-KMS 的 KMS API throttling 是真实存在的性能瓶颈，高吞吐量场景需要申请提升限额。',
+        rule: 'S3 默认加密 = SSE-S3（AES-256）。SSE-KMS = 可审计密钥使用 + 注意 KMS 限流。SSE-C = 你管密钥 + 必须 HTTPS'
+      },
+
+      {
+        id: 's3_10', topic: 'S3', diff: 'mid',
+        text: '你需要生成一个<em>临时链接</em>，让未经 AWS 认证的外部用户在限定时间内下载 S3 私有对象。应该用什么？',
+        en: 'You need to generate a temporary URL for an unauthenticated external user to download a private S3 object within a time limit. What should you use?',
+        ch: ['开启 Bucket Public Access', '使用 S3 Pre-signed URL', '将对象复制到公开 Bucket', '使用 S3 Access Point'],
+        ench: ['Enable Bucket Public Access', 'Use S3 Pre-signed URL', 'Copy the object to a public bucket', 'Use an S3 Access Point'],
+        ans: 1,
+        exp: '<strong>S3 Pre-signed URL（预签名 URL）</strong>：<br><br>工作原理：由<strong>拥有对象访问权限的 IAM 用户/角色</strong>生成一个包含签名的临时 URL，URL 本身携带了权限信息和过期时间。<br><br>有效期：<br>• AWS 控制台：最长 <strong>12 小时</strong><br>• CLI / SDK：最长 <strong>168 小时（7 天）</strong><br><br>使用场景：<br>• 允许用户临时下载私有视频/文件<br>• 允许用户临时上传到指定 S3 位置（无需 AWS 账号）<br>• 电商网站让客户下载购买的数字商品<br><br>安全：URL 过期后自动失效，对象本身不公开。Pre-signed URL 是以<strong>你的身份</strong>授权给用户使用，如果你的权限被取消，URL 也立即失效。',
+        ww: '开启 Public Access 会让所有人永久访问，不满足"时限"需求，且是安全风险。复制到公开 Bucket 同理是永久公开。Access Point 是简化 Bucket Policy 管理的，不是临时分享的工具。Pre-signed URL 才是"临时授权"的正确解法。',
+        rule: '临时分享私有 S3 对象 → Pre-signed URL（有效期最长 168h，以生成者身份授权）'
+      },
+
+      {
+        id: 's3_11', topic: 'S3', diff: 'high',
+        text: '公司要求 S3 某些关键对象必须保留 7 年，<em>任何人（包括 root 账号）</em>都无法在此期间删除或修改。应该使用什么？',
+        en: 'A company requires certain S3 objects to be retained for 7 years and cannot be deleted or modified by anyone, including the root account. What should you use?',
+        ch: ['S3 Versioning + MFA Delete', 'S3 Object Lock - Compliance 模式，Retention Period 7 年', 'S3 Object Lock - Governance 模式，Retention Period 7 年', 'S3 Glacier Vault Lock'],
+        ench: ['S3 Versioning + MFA Delete', 'S3 Object Lock - Compliance mode with 7-year Retention Period', 'S3 Object Lock - Governance mode with 7-year Retention Period', 'S3 Glacier Vault Lock'],
+        ans: 1,
+        exp: '<strong>S3 Object Lock</strong> 基于 WORM（Write Once Read Many，一写多读）模型：<br><br><strong>Compliance 模式（合规模式）</strong>：<br>• 没有任何用户（包括 root）可以删除或修改对象<br>• Retention Period <strong>不可缩短</strong>，不可覆盖<br>• 专为监管合规设计（金融、医疗等行业）<br><br><strong>Governance 模式（治理模式）</strong>：<br>• 大多数用户无法删除/修改<br>• 但拥有 <strong>s3:BypassGovernanceRetention 权限</strong>的用户可以绕过<br>• 更灵活，适合内部测试/管理场景<br><br><strong>Legal Hold（合法保留）</strong>：<br>• 没有过期时间，由授权用户手动解除<br>• 用于诉讼期间强制保留证据<br><br>注意：Object Lock 必须在创建 Bucket 时就启用，<strong>且必须开启 Versioning</strong>。',
+        ww: 'Governance 模式有绕过方法（特殊权限），不满足"任何人都无法"的要求。MFA Delete 只能增加删除操作的难度，root 用户仍然可以删。Compliance 模式才是真正连 root 都锁定的。Glacier Vault Lock 原理类似但只用于 Glacier，题目没说要存 Glacier。',
+        rule: 'S3 Object Lock Compliance = 连 root 都不能删，硬性合规保留。Governance = 有特权可绕过，更灵活'
+      },
+
+      {
+        id: 's3_12', topic: 'S3', diff: 'mid',
+        text: '你启用了 S3 Access Logs，但发现存储使用量不断快速增长，几分钟内就产生了大量日志文件。原因是什么？',
+        en: 'You enabled S3 Access Logs but find storage usage growing rapidly with a large number of log files appearing in minutes. What is the cause?',
+        ch: ['日志记录功能有 bug，记录了太多内容', '目标日志 Bucket 和源 Bucket 是同一个 Bucket（日志无限循环）', '日志 Bucket 没有开启 Versioning', '日志文件格式配置错误'],
+        ench: ['There is a bug in the logging feature recording too much', 'The destination log bucket and source bucket are the same bucket (infinite logging loop)', 'The log bucket does not have versioning enabled', 'Log file format is misconfigured'],
+        ans: 1,
+        exp: '<strong>S3 Access Logs 的致命陷阱</strong>：<br><br>如果你把<strong>访问日志写入同一个 Bucket</strong>，会发生无限循环：<br>① 用户访问 Bucket A → S3 生成一条日志 → 写入 Bucket A（同一个）<br>② 写入日志本身也是一次访问 → 又生成一条日志 → 又写入 Bucket A<br>③ 循环继续 → <strong>日志指数级爆炸</strong> → 存储费用暴涨<br><br>正确做法：<br>• 必须将日志写入<strong>不同的 S3 Bucket</strong>（可以是同账号下另一个 Bucket）<br><br>S3 Access Logs 记录的内容：<br>• 所有对 Bucket 的请求（GetObject、PutObject 等）<br>• 请求者 IP、时间、操作、响应状态码等<br>• 用于安全审计和分析',
+        ww: '其他选项都不会导致日志快速指数级增长。只有"日志写到自己 Bucket"这个配置错误会产生无限循环，是 S3 Access Logs 最经典的考试陷阱。',
+        rule: 'S3 Access Logs 必须写到另一个 Bucket！同 Bucket = 无限循环 = 存储爆炸'
+      },
+
+      {
+        id: 's3_13', topic: 'S3', diff: 'mid',
+        text: 'S3 单个 prefix 的默认请求速率是多少？如何进一步提升 GET 性能？',
+        en: 'What is the default S3 request rate per prefix? How can you further improve GET performance?',
+        ch: ['1,000 PUT/5,000 GET，用 CloudFront 分发', '3,500 PUT-COPY-POST-DELETE / 5,500 GET-HEAD，用 Byte-Range Fetches 并行下载', '10,000 PUT/10,000 GET，用 Transfer Acceleration', '无限制，无需特别优化'],
+        ench: ['1,000 PUT/5,000 GET, use CloudFront distribution', '3,500 PUT-COPY-POST-DELETE / 5,500 GET-HEAD, use Byte-Range Fetches for parallel downloads', '10,000 PUT/10,000 GET, use Transfer Acceleration', 'Unlimited, no optimization needed'],
+        ans: 1,
+        exp: '<strong>S3 性能数字（必背）</strong>：<br>• 每个 prefix：<strong>3,500 PUT/COPY/POST/DELETE</strong> 请求/秒<br>• 每个 prefix：<strong>5,500 GET/HEAD</strong> 请求/秒<br>• prefix 越多（路径前缀越分散），总吞吐量越高<br><br><strong>Byte-Range Fetches（字节范围获取）</strong>：<br>• 将大文件分成多个字节范围，并行发送多个 GET 请求<br>• 类比：多线程下载<br>• 优点：① 并行化加速 ② 某个范围失败只需重传 ③ 可以只取文件头部（如读 metadata）<br><br><strong>Transfer Acceleration</strong>：<br>• 使用 CloudFront <strong>边缘节点</strong>接收上传，再通过 AWS 专用网络传输到目标 Region<br>• 适合跨 Region 或跨大陆上传到 S3',
+        ww: 'A 中数字不对。C 中 10,000 是错误的。3,500/5,500 是需要记住的精确数字。Byte-Range Fetches 专门用于加速 GET（下载），Transfer Acceleration 主要用于加速上传（跨地域）。',
+        rule: 'S3 性能：3,500 PUT / 5,500 GET 每 prefix。加速下载 → Byte-Range Fetches。加速跨地域上传 → Transfer Acceleration'
+      },
+
+      {
+        id: 's3_14', topic: 'S3', diff: 'mid',
+        text: 'S3 <em>Event Notifications</em> 可以直接发送到哪些目的地？（选最完整的答案）',
+        en: 'Which destinations can S3 Event Notifications be sent to directly?',
+        ch: ['只有 Lambda 函数', 'SNS、SQS、Lambda', 'SNS、SQS、Lambda，且可通过 EventBridge 扩展到更多目的地', 'CloudWatch Logs 和 SNS'],
+        ench: ['Lambda functions only', 'SNS, SQS, Lambda', 'SNS, SQS, Lambda, and via EventBridge to many more destinations', 'CloudWatch Logs and SNS'],
+        ans: 2,
+        exp: '<strong>S3 Event Notifications（事件通知）</strong>可以在以下 S3 事件触发时发送通知：<br>• s3:ObjectCreated（对象创建/上传）<br>• s3:ObjectRemoved（对象删除）<br>• s3:ObjectRestore（从 Glacier 恢复）<br>• s3:Replication（复制状态变化）<br><br><strong>直接目的地（3种）</strong>：<br>• <strong>SNS</strong>（Simple Notification Service）<br>• <strong>SQS</strong>（Simple Queue Service）<br>• <strong>Lambda</strong> 函数<br><br><strong>通过 EventBridge（推荐新方案）</strong>：<br>• 先发送到 EventBridge，再路由到 18+ 个目的地<br>• 支持<strong>所有 S3 事件类型</strong><br>• 支持高级过滤（按 prefix、suffix、metadata 过滤）<br>• 支持将同一事件发送到多个目的地',
+        ww: 'Lambda 只是其中一个目的地。B 答案漏掉了 EventBridge 扩展能力。C 是最完整的：SNS/SQS/Lambda 是直接目的地，EventBridge 是推荐的更强大方案。CloudWatch Logs 不是直接目的地。',
+        rule: 'S3 通知直接目的地：SNS / SQS / Lambda。更强大方案：EventBridge（支持所有事件+18+目的地）'
+      },
+
+      {
+        id: 's3_15', topic: 'S3', diff: 'high',
+        text: 'S3 <em>CORS（跨源资源共享）</em> 的使用场景是什么？需要在哪里配置？',
+        en: 'What is the use case for S3 CORS? Where must it be configured?',
+        ch: ['防止 CSRF 攻击；在 IAM Policy 中配置', '允许浏览器从不同源的 S3 Bucket 加载资源；在目标（被访问）Bucket 配置 CORS 规则', '允许 Lambda 访问 S3；在 Lambda 中配置', '加密 S3 传输；在 Bucket Policy 中配置'],
+        ench: ['Prevent CSRF attacks; configured in IAM Policy', 'Allow browsers to load resources from a different-origin S3 bucket; configure CORS on the destination (accessed) bucket', 'Allow Lambda to access S3; configure on Lambda', 'Encrypt S3 transmission; configure in Bucket Policy'],
+        ans: 1,
+        exp: '<strong>CORS（Cross-Origin Resource Sharing，跨源资源共享）</strong>：<br><br>场景示例：<br>① 静态网站托管在 <code>bucket-website.s3.com</code>（Origin A）<br>② 网站中的 JS 代码需要加载 <code>bucket-assets.s3.com</code> 的图片/字体（Origin B）<br>③ 浏览器安全策略默认阻止跨源请求<br>④ 需要在 <strong>Origin B（被访问的 Bucket）</strong>配置 CORS 规则，允许来自 Origin A 的请求<br><br>CORS 配置示例：<br>AllowedOrigins: https://bucket-website.s3.com<br>AllowedMethods: GET<br><br>记忆要点：<br>• CORS 是<strong>浏览器安全机制</strong>，只有浏览器发出的请求才需要 CORS<br>• 要在<strong>被访问的那个 Bucket</strong> 配置，不是在发起请求的 Bucket',
+        ww: 'CORS 不防 CSRF，两个概念不同。Lambda 调用 S3 不经过浏览器，不需要 CORS。Bucket Policy 控制访问权限，不是 CORS 配置。关键：CORS 是浏览器场景，配置在被访问的目标 Bucket 上。',
+        rule: 'S3 CORS = 浏览器跨域加载资源，配置在被访问的 Bucket 上（允许指定 Origin）'
+      },
+
+      {
+        id: 's3_16', topic: 'S3', diff: 'high',
+        text: 'S3 <em>MFA Delete</em> 功能要求哪些操作必须提供 MFA 验证？谁能启用此功能？',
+        en: 'Which S3 operations require MFA when MFA Delete is enabled? Who can enable MFA Delete?',
+        ch: ['所有 GET/PUT 操作都需要 MFA；任何 IAM 用户可以启用', '永久删除对象版本和暂停 Versioning；只有 root 账号可以启用', '只有删除 Bucket 时需要 MFA；Bucket owner 可以启用', '上传对象和删除对象都需要 MFA；管理员可以启用'],
+        ench: ['All GET/PUT operations require MFA; any IAM user can enable it', 'Permanently deleting object versions and suspending Versioning; only the root account can enable it', 'Only deleting the bucket requires MFA; the bucket owner can enable it', 'Both uploading and deleting objects require MFA; admins can enable it'],
+        ans: 1,
+        exp: '<strong>S3 MFA Delete</strong> 保护两种最危险的操作：<br><br>需要 MFA 的操作：<br>① <strong>永久删除某个特定版本</strong>（Permanently delete an object version）<br>② <strong>暂停 Versioning</strong>（Suspend Versioning on the bucket）<br><br>不需要 MFA 的操作（普通操作不受影响）：<br>• 上传/下载对象<br>• 列出对象<br>• 添加 Delete Marker（软删除）<br><br>⚠️ <strong>关键限制</strong>：<br>• MFA Delete 只能由 <strong>root 账号</strong>通过 CLI 启用/禁用（控制台无此选项）<br>• 必须先开启 <strong>Versioning</strong>，才能启用 MFA Delete',
+        ww: 'MFA Delete 不会影响所有操作（只针对"永久删除版本"和"暂停 Versioning"这两个高危操作）。任何 IAM 用户都不能启用 MFA Delete，只有 root 才行。不需要 MFA 的情况包括普通删除（加 Delete Marker）和所有读取操作。',
+        rule: 'MFA Delete = 保护2个操作（永久删版本+暂停Versioning）。只有 root 能启用，需先开 Versioning'
+      },
+
+      {
+        id: 's3_17', topic: 'S3', diff: 'mid',
+        text: 'S3 <em>Intelligent-Tiering</em> 与 S3 Lifecycle Rules 的核心区别是什么？',
+        en: 'What is the key difference between S3 Intelligent-Tiering and S3 Lifecycle Rules?',
+        ch: ['Intelligent-Tiering 只能在两个层级之间移动，Lifecycle Rules 支持所有层级', 'Intelligent-Tiering 根据实际访问频率<strong>自动</strong>移动对象（有月度监控费），Lifecycle Rules 需要手动定义时间规则', 'Lifecycle Rules 比 Intelligent-Tiering 更贵', 'Intelligent-Tiering 不支持 Glacier，Lifecycle Rules 支持'],
+        ench: ['Intelligent-Tiering moves objects between only 2 tiers; Lifecycle Rules support all tiers', 'Intelligent-Tiering automatically moves objects based on actual access patterns (with a monthly monitoring fee), while Lifecycle Rules require manually defined time-based rules', 'Lifecycle Rules are more expensive than Intelligent-Tiering', 'Intelligent-Tiering does not support Glacier; Lifecycle Rules support Glacier'],
+        ans: 1,
+        exp: '<strong>S3 Intelligent-Tiering</strong>：<br>• 监控每个对象的访问频率<br>• 自动在以下层级之间移动（<strong>无检索费用</strong>）：<br>  - Frequent Access（默认）<br>  - Infrequent Access（30天未访问）<br>  - Archive Instant Access（90天未访问）<br>  - Archive Access（90-700天，需手动配置）<br>  - Deep Archive（180-730天，需手动配置）<br>• 有<strong>月度对象监控和自动化费用</strong>（小对象可能不划算）<br>• 无检索费用<br><br><strong>Lifecycle Rules</strong>：<br>• 由你手动定义规则（"N天后移动到X层"）<br>• 基于<strong>时间</strong>，不基于访问频率<br>• 适合可以预测访问模式的数据<br><br>选择建议：<br>• 访问模式<strong>不可预测</strong> → Intelligent-Tiering<br>• 访问模式<strong>可预测</strong>（如日志30天后冷存）→ Lifecycle Rules',
+        ww: 'Intelligent-Tiering 实际上支持多个层级包括 Glacier 相关层级（Archive/Deep Archive），不是只有两个层级，也不是不支持 Glacier。Lifecycle Rules 本身没有比 Intelligent-Tiering 贵，是不同的计费模型。',
+        rule: 'Intelligent-Tiering = 按访问频率自动分层（有监控费）。Lifecycle Rules = 按时间手动定义规则'
+      },
+
+      {
+        id: 's3_18', topic: 'S3', diff: 'high',
+        text: '你的 S3 Bucket 中有来自多个不同团队的数据，每个团队只能访问自己的数据。目前 Bucket Policy 非常复杂难以维护。如何简化？',
+        en: 'Your S3 bucket has data from multiple teams, each should only access their own data. The bucket policy is becoming complex. How can you simplify management?',
+        ch: ['为每个团队创建一个独立的 S3 Bucket', '使用 S3 Access Points，每个团队一个 Access Point，各有独立策略', '使用 S3 Lifecycle Rules 按 prefix 分离权限', '使用 IAM Role 替代 Bucket Policy'],
+        ench: ['Create a separate S3 bucket for each team', 'Use S3 Access Points, one per team with independent policies', 'Use S3 Lifecycle Rules to separate permissions by prefix', 'Replace Bucket Policy with IAM Roles'],
+        ans: 1,
+        exp: '<strong>S3 Access Points（访问点）</strong> 专门解决多团队共用 Bucket 时的策略管理复杂性问题：<br><br>工作原理：<br>• 每个 Access Point 有独立的 <strong>DNS 名称</strong>（团队通过该 DNS 访问）<br>• 每个 Access Point 有独立的 <strong>Access Point Policy</strong>（等效于精简版 Bucket Policy）<br>• Access Point Policy 可以限制只访问 Bucket 中特定 <strong>prefix</strong>（路径前缀）<br><br>好处：<br>• 原来一个巨大的 Bucket Policy → 拆成 N 个小的 Access Point Policy<br>• 每个团队管理自己的 Access Point Policy，互不干扰<br>• 主 Bucket Policy 只需要信任 Access Points 即可<br><br>VPC Access Point：<br>• 可以创建仅限 VPC 内部访问的 Access Point<br>• 需要配置 VPC Endpoint Policy 允许 → Access Point → Bucket 的完整链路',
+        ww: '为每个团队创建独立 Bucket 可行，但浪费（数据不能共享，难以跨团队分析）。Lifecycle Rules 管理的是存储类迁移，不是权限。IAM Role 管理用户身份，但解决不了"Bucket Policy 太复杂"的核心问题。Access Points 就是为这个场景设计的。',
+        rule: '多团队共享 Bucket 权限复杂 → S3 Access Points（每个团队独立 Access Point + 独立策略）'
+      },
+
+      {
+        id: 's3_19', topic: 'S3', diff: 'mid',
+        text: 'S3 <em>Select</em> 的核心价值是什么？它的性能提升来自哪里？',
+        en: 'What is the core value of S3 Select? Where does the performance improvement come from?',
+        ch: ['加速 S3 Replication；减少复制时间', '在 S3 服务端执行 SQL 过滤，只返回所需数据（减少数据传输量），提升速度高达 400%', '加速 Multi-Part Upload；分片并行压缩', '将 S3 数据自动转换格式（CSV 转 Parquet）'],
+        ench: ['Speeds up S3 replication; reduces replication time', 'Executes SQL filtering on the S3 server side, returning only needed data (reduces data transfer), improving speed up to 400%', 'Speeds up Multi-Part Upload with parallel compression', 'Auto-converts S3 data formats (CSV to Parquet)'],
+        ans: 1,
+        exp: '<strong>S3 Select（S3 数据选择）</strong>：<br><br>传统方案的问题：<br>① 下载整个 CSV/JSON 文件（可能 GB 级）<br>② 在应用层解析并过滤数据<br>③ 浪费网络带宽 + 增加应用处理时间<br><br>S3 Select 方案：<br>① 发送 SQL 表达式到 S3（如 SELECT * FROM S3Object WHERE age > 25）<br>② <strong>S3 服务器端</strong>在存储层直接执行过滤<br>③ 只返回符合条件的数据<br>④ 结果：<strong>网络传输减少高达 80%，速度提升高达 400%</strong><br><br>支持的格式：CSV、JSON、Apache Parquet（压缩：GZIP/BZIP2）<br><br><strong>Glacier Select</strong>：原理相同，用于查询 Glacier 中的归档数据，同样支持 SQL 过滤。',
+        ww: 'S3 Select 和复制、上传加速完全无关。格式转换是 S3 Batch Operations 或 Glue 的功能。S3 Select 核心：把"过滤计算"从客户端移到 S3 服务端，减少传输数据量 → 更快更省钱。',
+        rule: 'S3 Select = 服务端 SQL 过滤，只返回所需数据，减少传输 80%，速度提升 400%'
+      },
+
+      {
+        id: 's3_20', topic: 'S3', diff: 'high',
+        text: '在浏览器中，用户从网站 A（https://www.example.com）加载资源，页面 JS 尝试从 S3 静态网站 B 请求图片，但被浏览器阻止。需要如何解决？',
+        en: 'A browser loads a page from website A. A JavaScript call to fetch images from S3 static website B is blocked by the browser. What must be configured?',
+        ch: ['在网站 A 的服务器上配置 CORS 响应头', '在 S3 Bucket B 上配置 CORS 规则，允许来自 https://www.example.com 的请求', '在 S3 Bucket A 上配置 Bucket Policy 允许 Bucket B 访问', '使用 VPN 绕过浏览器安全策略'],
+        ench: ['Configure CORS response headers on website A server', 'Configure CORS rules on S3 Bucket B to allow requests from https://www.example.com', 'Configure a Bucket Policy on Bucket A to allow Bucket B access', 'Use a VPN to bypass browser security'],
+        ans: 1,
+        exp: '<strong>CORS 问题分析</strong>：<br><br>浏览器安全策略（同源策略）规定：<br>• 网页 JS 不能直接请求<strong>不同源</strong>（不同域名/协议/端口）的资源<br>• 需要目标服务器返回 CORS 头授权<br><br>谁需要配置 CORS？<br>• <strong>被请求的那一方</strong>（目标资源所在的服务器）需要配置<br>• 即 <strong>S3 Bucket B</strong>（图片所在的 Bucket）<br><br>配置内容：<br>AllowedHeaders: *<br>AllowedMethods: GET<br>AllowedOrigins: https://www.example.com<br>MaxAgeSeconds: 3000<br><br>类比：外国人来中国需要中国签发签证（目标国批准），不是本国审批。',
+        ww: '不是在网站 A 配置，而是在目标资源 Bucket B 配置。Bucket Policy 控制权限（谁能访问），不是 CORS（浏览器跨域）。VPN 是网络层方案，解决不了浏览器 CORS 限制。CORS 配置必须在被访问的目标 Bucket 上。',
+        rule: 'CORS 配置在被访问方（Bucket B），允许指定 Origin（Bucket A 的域名）才能让浏览器跨域加载'
       }
+
     ];
 
     /* ═══════════════ QUIZ STATE ═══════════════ */
@@ -3284,9 +3529,9 @@
       };
     })();
 
-    const TOPIC_PAGE = { 'IAM': 'iam', 'Security Group': 'security-groups', 'Load Balancer': 'elb', 'Auto Scaling Group': 'asg', 'EBS': 'ebs', '扩展性与高可用': 'scalability', '购买模式': 'purchasing', 'RDS': 'rds', 'ElastiCache': 'elasticache', 'Route 53': 'route53', '经典架构': 'classic-arch' };
+    const TOPIC_PAGE = { 'IAM': 'iam', 'Security Group': 'security-groups', 'Load Balancer': 'elb', 'Auto Scaling Group': 'asg', 'EBS': 'ebs', '扩展性与高可用': 'scalability', '购买模式': 'purchasing', 'RDS': 'rds', 'ElastiCache': 'elasticache', 'Route 53': 'route53', '经典架构': 'classic-arch', 'S3': 's3' };
 
-    const CONFUSED_TOPICS = { 'RDS': ['ElastiCache'], 'ElastiCache': ['RDS'], 'EBS': ['扩展性与高可用'], 'Load Balancer': ['Auto Scaling Group'], 'Auto Scaling Group': ['Load Balancer'], 'Security Group': ['IAM'], 'IAM': ['Security Group'], '购买模式': ['扩展性与高可用'], '扩展性与高可用': ['购买模式', 'EBS'], 'Route 53': ['Load Balancer'], '经典架构': ['Load Balancer', 'Auto Scaling Group', 'ElastiCache'] };
+    const CONFUSED_TOPICS = { 'RDS': ['ElastiCache', 'S3'], 'ElastiCache': ['RDS'], 'EBS': ['扩展性与高可用', 'S3'], 'Load Balancer': ['Auto Scaling Group'], 'Auto Scaling Group': ['Load Balancer'], 'Security Group': ['IAM'], 'IAM': ['Security Group'], '购买模式': ['扩展性与高可用'], '扩展性与高可用': ['购买模式', 'EBS'], 'Route 53': ['Load Balancer'], '经典架构': ['Load Balancer', 'Auto Scaling Group', 'ElastiCache'], 'S3': ['EBS', 'RDS', 'EFS'] };
 
     function getDueQuestions() {
       const now = Date.now();
@@ -3354,7 +3599,7 @@
       document.querySelectorAll('.mobile-nav-btn').forEach(b => b.classList.remove('active'));
       const mmap = { 'home': 0, 'compare': 1, 'quiz-home': 2, 'records': 3 };
       const mi = mmap[id]; if (mi !== undefined) { const mb = document.querySelectorAll('.mobile-nav-btn')[mi]; if (mb) mb.classList.add('active'); }
-      const renders = { home: pgHome, compare: pgCompare, 'quiz-home': pgQuizHome, records: pgRecords, iam: pgIAM, 'instance-types': pgInstanceTypes, 'security-groups': pgSecurityGroups, purchasing: pgPurchasing, 'ec2-network': pgEC2Network, scalability: pgScalability, elb: pgELB, asg: pgASG, ebs: pgEBS, 'ebs-types': pgEBSTypes, snapshot: pgSnapshot, istore: pgIStore, efs: pgEFS, ami: pgAMI, rds: pgRDS, elasticache: pgElastiCache, route53: pgRoute53, 'classic-arch': pgClassicArch };
+      const renders = { home: pgHome, compare: pgCompare, 'quiz-home': pgQuizHome, records: pgRecords, iam: pgIAM, 'instance-types': pgInstanceTypes, 'security-groups': pgSecurityGroups, purchasing: pgPurchasing, 'ec2-network': pgEC2Network, scalability: pgScalability, elb: pgELB, asg: pgASG, ebs: pgEBS, 'ebs-types': pgEBSTypes, snapshot: pgSnapshot, istore: pgIStore, efs: pgEFS, ami: pgAMI, rds: pgRDS, elasticache: pgElastiCache, route53: pgRoute53, 'classic-arch': pgClassicArch, s3: pgS3 };
       const v = document.getElementById('view');
       v.style.opacity = '0';
       setTimeout(() => { v.innerHTML = (renders[id] || pgHome)(); v.style.opacity = '1'; v.scrollTop = 0; updateSbProgress(); }, 80);
@@ -3368,7 +3613,7 @@
       if (bar) bar.style.width = pct + '%';
       if (txt) txt.textContent = pct + '% · ' + ov.done + '/' + QS.length;
       // per-topic rates in sidebar
-      const tmap = { 'IAM': 'sp-iam', 'Security Group': 'sp-sg', 'Load Balancer': 'sp-lb', 'Auto Scaling Group': 'sp-asg', 'EBS': 'sp-ebs', '扩展性与高可用': 'sp-ha', 'RDS': 'sp-rds', 'ElastiCache': 'sp-elasticache', 'Route 53': 'sp-r53', '经典架构': 'sp-ca' };
+      const tmap = { 'IAM': 'sp-iam', 'Security Group': 'sp-sg', 'Load Balancer': 'sp-lb', 'Auto Scaling Group': 'sp-asg', 'EBS': 'sp-ebs', '扩展性与高可用': 'sp-ha', 'RDS': 'sp-rds', 'ElastiCache': 'sp-elasticache', 'Route 53': 'sp-r53', '经典架构': 'sp-ca', 'S3': 'sp-s3' };
       Object.entries(tmap).forEach(([tp, elId]) => {
         const el = document.getElementById(elId);
         if (!el) return;
@@ -3484,6 +3729,11 @@
         {
           label: '架构与平台', color: '#F59E0B', items: [
             { id: 'classic-arch', icon: '🏗️', name: '经典架构', desc: 'WhatIsTheTime · MyClothes · Beanstalk · 三层架构', tags: [{ t: '⭐高频', c: '#C0392B', bg: '#FEF0EE' }, { t: '架构演进', c: '#0369A1', bg: '#EFF6FF' }] }
+          ]
+        },
+        {
+          label: '对象存储', color: '#E8831A', items: [
+            { id: 's3', icon: '🪣', name: 'Amazon S3', desc: '存储类 · 加密 · 生命周期 · 复制 · 预签名 URL · Object Lock', tags: [{ t: '⭐极高频', c: '#C0392B', bg: '#FEF0EE' }, { t: 'Section 12', c: '#0369A1', bg: '#EFF6FF' }] }
           ]
         }
       ];
@@ -5892,6 +6142,383 @@ Sub-ms 延迟 / 极致 IOPS                  → io2 Block Express（最高 256,
   <div class="trap amber"><span class="trap-icon">⚠️</span><div><strong>开发者只想上传代码 → Elastic Beanstalk<span class="trap-freq">高频</span></strong>Beanstalk 自动管理 EC2/ASG/ELB，开发者只负责代码。本身免费，为底层资源付费。</div></div>
   <div class="trap amber"><span class="trap-icon">⚠️</span><div><strong>Worker Tier 扩缩依据是 SQS 消息数<span class="trap-freq">中频</span></strong>Web Tier 按 HTTP 请求/CPU 扩缩。Worker Tier 专门根据 SQS 积压消息数动态扩缩。</div></div>
   <div class="trap amber"><span class="trap-icon">⚠️</span><div><strong>Beanstalk 免费，底层资源付费<span class="trap-freq">中频</span></strong>Beanstalk 服务本身不收费。运行的 EC2、RDS、ELB 等资源按正常价格计费。</div></div>
+</div>
+`}
+
+
+    /* ═══════════════ S3 PAGE ═══════════════ */
+    function pgS3() {
+      return `${back()}
+<div class="pg-title">Amazon S3 — 简单存储服务</div>
+<div class="pg-tags">
+  <span class="tag tag-high">⭐ 极高频必考</span>
+  <span class="tag tag-mid">Section 12</span>
+  <span class="tag tag-low">对象存储 · 加密 · 生命周期 · 复制</span>
+</div>
+
+<div class="s-card">
+  <h3>🪣 S3 是什么？— What</h3>
+  <p style="color:var(--ink2);font-size:15px;line-height:1.8"><strong>Amazon S3（Simple Storage Service，简单存储服务）</strong>是 AWS 的<strong>对象存储（Object Storage）</strong>服务。类比：把 S3 想象成一个<strong>无限容量的网盘</strong>——你上传文件，AWS 负责存储、冗余、持久性，你只需要通过 HTTP 读写数据，无需管理任何服务器或磁盘。</p>
+  <div class="g2" style="margin-top:14px">
+    <div style="background:var(--aws-bg);border:1.5px solid var(--aws-border);border-radius:8px;padding:12px">
+      <div style="font-size:12px;font-weight:700;color:var(--aws);margin-bottom:8px">S3 两大核心概念</div>
+      <div class="bl">
+        <div class="bl-item"><span class="bl-dot"></span><strong>Bucket（桶）</strong> — 存放对象的顶级容器，类比"文件夹的根目录"</div>
+        <div class="bl-item"><span class="bl-dot"></span><strong>Object（对象）</strong> — 实际存储的文件，由 Key（键）+ Value（数据）+ Metadata 组成</div>
+        <div class="bl-item"><span class="bl-dot"></span>Bucket 名称<strong>全球唯一</strong>（跨所有账号），但 Bucket 是 <strong>Region 级别</strong>资源</div>
+        <div class="bl-item"><span class="bl-dot"></span>Object Key = 完整路径（如 <code>photos/2024/cat.jpg</code>），S3 中没有真正的"文件夹"</div>
+      </div>
+    </div>
+    <div style="background:var(--blue-bg);border:1.5px solid var(--blue-border);border-radius:8px;padding:12px">
+      <div style="font-size:12px;font-weight:700;color:var(--blue);margin-bottom:8px">Object 的组成</div>
+      <div class="bl">
+        <div class="bl-item"><span class="bl-dot"></span><strong>Key</strong> — 对象在 Bucket 中的唯一标识（完整路径）</div>
+        <div class="bl-item"><span class="bl-dot"></span><strong>Value</strong> — 实际数据（字节序列）</div>
+        <div class="bl-item"><span class="bl-dot"></span><strong>单个最大 5 TB</strong>，>100 MB 推荐 Multi-Part，>5 GB 必须 Multi-Part</div>
+        <div class="bl-item"><span class="bl-dot"></span><strong>Metadata</strong> — 键值对（系统/用户自定义）</div>
+        <div class="bl-item"><span class="bl-dot"></span><strong>Tags</strong> — 最多 10 个，用于生命周期/权限控制</div>
+        <div class="bl-item"><span class="bl-dot"></span><strong>Version ID</strong> — 开启 Versioning 后存在</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="s-card">
+  <h3>🔐 S3 安全模型 — Security</h3>
+  <div style="background:var(--surface2);border-radius:10px;padding:14px;margin-bottom:14px">
+    <div style="font-size:12px;font-weight:700;color:var(--ink3);margin-bottom:10px;text-transform:uppercase">权限控制三层架构</div>
+    <div class="flow">
+      <div class="flow-step">
+        <div class="flow-n">1</div>
+        <div class="flow-body"><strong>IAM Policy</strong>（用户层）— 定义<em>哪个 IAM 用户/角色</em>可以做什么操作。适合管理内部 AWS 用户权限</div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-n">2</div>
+        <div class="flow-body"><strong>Bucket Policy</strong>（资源层）— JSON 格式，直接绑定在 Bucket 上，可以授权<em>其他 AWS 账号</em>或<em>公网用户</em>访问，是跨账号共享和公开访问的核心工具</div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-n">3</div>
+        <div class="flow-body"><strong>Block Public Access</strong>（防护层）— 账号或 Bucket 级别的安全开关，<strong>覆盖并忽略</strong>任何授予 public 访问的 Policy/ACL。防止意外数据泄露的最后防线</div>
+      </div>
+    </div>
+  </div>
+  <div class="g2">
+    <div style="background:#FEF9EB;border:1.5px solid #F59E0B44;border-radius:8px;padding:12px">
+      <div style="font-size:12px;font-weight:700;color:#B45309;margin-bottom:8px">Bucket Policy 结构</div>
+      <div style="font-size:12px;color:var(--ink2);line-height:1.8">
+        <code>Principal</code> — 谁（账号/用户）<br>
+        <code>Action</code> — 什么操作（s3:GetObject）<br>
+        <code>Resource</code> — 哪个 Bucket/对象<br>
+        <code>Effect</code> — Allow / Deny<br>
+        Resource-based，不依赖 IAM
+      </div>
+    </div>
+    <div style="background:#FEF0EE;border:1.5px solid #C0392B44;border-radius:8px;padding:12px">
+      <div style="font-size:12px;font-weight:700;color:#C0392B;margin-bottom:8px">Block Public Access（新账号默认开启）</div>
+      <div class="bl">
+        <div class="bl-item"><span class="bl-dot" style="background:#C0392B"></span>BlockPublicAcls — 禁止新建公开 ACL</div>
+        <div class="bl-item"><span class="bl-dot" style="background:#C0392B"></span>IgnorePublicAcls — 忽略已有公开 ACL</div>
+        <div class="bl-item"><span class="bl-dot" style="background:#C0392B"></span>BlockPublicPolicy — 禁止新建公开 Policy</div>
+        <div class="bl-item"><span class="bl-dot" style="background:#C0392B"></span>RestrictPublicBuckets — 拒绝公开 Policy 生效</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="s-card">
+  <h3>🔄 S3 Versioning（版本控制）</h3>
+  <div style="background:var(--surface2);border-radius:10px;padding:14px;margin-bottom:14px">
+    <div style="font-size:12px;font-weight:700;color:var(--ink3);margin-bottom:10px;text-transform:uppercase">Versioning 工作机制</div>
+    <div class="flow">
+      <div class="flow-step">
+        <div class="flow-n">1</div>
+        <div class="flow-body">开启 Versioning 前已有的对象：Version ID = <strong>null</strong>（"null 版本"）</div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-n">2</div>
+        <div class="flow-body">上传同名文件 → 不覆盖，而是创建新版本（新 Version ID）</div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-n">3</div>
+        <div class="flow-body"><strong>删除对象</strong> → 只是添加一个 <strong>Delete Marker</strong>（软删除），数据未丢失</div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-n">4</div>
+        <div class="flow-body">恢复对象 → 删除那个 Delete Marker → 最新版本重新可见</div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-n">5</div>
+        <div class="flow-body">永久删除 → 必须指定具体的 <strong>Version ID</strong> 进行删除（不可恢复）</div>
+      </div>
+    </div>
+  </div>
+  <div style="background:#F0FFF4;border:1.5px solid #34D39944;border-radius:8px;padding:12px">
+    <div style="font-size:12px;font-weight:700;color:#065F46;margin-bottom:6px">MFA Delete（双重保护）</div>
+    <div style="font-size:13px;color:var(--ink2);line-height:1.8">
+      需要 MFA 的操作：① <strong>永久删除某个版本</strong> ② <strong>暂停 Versioning</strong><br>
+      限制：<strong>只有 root 账号</strong>可以通过 CLI 启用（控制台无此选项），且必须先开启 Versioning
+    </div>
+  </div>
+</div>
+
+<div class="s-card">
+  <h3>🌍 S3 Replication（复制）</h3>
+  <div class="g2" style="margin-bottom:14px">
+    <div style="background:var(--aws-bg);border:1.5px solid var(--aws-border);border-radius:8px;padding:12px">
+      <div style="font-size:12px;font-weight:700;color:var(--aws);margin-bottom:8px">CRR — 跨 Region 复制</div>
+      <div class="bl">
+        <div class="bl-item"><span class="bl-dot"></span>Copy to <strong>different Region</strong></div>
+        <div class="bl-item"><span class="bl-dot"></span>用途：合规、低延迟读取、灾备</div>
+        <div class="bl-item"><span class="bl-dot"></span>例：us-east-1 → eu-west-1</div>
+      </div>
+    </div>
+    <div style="background:var(--blue-bg);border:1.5px solid var(--blue-border);border-radius:8px;padding:12px">
+      <div style="font-size:12px;font-weight:700;color:var(--blue);margin-bottom:8px">SRR — 同 Region 复制</div>
+      <div class="bl">
+        <div class="bl-item"><span class="bl-dot"></span>Copy to <strong>same Region</strong></div>
+        <div class="bl-item"><span class="bl-dot"></span>用途：日志聚合、生产→测试同步</div>
+        <div class="bl-item"><span class="bl-dot"></span>例：us-east-1 → us-east-1</div>
+      </div>
+    </div>
+  </div>
+  <div style="background:#FEF9EB;border:1.5px solid #F59E0B44;border-radius:8px;padding:12px">
+    <div style="font-size:12px;font-weight:700;color:#B45309;margin-bottom:8px">⚠️ 复制的重要规则</div>
+    <div class="g2-sm">
+      <div class="bl">
+        <div class="bl-item"><span class="bl-dot" style="background:#B45309"></span>源和目标 Bucket <strong>都必须开启 Versioning</strong></div>
+        <div class="bl-item"><span class="bl-dot" style="background:#B45309"></span>复制是<strong>异步（Async）</strong>进行</div>
+        <div class="bl-item"><span class="bl-dot" style="background:#B45309"></span>需要配置 <strong>IAM 权限</strong>（允许 S3 读源/写目标）</div>
+      </div>
+      <div class="bl">
+        <div class="bl-item"><span class="bl-dot" style="background:#B45309"></span>只复制激活后<strong>新上传</strong>的对象</div>
+        <div class="bl-item"><span class="bl-dot" style="background:#B45309"></span>旧对象用 <strong>S3 Batch Replication</strong></div>
+        <div class="bl-item"><span class="bl-dot" style="background:#B45309"></span>Delete Marker 默认<strong>不复制</strong>（可选开启）</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="s-card">
+  <h3>🗂️ S3 存储类（Storage Classes）</h3>
+  <div class="tbl-wrap">
+    <table>
+      <thead><tr><th>存储类</th><th>可用性</th><th>AZ数</th><th>最低存储期</th><th>检索费</th><th>适用场景</th></tr></thead>
+      <tbody>
+        <tr><td><strong>Standard</strong></td><td>99.99%</td><td>≥3</td><td>无</td><td>无</td><td>频繁访问的数据</td></tr>
+        <tr><td><strong>Standard-IA</strong></td><td>99.9%</td><td>≥3</td><td>30天</td><td>有</td><td>不频繁访问，需快速取回</td></tr>
+        <tr style="background:#FEF9EB"><td><strong>One Zone-IA</strong></td><td>99.5%</td><td><strong>1个</strong></td><td>30天</td><td>有</td><td>可再生成的数据，容忍 AZ 故障</td></tr>
+        <tr><td><strong>Glacier Instant</strong></td><td>99.9%</td><td>≥3</td><td>90天</td><td>高</td><td>极少访问，需毫秒检索</td></tr>
+        <tr><td><strong>Glacier Flexible</strong></td><td>99.99%</td><td>≥3</td><td>90天</td><td>有</td><td>极少访问，1分钟~12小时可接受</td></tr>
+        <tr style="background:#EFF6FF"><td><strong>Deep Archive</strong></td><td>99.99%</td><td>≥3</td><td><strong>180天</strong></td><td>有</td><td>合规归档，12~48小时检索</td></tr>
+        <tr><td><strong>Intelligent-Tiering</strong></td><td>99.9%</td><td>≥3</td><td>无</td><td>无检索费</td><td>访问模式不可预测</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div style="margin-top:12px;background:#F5F3FF;border:1.5px solid #C4B5FD;border-radius:8px;padding:12px">
+    <div style="font-size:12px;font-weight:700;color:#6D28D9;margin-bottom:6px">Glacier Flexible Retrieval 检索速度</div>
+    <div style="font-size:13px;color:var(--ink2);display:flex;gap:20px;flex-wrap:wrap">
+      <span><strong>Expedited</strong>：1-5 分钟</span>
+      <span><strong>Standard</strong>：3-5 小时</span>
+      <span><strong>Bulk</strong>：5-12 小时（最便宜）</span>
+    </div>
+  </div>
+</div>
+
+<div class="s-card">
+  <h3>⏰ S3 Lifecycle Rules（生命周期规则）</h3>
+  <div style="background:var(--surface2);border-radius:10px;padding:14px;margin-bottom:14px">
+    <div style="font-size:12px;font-weight:700;color:var(--ink3);margin-bottom:10px;text-transform:uppercase">典型生命周期示例：日志数据</div>
+    <div style="display:flex;align-items:center;flex-wrap:wrap;gap:6px;font-size:13px">
+      <div style="background:var(--aws-bg);border:1.5px solid var(--aws-border);border-radius:6px;padding:6px 10px;text-align:center"><strong>0天</strong><br><span style="color:var(--ink3)">Standard</span></div>
+      <div style="color:var(--ink3)">→ 30天 →</div>
+      <div style="background:var(--blue-bg);border:1.5px solid var(--blue-border);border-radius:6px;padding:6px 10px;text-align:center"><strong>30天</strong><br><span style="color:var(--blue)">Standard-IA</span></div>
+      <div style="color:var(--ink3)">→ 90天 →</div>
+      <div style="background:#F5F3FF;border:1.5px solid #C4B5FD;border-radius:6px;padding:6px 10px;text-align:center"><strong>90天</strong><br><span style="color:#6D28D9">Glacier Flexible</span></div>
+      <div style="color:var(--ink3)">→ 365天 →</div>
+      <div style="background:#FEF0EE;border:1.5px solid #C0392B44;border-radius:6px;padding:6px 10px;text-align:center"><strong>365天</strong><br><span style="color:#C0392B">删除</span></div>
+    </div>
+  </div>
+  <div class="g2">
+    <div style="background:var(--green-bg);border:1.5px solid var(--green-border);border-radius:8px;padding:12px">
+      <div style="font-size:12px;font-weight:700;color:var(--green);margin-bottom:8px">Transition Actions（转换）</div>
+      <div class="bl">
+        <div class="bl-item"><span class="bl-dot" style="background:var(--green)"></span>N 天后移动到另一存储类</div>
+        <div class="bl-item"><span class="bl-dot" style="background:var(--green)"></span>可以设置多个阶段（阶梯迁移）</div>
+        <div class="bl-item"><span class="bl-dot" style="background:var(--green)"></span>按 prefix 或 tag 过滤</div>
+      </div>
+    </div>
+    <div style="background:#FEF0EE;border:1.5px solid #C0392B44;border-radius:8px;padding:12px">
+      <div style="font-size:12px;font-weight:700;color:#C0392B;margin-bottom:8px">Expiration Actions（过期删除）</div>
+      <div class="bl">
+        <div class="bl-item"><span class="bl-dot" style="background:#C0392B"></span>N 天后永久删除对象</div>
+        <div class="bl-item"><span class="bl-dot" style="background:#C0392B"></span>删除旧版本（Versioning 开启时）</div>
+        <div class="bl-item"><span class="bl-dot" style="background:#C0392B"></span>清理未完成的 Multipart Upload</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="s-card">
+  <h3>🔒 S3 加密（4种方式）</h3>
+  <div style="background:var(--surface2);border-radius:10px;padding:14px;margin-bottom:14px">
+    <div style="font-size:12px;font-weight:700;color:var(--ink3);margin-bottom:12px;text-transform:uppercase">加密方式对比</div>
+    <div class="flow">
+      <div class="flow-step">
+        <div class="flow-n" style="background:var(--green)">1</div>
+        <div class="flow-body">
+          <strong>SSE-S3（默认）</strong> — AWS 托管密钥，AES-256<br>
+          请求头：<code>x-amz-server-side-encryption: AES256</code><br>
+          完全透明，无额外费用
+        </div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-n" style="background:var(--blue)">2</div>
+        <div class="flow-body">
+          <strong>SSE-KMS</strong> — AWS KMS 管理密钥<br>
+          请求头：<code>x-amz-server-side-encryption: aws:kms</code><br>
+          CloudTrail 审计 ⚠️ <strong>KMS API 限流</strong>，高并发需申请提升配额
+        </div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-n" style="background:#F59E0B">3</div>
+        <div class="flow-body">
+          <strong>SSE-C</strong> — 客户自提供密钥<br>
+          必须使用 <strong>HTTPS</strong>，密钥在请求头传输，AWS 用完即丢
+        </div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-n" style="background:#8B5CF6">4</div>
+        <div class="flow-body">
+          <strong>Client-Side Encryption</strong> — 客户端加密后再上传<br>
+          AWS 存储的始终是加密后的密文
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="s-card">
+  <h3>⚡ S3 性能优化</h3>
+  <div class="g2" style="margin-bottom:14px">
+    <div style="background:var(--aws-bg);border:1.5px solid var(--aws-border);border-radius:8px;padding:12px">
+      <div style="font-size:12px;font-weight:700;color:var(--aws);margin-bottom:8px">基准吞吐量（每 prefix）</div>
+      <div style="text-align:center;padding:8px 0">
+        <div style="font-size:22px;font-weight:800;color:var(--aws)">3,500</div>
+        <div style="font-size:11px;color:var(--ink3)">PUT/COPY/POST/DELETE 每秒</div>
+        <div style="font-size:22px;font-weight:800;color:var(--blue);margin-top:8px">5,500</div>
+        <div style="font-size:11px;color:var(--ink3)">GET/HEAD 每秒</div>
+      </div>
+      <div style="font-size:12px;color:var(--ink3);margin-top:8px">prefix 越多，总吞吐越高（随 prefix 数线性扩展）</div>
+    </div>
+    <div style="background:var(--blue-bg);border:1.5px solid var(--blue-border);border-radius:8px;padding:12px">
+      <div style="font-size:12px;font-weight:700;color:var(--blue);margin-bottom:8px">三大加速工具</div>
+      <div class="bl">
+        <div class="bl-item"><span class="bl-dot"></span><strong>Multi-Part Upload</strong> — 大文件分片并行上传，>100MB 推荐，>5GB 必须</div>
+        <div class="bl-item"><span class="bl-dot"></span><strong>Transfer Acceleration</strong> — 使用 CloudFront 边缘节点接收上传，走 AWS 专线到目标 Region（跨地域上传利器）</div>
+        <div class="bl-item"><span class="bl-dot"></span><strong>Byte-Range Fetches</strong> — 分块并行 GET，加速下载；也可只取文件特定字节（如只读文件头）</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="s-card">
+  <h3>📣 S3 Event Notifications + 🛡️ 高级安全功能</h3>
+  <div class="g2" style="margin-bottom:14px">
+    <div style="background:var(--surface2);border-radius:8px;padding:12px">
+      <div style="font-size:12px;font-weight:700;color:var(--ink2);margin-bottom:8px">Event Notifications 目的地</div>
+      <div class="bl">
+        <div class="bl-item"><span class="bl-dot"></span>直接：<strong>SNS / SQS / Lambda</strong></div>
+        <div class="bl-item"><span class="bl-dot"></span>通过 <strong>EventBridge</strong>：18+ 目的地，支持所有事件类型，高级过滤</div>
+      </div>
+    </div>
+    <div style="background:#FEF0EE;border:1.5px solid #C0392B44;border-radius:8px;padding:12px">
+      <div style="font-size:12px;font-weight:700;color:#C0392B;margin-bottom:8px">Object Lock — WORM 模型</div>
+      <div class="bl">
+        <div class="bl-item"><span class="bl-dot" style="background:#C0392B"></span><strong>Compliance</strong>：连 root 都不能删，Retention 不可缩短</div>
+        <div class="bl-item"><span class="bl-dot" style="background:#C0392B"></span><strong>Governance</strong>：特权用户可绕过，更灵活</div>
+        <div class="bl-item"><span class="bl-dot" style="background:#C0392B"></span><strong>Legal Hold</strong>：无到期，手动解除</div>
+      </div>
+    </div>
+  </div>
+  <div class="g2">
+    <div style="background:#F5F3FF;border:1.5px solid #C4B5FD;border-radius:8px;padding:12px">
+      <div style="font-size:12px;font-weight:700;color:#6D28D9;margin-bottom:8px">Pre-signed URL（预签名 URL）</div>
+      <div class="bl">
+        <div class="bl-item"><span class="bl-dot" style="background:#6D28D9"></span>以生成者的身份授权临时访问</div>
+        <div class="bl-item"><span class="bl-dot" style="background:#6D28D9"></span>控制台最长 <strong>12 小时</strong>，CLI 最长 <strong>168 小时</strong></div>
+        <div class="bl-item"><span class="bl-dot" style="background:#6D28D9"></span>临时下载/上传私有对象</div>
+      </div>
+    </div>
+    <div style="background:var(--surface2);border-radius:8px;padding:12px">
+      <div style="font-size:12px;font-weight:700;color:var(--ink2);margin-bottom:8px">Access Logs / S3 Select</div>
+      <div class="bl">
+        <div class="bl-item"><span class="bl-dot"></span>Access Logs：<strong>必须写到另一个 Bucket</strong>（同 Bucket = 无限循环！）</div>
+        <div class="bl-item"><span class="bl-dot"></span>S3 Select：服务端 SQL 过滤，减少传输 80%，速度提升 400%</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="s-card">
+  <h3>🔗 S3 Access Points &amp; CORS</h3>
+  <div class="g2">
+    <div style="background:var(--aws-bg);border:1.5px solid var(--aws-border);border-radius:8px;padding:12px">
+      <div style="font-size:12px;font-weight:700;color:var(--aws);margin-bottom:8px">S3 Access Points（访问点）</div>
+      <div style="background:var(--surface2);border-radius:8px;padding:10px;margin-bottom:8px;font-size:12px;text-align:center;line-height:2;color:var(--ink2)">
+        <span style="background:var(--aws-bg);border:1px solid var(--aws-border);border-radius:4px;padding:2px 8px">S3 Bucket</span>
+        <br>↙ ↓ ↘<br>
+        <span style="background:var(--blue-bg);border:1px solid var(--blue-border);border-radius:4px;padding:2px 6px;font-size:11px">AP-Finance</span>
+        <span style="margin:0 4px;background:var(--blue-bg);border:1px solid var(--blue-border);border-radius:4px;padding:2px 6px;font-size:11px">AP-Sales</span>
+        <span style="background:var(--blue-bg);border:1px solid var(--blue-border);border-radius:4px;padding:2px 6px;font-size:11px">AP-DevOps</span>
+        <br><span style="font-size:11px">各有独立 DNS + 独立 Policy</span>
+      </div>
+      <div class="bl">
+        <div class="bl-item"><span class="bl-dot"></span>替代复杂 Bucket Policy，每个 AP 独立管理</div>
+        <div class="bl-item"><span class="bl-dot"></span>可绑定 VPC（仅 VPC 内访问）</div>
+      </div>
+    </div>
+    <div style="background:var(--blue-bg);border:1.5px solid var(--blue-border);border-radius:8px;padding:12px">
+      <div style="font-size:12px;font-weight:700;color:var(--blue);margin-bottom:8px">CORS（跨源资源共享）</div>
+      <div style="background:var(--surface2);border-radius:8px;padding:10px;font-size:12px;line-height:1.9;margin-bottom:8px;color:var(--ink2)">
+        浏览器 → 网站A的JS → 请求 <strong>Bucket B</strong> 的图片<br>
+        ⚠️ 跨源！配置在 <strong>被访问的 Bucket B</strong> 上
+      </div>
+      <div class="bl">
+        <div class="bl-item"><span class="bl-dot"></span>配置 <code>AllowedOrigins</code> 允许特定域名</div>
+        <div class="bl-item"><span class="bl-dot"></span>仅浏览器场景需要，后端 SDK 不需要</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="s-card" style="border-left:4px solid var(--aws);background:linear-gradient(135deg,var(--aws-bg),var(--surface))">
+  <h3>🎯 考试重点</h3>
+  <div class="g3-sm">
+    <div style="background:var(--surface);border-radius:8px;padding:10px">
+      <div style="font-size:11px;font-weight:700;color:var(--aws);margin-bottom:6px">场景 1：合规存储不可删除</div>
+      <div style="font-size:12px;color:var(--ink2);line-height:1.7">任何人含 root 不能删 → Object Lock <strong>Compliance 模式</strong></div>
+    </div>
+    <div style="background:var(--surface);border-radius:8px;padding:10px">
+      <div style="font-size:11px;font-weight:700;color:var(--blue);margin-bottom:6px">场景 2：存储类选择</div>
+      <div style="font-size:12px;color:var(--ink2);line-height:1.7">极少+毫秒检索 → <strong>Glacier Instant</strong><br>12h可接受+>180天 → <strong>Deep Archive</strong><br>不可预测 → <strong>Intelligent-Tiering</strong></div>
+    </div>
+    <div style="background:var(--surface);border-radius:8px;padding:10px">
+      <div style="font-size:11px;font-weight:700;color:#C0392B;margin-bottom:6px">场景 3：安全陷阱</div>
+      <div style="font-size:12px;color:var(--ink2);line-height:1.7">日志写同 Bucket → 无限循环❌<br>MFA Delete 只有 root 能开<br>Block Public Access 覆盖 Policy</div>
+    </div>
+    <div style="background:var(--surface);border-radius:8px;padding:10px">
+      <div style="font-size:11px;font-weight:700;color:var(--green);margin-bottom:6px">场景 4：性能优化</div>
+      <div style="font-size:12px;color:var(--ink2);line-height:1.7">跨地域上传慢 → Transfer Acceleration<br>大文件下载慢 → Byte-Range Fetches<br>查询 CSV/JSON → S3 Select</div>
+    </div>
+    <div style="background:var(--surface);border-radius:8px;padding:10px">
+      <div style="font-size:11px;font-weight:700;color:#6D28D9;margin-bottom:6px">场景 5：临时访问</div>
+      <div style="font-size:12px;color:var(--ink2);line-height:1.7">临时分享私有对象 → <strong>Pre-signed URL</strong>（最长168h）</div>
+    </div>
+    <div style="background:var(--surface);border-radius:8px;padding:10px">
+      <div style="font-size:11px;font-weight:700;color:#B45309;margin-bottom:6px">场景 6：复制规则</div>
+      <div style="font-size:12px;color:var(--ink2);line-height:1.7">跨 Region 灾备 → CRR<br>旧对象也要复制 → S3 Batch Replication<br>两端必须开 Versioning</div>
+    </div>
+  </div>
 </div>
 `}
 
